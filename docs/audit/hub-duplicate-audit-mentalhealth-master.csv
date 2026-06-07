@@ -1,0 +1,15 @@
+kind,hub,cluster_key,count,members
+angle_batch,compare,kyushoku-shushoku,2,s31-kyushoku-shushoku:休職支援と就業配慮の違い | s32-kyushoku-shushoku:休職手続と復職手続の違い
+angle_batch,compare,line-sangyoui,2,s32-line-sangyoui:ラインケアと産業医連携 | s34-line-sangyoui:ラインケアと産業医面接
+angle_batch,compare,privacy-limited,2,s32-privacy-limited:情報の限定提供と共有範囲 | s34-privacy-limited:限定提供と情報共有範囲
+angle_batch,numbers,fukki-step-days,2,s31-fukki-step-days:段階的復職ステップ管理 | s34-fukki-step-days:段階的復職の日数目安
+angle_batch,numbers,kenshu-frequency,2,s31-kenshu-frequency:管理監督者研修の実施頻度 | s34-kenshu-frequency:管理監督者研修頻度
+angle_batch,numbers,kenshu-hours,2,s32-kenshu-hours:管理監督者研修の時間・頻度 | s33-kenshu-hours:管理監督者研修時間
+angle_batch,numbers,kyushoku-period,2,s32-kyushoku-period:休職期間の管理・記録 | s34-kyushoku-period:休職期間の管理記録
+angle_batch,numbers,mensetsu-timing,2,s32-mensetsu-timing:医師面接・面接指導の実施タイミング | s34-mensetsu-timing:医師面接の実施タイミング
+angle_batch,numbers,record-retention,3,s31-record-retention:相談・健診記録の保存確認 | s33-record-retention:相談記録の保存管理 | s34-record-retention:相談記録の保存期間
+angle_batch,numbers,shudan-cycle,2,s32-shudan-cycle:集団分析の実施サイクル | s38-shudan-cycle:集団分析の数値整理（判例・ガイド）
+angle_batch,numbers,youkou-review,2,s32-youkou-review:要項・ガイドライン確認回数 | s34-youkou-review:要項確認回数
+angle_batch,mistakes,kon-harassment,3,s32-kon-harassment:ハラスメント対応主体の取り違え | s33-kon-harassment:ハラスメント対応主体の誤認 | s34-kon-harassment:ハラスメント初動の逆転
+angle_batch,mistakes,kon-kyushoku,2,s32-kon-kyushoku:休職と解雇手続の混同 | s34-kon-kyushoku:休職と復職手続の混同
+angle_batch,mistakes,kon-privacy,2,s32-kon-privacy:情報共有範囲の拡大誤認 | s34-kon-privacy:情報限定提供の拡大誤認

@@ -1,0 +1,19 @@
+# フェーズ1・2完了後の追加分（html_footer / build_glossary 等は SITE.md §3 手動マージ済み想定）
+# 正本: docs/integration-checklist.md §6.4
+
+site-q-index.js
+site-terms-index.js
+
+tools/build_practice_ichimon_pages.py
+tools/csv_to_exam_site_past_js.py
+tools/csv_to_exam_site_ichimondou_js.py
+tools/import_orig_questions_to_practice_csv.py
+tools/import_base_questions_to_ichimon_csv.py
+tools/validate_site_integration.py
+tools/audit_integration_rules.py
+
+docs/integration-checklist.md
+docs/question-static-pages.md
+
+.cursor/rules/practice-ichimon-static.mdc
+.cursor/rules/site-integration.mdc

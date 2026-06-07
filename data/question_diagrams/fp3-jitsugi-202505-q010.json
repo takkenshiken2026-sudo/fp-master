@@ -1,0 +1,10 @@
+{
+  "type": "fp_materials",
+  "sections": [
+    {
+      "type": "fp_text_block",
+      "title": "土地登記記録の構成",
+      "body": "土地登記記録\n表題部 （ ア ）\n権利部 甲区 （ イ ）\n乙区 （ ウ ）"
+    }
+  ]
+}

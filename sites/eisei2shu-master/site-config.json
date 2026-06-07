@@ -1,0 +1,280 @@
+{
+  "brandName": "二衛マスター",
+  "brandMark": "二衛",
+  "examName": "第二種衛生管理者試験",
+  "siteOrigin": "https://eisei2shu-master.jp",
+  "contactUrl": "https://forms.gle/51E5d6D41BZETjhY6",
+  "ga4MeasurementId": "",
+  "copyright": "",
+  "footerDisclaimer": "学習用のコンテンツです。出題・法令の正確な内容は厚生労働省・安全衛生技術試験協会などの公式情報で必ず確認してください。",
+  "officialOrganization": "安全衛生技術試験協会",
+  "learningNavLabelOverrides": {
+    "tnav-orig": "オリジナル問題"
+  },
+  "theme": {
+    "accent": "#4a8f6a",
+    "accentText": "#ffffff",
+    "background": "#f4f4f5",
+    "surface": "#ffffff",
+    "surfaceAlt": "#f4f4f5",
+    "text": "#111111",
+    "textMuted": "#555555",
+    "border": "rgba(0, 0, 0, 0.09)",
+    "radius": "10px",
+    "navWidth": "1080px",
+    "contentWidth": "1080px"
+  },
+  "navigation": {
+    "header": [
+      {
+        "label": "トップ",
+        "href": "index.html",
+        "key": "top"
+      },
+      {
+        "label": "このサイトについて",
+        "href": "about.html",
+        "key": "about"
+      },
+      {
+        "label": "過去問一覧",
+        "href": "q/index.html",
+        "key": "q"
+      },
+      {
+        "label": "用語解説",
+        "href": "terms/index.html",
+        "key": "terms"
+      },
+      {
+        "label": "試験ガイド",
+        "href": "articles/index.html",
+        "key": "articles"
+      },
+      {
+        "label": "関連リンク",
+        "href": "related-sites.html",
+        "key": "related"
+      },
+      {
+        "label": "プライバシー",
+        "href": "privacy-terms.html",
+        "key": "privacy"
+      }
+    ],
+    "footer": [
+      {
+        "label": "トップ",
+        "href": "index.html",
+        "key": "top"
+      },
+      {
+        "label": "このサイトについて",
+        "href": "about.html",
+        "key": "about"
+      },
+      {
+        "label": "過去問一覧",
+        "href": "q/index.html",
+        "key": "q"
+      },
+      {
+        "label": "用語解説",
+        "href": "terms/index.html",
+        "key": "terms"
+      },
+      {
+        "label": "試験ガイド",
+        "href": "articles/index.html",
+        "key": "articles"
+      },
+      {
+        "label": "関連リンク",
+        "href": "related-sites.html",
+        "key": "related"
+      },
+      {
+        "label": "プライバシー",
+        "href": "privacy-terms.html",
+        "key": "privacy"
+      },
+      {
+        "label": "お問い合わせ",
+        "href": "__CONTACT__",
+        "key": "contact"
+      }
+    ]
+  },
+  "guideArticleGenres": [
+    {
+      "id": "overview",
+      "label": "試験概要",
+      "phase": "制度を知る",
+      "style": "overview",
+      "hint": "試験の全体像・公式情報の見方"
+    },
+    {
+      "id": "application",
+      "label": "受験・申込",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "受験資格・日程・手数料"
+    },
+    {
+      "id": "pass-stats",
+      "label": "合格・難易度",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "合格率・合格点・統計"
+    },
+    {
+      "id": "exam-scope",
+      "label": "出題・形式",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "出題範囲・科目構成"
+    },
+    {
+      "id": "study-plan",
+      "label": "学習計画",
+      "phase": "学習を設計する",
+      "style": "study",
+      "hint": "学習期間・週間表"
+    },
+    {
+      "id": "self-study",
+      "label": "独学対策",
+      "phase": "学習を設計する",
+      "style": "study",
+      "hint": "独学の進め方・教材"
+    },
+    {
+      "id": "past-questions",
+      "label": "過去問活用",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "過去問・解き直し"
+    },
+    {
+      "id": "field-study",
+      "label": "分野別対策",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "関係法令・労働衛生・労働生理"
+    },
+    {
+      "id": "glossary-study",
+      "label": "用語整理",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "用語集の使い方"
+    },
+    {
+      "id": "review-weak",
+      "label": "復習・苦手克服",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "復習サイクル"
+    },
+    {
+      "id": "final-prep",
+      "label": "直前・当日",
+      "phase": "直前と当日",
+      "style": "final",
+      "hint": "直前期・当日"
+    },
+    {
+      "id": "cautions",
+      "label": "注意点・更新",
+      "phase": "横断",
+      "style": "meta",
+      "hint": "制度変更・誤解"
+    },
+    {
+      "id": "legacy-taisaku",
+      "label": "試験対策",
+      "phase": "移行中（既存記事）",
+      "style": "study",
+      "hint": "既存 articles/*.html のジャンル暫定"
+    },
+    {
+      "id": "legacy-matome",
+      "label": "まとめ",
+      "phase": "移行中（既存記事）",
+      "style": "practice",
+      "hint": "分野まとめ記事"
+    },
+    {
+      "id": "legacy-shiken",
+      "label": "試験情報",
+      "phase": "移行中（既存記事）",
+      "style": "institution",
+      "hint": "受験・制度系の既存記事"
+    },
+    {
+      "id": "legacy-pass-line",
+      "label": "合格基準",
+      "phase": "移行中（既存記事）",
+      "style": "institution",
+      "hint": "合格点・足切り"
+    },
+    {
+      "id": "legacy-eligibility",
+      "label": "受験資格",
+      "phase": "移行中（既存記事）",
+      "style": "institution",
+      "hint": "受験資格・実務"
+    },
+    {
+      "id": "legacy-schedule",
+      "label": "日程・申込",
+      "phase": "移行中（既存記事）",
+      "style": "institution",
+      "hint": "試験日程・申込"
+    }
+  ],
+  "fields": [
+    {
+      "id": "law",
+      "name": "関係法令",
+      "aliases": [
+        "関係法令",
+        "法令",
+        "労働安全衛生法"
+      ],
+      "legacyGlossaryCat": "関係法令"
+    },
+    {
+      "id": "rights",
+      "name": "労働衛生",
+      "aliases": [
+        "労働衛生",
+        "労働衛生一般",
+        "衛生"
+      ],
+      "legacyGlossaryCat": "労働衛生"
+    },
+    {
+      "id": "limit",
+      "name": "労働生理",
+      "aliases": [
+        "労働生理",
+        "生理",
+        "人体"
+      ],
+      "legacyGlossaryCat": "労働生理"
+    }
+  ],
+  "externalLinks": [
+    {
+      "url": "https://www.jissh.or.jp/",
+      "label": "安全衛生技術試験協会（公式）",
+      "description": "試験日程・要項・合格発表"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/",
+      "label": "厚生労働省",
+      "description": "労働安全衛生法・関連告示"
+    }
+  ]
+}

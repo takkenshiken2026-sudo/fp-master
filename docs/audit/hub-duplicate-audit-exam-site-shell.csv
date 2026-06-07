@@ -1,0 +1,4 @@
+kind,hub,cluster_key,count,members
+angle_batch,numbers,pass-margin,2,s32-pass-margin:合格ライン＋余裕点の設定 | s33-pass-margin:合格ライン＋余裕点
+angle_batch,mistakes,kon-error-no-note,2,s32-kon-error-no-note:誤答を記録しない | s33-kon-error-no-note:直前誤答未記録
+angle_batch,mistakes,kon-youkou-skip,2,s32-kon-youkou-skip:要項を読まず演習開始 | s33-kon-youkou-skip:直前要項未確認

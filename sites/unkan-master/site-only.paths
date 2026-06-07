@@ -1,0 +1,15 @@
+# 運送管理者マスター（unkan-master）— 同期で上書きしない
+# 用語 3900 語超 — validate_csv は段階移行
+
+tools/build_all.py
+tools/build_glossary_pages.py
+tools/validate_csv.py
+tools/glossary_term_rules.py
+tools/guide_article_rules.py
+tools/audit_editorial_quality.py
+
+tools/csv_to_exam_site_past_js.py
+tools/csv_to_exam_site_ichimondou_js.py
+tools/build_past_question_pages.py
+tools/build_practice_ichimon_pages.py
+tools/q_page_seo.py

@@ -1,0 +1,9 @@
+# 管理業務主任者マスター（mankan-master）— 同期で上書きしない
+# CSV 品質改善後に validate_csv / rules をテンプレ版へ切替予定
+
+tools/build_all.py
+tools/build_glossary_pages.py
+tools/validate_csv.py
+tools/glossary_term_rules.py
+tools/guide_article_rules.py
+tools/audit_editorial_quality.py

@@ -1,0 +1,6 @@
+# sites/<SITE_ID>/site-only.paths — このサイトだけの「上書き禁止」追記（任意）
+# 1行1パス。tools/template_site_only.paths に加えて適用する場合は SITE.md に記載。
+
+# 例:
+# tools/past_question_seo.py
+# takken-master-data.js

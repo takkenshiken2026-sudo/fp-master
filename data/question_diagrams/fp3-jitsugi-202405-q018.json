@@ -1,0 +1,44 @@
+{
+  "type": "fp_materials",
+  "sections": [
+    {
+      "type": "family_tree",
+      "title": "親族関係図",
+      "footnotes": [
+        "※妙子さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。"
+      ],
+      "rows": [
+        [
+          {
+            "name": "妙子",
+            "suffix": "※"
+          }
+        ],
+        [
+          {
+            "name": "森 隆男",
+            "sub": "（被相続人）",
+            "role": "decedent"
+          },
+          {
+            "name": "綾子",
+            "join": "marriage"
+          }
+        ],
+        [
+          {
+            "name": "龍子"
+          },
+          {
+            "name": "元貴"
+          },
+          {
+            "name": "吉春",
+            "sub": "（すでに死亡）",
+            "role": "deceased"
+          }
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# takken-master フェーズ1 — 上書きしても build パイプラインが壊れにくいものだけ
+# フル同期は sites/takken-master/SITE.md の「上書き禁止」を参照
+# 統合手順（フッター・ハブタブ・用語一覧）: docs/integration-checklist.md
+
+site-pages.css
+site-analytics.js
+site-q-index.js
+site-terms-index.js
+# about.html / related-sites.html はテンプレ版が q/practice・q/ichimon へリンクするため宅建では同期しない
+
+tools/q_explanation.py
+tools/q_similar_questions.py
+tools/q_page_seo.py

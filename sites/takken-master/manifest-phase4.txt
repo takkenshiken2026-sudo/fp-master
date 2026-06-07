@@ -1,0 +1,36 @@
+# takken-master フェーズ4 — ナレッジハブ SEO 修正・検証器・compare JS
+# 正本: sites/takken-master/SITE.md（build_all / build_past / html_footer / data は同期しない）
+
+site-pages.css
+site-compare-index.js
+
+tools/build_compare_pages.py
+tools/build_numbers_mistakes_pages.py
+tools/build_priority_pages.py
+tools/build_knowledge_hub_sample_pages.py
+tools/build_knowledge_hub_tabs.py
+tools/knowledge_hub_tabs.py
+tools/knowledge_hub_seo.py
+tools/knowledge_hub_rules.py
+tools/knowledge_hub_writing_samples.py
+tools/validate_public_content.py
+tools/validate_internal_links.py
+tools/validate_generated_seo.py
+tools/audit_integration_rules.py
+tools/patch_header_nav.py
+tools/glossary_term_rules.py
+tools/guide_article_rules.py
+tools/editorial_quality.py
+tools/audit_editorial_quality.py
+tools/scaffold_knowledge_hub_article.py
+
+docs/integration-checklist.md
+docs/site-chrome.md
+docs/knowledge-hub-article-templates.md
+docs/responsive-layout.md
+docs/term-diagrams.md
+
+.cursor/rules/knowledge-hub-content.mdc
+.cursor/rules/responsive-layout.mdc
+.cursor/rules/site-chrome-nav.mdc
+.cursor/rules/term-diagrams.mdc

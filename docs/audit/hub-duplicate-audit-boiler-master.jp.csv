@@ -1,0 +1,9 @@
+kind,hub,cluster_key,count,members
+angle_batch,numbers,jikan-haibun,2,s31-jikan-haibun:試験時間配分の実務 | s34-jikan-haibun:試験時間配分
+angle_batch,numbers,kamoku-bunseki,2,s32-kamoku-bunseki:科目別学習配分 | s34-kamoku-bunseki:科目別得点管理
+angle_batch,numbers,kensa-cycle,2,s34-kensa-cycle:ボイラー検査周期の確認 | s35-kensa-cycle:検査の数値整理（基礎整理）
+angle_batch,numbers,kensa-shuki,2,s32-kensa-shuki:ボイラー検査周期の代表値 | s33-kensa-shuki:法定検査周期の代表値
+angle_batch,numbers,teisuii-keihou,2,s31-teisuii-keihou:低水位警報の点検手順 | s34-teisuii-keihou:低水位警報の設定
+angle_batch,mistakes,kon-junkan,2,s32-kon-junkan:循環方式の再混同 | s33-kon-junkan:水循環方式の再混同
+angle_batch,mistakes,kon-kensa-shubetsu,2,s32-kon-kensa-shubetsu:検査種別の取り違え | s33-kon-kensa-shubetsu:使用検査と定期検査の混同
+angle_batch,mistakes,kon-nenryo,2,s32-kon-nenryo:燃料種別の誤認 | s34-kon-nenryo:燃料切替手順の混同

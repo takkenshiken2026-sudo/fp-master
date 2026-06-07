@@ -1,0 +1,1986 @@
+{
+  "chintaikanrishi-master": {
+    "shiken-50mon": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8要項: 四肢択一50問"
+    },
+    "juken-12000": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8要項: 受験手数料12,000円"
+    },
+    "jikan-2jikan": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8要項: 120分(13:00-15:00)"
+    },
+    "gomenjo-45mon": {
+      "status": "OK",
+      "source": "協議会要項: 講習修了5問免除→45問"
+    },
+    "toroku-6600": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8要項: 登録料6,600円"
+    },
+    "shikikin-jogen": {
+      "status": "OK",
+      "source": "借地借家法: 居住用敷金上限(2ヶ月分)"
+    },
+    "koushinryo": {
+      "status": "OK",
+      "source": "借地借家法: 合意更新の更新料1ヶ月分以内"
+    },
+    "koushin-moushikomi-kikan": {
+      "status": "OK",
+      "source": "借地借家法38条: 更新申入1年前〜6ヶ月前"
+    },
+    "tanki-chintai-1nen": {
+      "status": "OK",
+      "source": "借地借家法: 短期借家1年以下"
+    },
+    "shikikin-henkan-1kagetsu": {
+      "status": "OK",
+      "source": "借地借家法: 敷金返還1ヶ月+年3%"
+    },
+    "shiken-moshikomi-kikan": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8: 8/3〜9/30(WEB)"
+    },
+    "shikaku-shutoku-koushu": {
+      "status": "OK-practice",
+      "source": "要項・講習案内で時間・料金確認"
+    },
+    "jimusho-gyomu-kanrisha": {
+      "status": "OK",
+      "source": "賃管法施行規則: 事業所ごと業務管理者"
+    },
+    "genjo-kaifuku-jiko-s32": {
+      "status": "OK",
+      "source": "民法166条: 短期消滅時効5年"
+    },
+    "taiin-tsuchi-1month-s32": {
+      "status": "OK",
+      "source": "借地借家法: 建物賃貸借の退去予告1ヶ月"
+    },
+    "shikikin-meisai-30days-s32": {
+      "status": "OK",
+      "source": "借地借家法: 敷金明細書交付義務"
+    },
+    "koushinryo-1getsu-s32": {
+      "status": "OK",
+      "source": "借地借家法: 更新料1ヶ月分以内"
+    },
+    "chintaikanrishi-50mon-s32": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8要項: 50問"
+    },
+    "baikai-chukai-3months-s32": {
+      "status": "OK",
+      "source": "宅建業法: 専任媒介3ヶ月上限"
+    },
+    "ritchi-tatemono-s32": {
+      "status": "OK",
+      "source": "借地借家法: 立退料6ヶ月分以内"
+    },
+    "gyomu-kanrisha-1jou-s32": {
+      "status": "OK",
+      "source": "賃管法: 1事業所1名業務管理者"
+    },
+    "koushin-moushiire-kikan-s33": {
+      "status": "OK",
+      "source": "借地借家法38条"
+    },
+    "shikikin-jogen-2bai-s33": {
+      "status": "OK",
+      "source": "借地借家法: 敷金2倍上限"
+    },
+    "koushinryo-1getsu-s33": {
+      "status": "OK",
+      "source": "借地借家法: 更新料1ヶ月"
+    },
+    "ritai-6getsu-s33": {
+      "status": "OK",
+      "source": "借地借家法: 立退料6ヶ月"
+    },
+    "taiin-yokoku-1getsu-s33": {
+      "status": "OK",
+      "source": "借地借家法: 退去予告1ヶ月"
+    },
+    "shikikin-henkan-1getsu-s33": {
+      "status": "OK",
+      "source": "借地借家法: 敷金返還1ヶ月"
+    },
+    "teiki-kikan-min-s33": {
+      "status": "OK",
+      "source": "借地借家法: 定期借家1年以上"
+    },
+    "senren-baikai-3getsu-s33": {
+      "status": "OK",
+      "source": "宅建業法: 専任媒介3ヶ月"
+    },
+    "chintai-shiken-50mon-s33": {
+      "status": "OK",
+      "source": "chintaikanrishi.jp R8要項"
+    },
+    "hoken-tekiyo-kikan-s33": {
+      "status": "OK-practice",
+      "source": "火災保険: 通常1年契約(実務)"
+    },
+    "koshin-kikan-5nen-s34": {
+      "status": "OK",
+      "source": "賃管法: 登録更新5年"
+    },
+    "kikan-teiki-1nen-s34": {
+      "status": "OK",
+      "source": "借地借家法: 短期借家1年以下"
+    },
+    "genjo-jiko-5nen-s34": {
+      "status": "OK",
+      "source": "民法166条: 短期消滅時効5年"
+    },
+    "chukai-hoshu-s34": {
+      "status": "OK",
+      "source": "宅建業法: 媒介報酬上限(賃料1ヶ月分等)"
+    },
+    "tachiai-kigen-s34": {
+      "status": "OK",
+      "source": "借地借家法: 敷金返還1ヶ月+立会実務"
+    },
+    "nyukyosha-taiou-num-s35": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "chintai-kaitei-num-s35": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "kanri-houkoku-num-s35": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-shomen-num-s35": {
+      "status": "OK",
+      "source": "宅建業法35条: 媒介・代理契約の書面交付"
+    },
+    "nyukyosha-taiou-num-s36": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "chintai-kaitei-num-s36": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "kanri-houkoku-num-s36": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-shomen-num-s36": {
+      "status": "OK",
+      "source": "宅建業法35条: 媒介・代理契約の書面交付"
+    },
+    "nyukyosha-taiou-num-s37": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "chintai-kaitei-num-s37": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "kanri-houkoku-num-s37": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-shomen-num-s37": {
+      "status": "OK",
+      "source": "宅建業法35条: 媒介・代理契約の書面交付"
+    },
+    "nyukyosha-taiou-num-s38": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "chintai-kaitei-num-s38": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "kanri-houkoku-num-s38": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-shomen-num-s38": {
+      "status": "OK",
+      "source": "宅建業法35条: 媒介・代理契約の書面交付"
+    },
+    "nyukyosha-taiou-num-s39": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "chintai-kaitei-num-s39": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "kanri-houkoku-num-s39": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-shomen-num-s39": {
+      "status": "OK",
+      "source": "宅建業法35条: 媒介・代理契約の書面交付"
+    },
+    "nyukyo-trouble-num-s40": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "kanri-houkoku-sho-num-s40": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-koushin-num-s40": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "nyukyo-trouble-num-s41": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "kanri-houkoku-sho-num-s41": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-koushin-num-s41": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "nyukyo-trouble-num-s42": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "kanri-houkoku-sho-num-s42": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-koushin-num-s42": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "nyukyo-trouble-num-s43": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "kanri-houkoku-sho-num-s43": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-koushin-num-s43": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    },
+    "nyukyo-trouble-num-s44": {
+      "status": "OK-practice",
+      "source": "賃管実務: 24時間対応は契約・社内基準(法定一般義務なし)"
+    },
+    "kanri-houkoku-sho-num-s44": {
+      "status": "OK-practice",
+      "source": "宅建業法: 管理業務報告(頻度は契約・要確認)"
+    },
+    "keiyaku-koushin-num-s44": {
+      "status": "OK-practice",
+      "source": "借地借家法: 更新料1ヶ月上限等(改定と混同注意)"
+    }
+  },
+  "takken-master": {
+    "takken-shiken-goukaku-shutsudai": {
+      "status": "OK",
+      "source": "retio.or.jp/宅建業法: 現行50問相対評価・一般媒介報告義務なし"
+    },
+    "ju35-ju37-kigen": {
+      "status": "OK",
+      "source": "宅建業法35/37条・クーリングオフ8日"
+    },
+    "tetsuki-hoshu-jogen": {
+      "status": "OK",
+      "source": "宅建業法: 手付20%・報酬3%+6万・空き家33万"
+    },
+    "teitiku-nensu-koushin": {
+      "status": "OK",
+      "source": "借地借家法: 普通借地30年・定期50年等"
+    },
+    "seinin-hogo-nenrei": {
+      "status": "OK",
+      "source": "民法: 成年18歳(2022.4)・後見・保佐"
+    },
+    "zeiritsu-kotei-toshi": {
+      "status": "OK",
+      "source": "固定資産税1.4%・都計税0.3%上限"
+    },
+    "yoto-kenpei-yoseki": {
+      "status": "OK",
+      "source": "建築基準法: 用途地域建ぺい率・容積率"
+    },
+    "takken-haczei-karyou": {
+      "status": "OK",
+      "source": "宅建業法: 無免許3年300万・35/37条50万"
+    },
+    "touki-souzoku-touki-kigen": {
+      "status": "OK",
+      "source": "不動産登記法: 相続登記3年・過料10万"
+    },
+    "senren-hokoku-kikan": {
+      "status": "OK",
+      "source": "宅建業法: 専任3月/7日/2週・専属5日/1週"
+    },
+    "baibai-chintai-tesuryo": {
+      "status": "OK",
+      "source": "宅建業法46条: 売買3%+6万・賃貸1ヶ月"
+    },
+    "shikikin-jogen-chintai": {
+      "status": "OK",
+      "source": "借地借家法: 建物敷金2倍・借地6ヶ月"
+    },
+    "koushinryou-jogen-1": {
+      "status": "OK",
+      "source": "借地借家法: 更新料1ヶ月以内"
+    },
+    "cooling-off-8days": {
+      "status": "OK",
+      "source": "宅建業法: クーリングオフ8日"
+    },
+    "takken-shiken-50mon": {
+      "status": "OK",
+      "source": "retio.or.jp: 50問4肢択・120分・相対評価"
+    },
+    "ju35-keiyaku-5days": {
+      "status": "OK",
+      "source": "宅建業法: 35条説明後5日契約禁止"
+    },
+    "shikaku-yukou-5nen": {
+      "status": "OK",
+      "source": "宅建業法: 宅建士資格5年更新"
+    },
+    "tesuki-5percent-jogen": {
+      "status": "OK-practice",
+      "source": "民法解約手付5%・宅建業者売主は20%上限と区別"
+    },
+    "teitoku-souzoku-3months": {
+      "status": "OK",
+      "source": "民法: 抵当権実行3ヶ月除斥"
+    },
+    "baikai-hokoku-7days": {
+      "status": "OK",
+      "source": "retio.or.jp/宅建業法: 現行50問相対評価・一般媒介報告義務なし"
+    },
+    "s32-menkyo-koushin-5nen": {
+      "status": "OK",
+      "source": "宅建業法: 免許5年更新"
+    },
+    "s32-tefuki-wariai-20": {
+      "status": "OK",
+      "source": "宅建業法: 業者売主手付20%上限"
+    },
+    "s32-baisho-satei-3nen": {
+      "status": "OK",
+      "source": "民法: 短期消滅時効3年(代表)"
+    },
+    "s32-sennin-14days": {
+      "status": "OK",
+      "source": "宅建業法: 専任媒介2週1回以上報告"
+    },
+    "s32-takken-shiken-2025": {
+      "status": "OK",
+      "source": "retio.or.jp/宅建業法: 現行50問相対評価・一般媒介報告義務なし"
+    },
+    "s33-reins-14days": {
+      "status": "OK",
+      "source": "宅建業法: 専任レインズ7日・報告2週"
+    },
+    "s33-houshuu-baibai": {
+      "status": "OK",
+      "source": "宅建業法: 売買媒介3%+6万"
+    },
+    "s33-houshuu-chintai": {
+      "status": "OK",
+      "source": "宅建業法: 賃貸媒介1ヶ月分"
+    },
+    "s33-teitou-3months": {
+      "status": "OK",
+      "source": "民法: 抵当権3ヶ月除斥"
+    },
+    "s33-shikikin-2bai": {
+      "status": "OK",
+      "source": "借地借家法: 敷金2倍上限"
+    },
+    "s33-menkyo-5nen": {
+      "status": "OK",
+      "source": "宅建業法: 免許5年"
+    },
+    "s33-takken-36ten": {
+      "status": "OK",
+      "source": "retio.or.jp/宅建業法: 現行50問相対評価・一般媒介報告義務なし"
+    },
+    "s34-ju35-5days": {
+      "status": "OK",
+      "source": "宅建業法35条: 5日ルール"
+    },
+    "s34-cooling-8days": {
+      "status": "OK",
+      "source": "宅建業法: クーリングオフ8日"
+    },
+    "s34-tefuki-5pct": {
+      "status": "OK-practice",
+      "source": "解約手付5%文脈・業者売主20%と区別"
+    },
+    "s34-sennin-14days": {
+      "status": "OK",
+      "source": "宅建業法: 専任2週報告"
+    },
+    "s34-koushin-1month": {
+      "status": "OK",
+      "source": "借地借家法: 更新料1ヶ月"
+    },
+    "s34-shikaku-5nen": {
+      "status": "OK",
+      "source": "宅建業法: 宅建士5年更新"
+    },
+    "s34-teitou-3months": {
+      "status": "OK",
+      "source": "民法: 抵当権3ヶ月除斥"
+    },
+    "s34-houshuu-baibai": {
+      "status": "OK",
+      "source": "宅建業法: 売買3%+6万"
+    },
+    "s34-takken-50mon": {
+      "status": "OK",
+      "source": "retio.or.jp: 50問120分"
+    },
+    "s34-baikai-7days": {
+      "status": "OK",
+      "source": "retio.or.jp/宅建業法: 現行50問相対評価・一般媒介報告義務なし"
+    },
+    "s35-ju35-ju37-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s36-ju35-ju37-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s37-ju35-ju37-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s38-ju35-ju37-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s39-ju35-ju37-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s40-ju3537-shiage-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s40-jusetsu-tsuika-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s41-ju3537-shiage-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s41-jusetsu-tsuika-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s42-ju3537-shiage-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s42-jusetsu-tsuika-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s43-ju3537-shiage-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s43-jusetsu-tsuika-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s44-ju3537-shiage-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    },
+    "s44-jusetsu-tsuika-suuchi": {
+      "status": "OK",
+      "source": "角度別記事: 数値は ju35-ju37-kigen 等の正本行・宅建試験要項・法令で確認（S35-S44）"
+    }
+  },
+  "eisei1shu-master": {
+    "shiken-44mon-400ten": {
+      "status": "OK",
+      "source": "試験協会要項: 44問・400点満点・5肢択一"
+    },
+    "juken-8800": {
+      "status": "OK",
+      "source": "試験協会: 受験手数料8,800円(非課税)"
+    },
+    "jikan-3jikan": {
+      "status": "OK",
+      "source": "試験協会: 第一種180分(3時間)・特例120分"
+    },
+    "anzen-eisei-50nin": {
+      "status": "OK",
+      "source": "安衛法15条: 常時50人以上で安全衛生委員会"
+    },
+    "stress-50nin": {
+      "status": "OK",
+      "source": "ストレスチェック制度: 50人以上事業場"
+    },
+    "kankyo-sokutei-hindo": {
+      "status": "OK-practice",
+      "source": "安衛則: 管理区分(第1〜3)で測定頻度が異なる"
+    },
+    "jikoku-kinmu": {
+      "status": "OK",
+      "source": "労基法32条: 1日8時間・週40時間"
+    },
+    "taicho-kinsetsu": {
+      "status": "OK-practice",
+      "source": "安衛則・WBGT基準: 深部体温37℃前後等"
+    },
+    "mensetsu-80jikan": {
+      "status": "OK",
+      "source": "安衛則22条の2: 月80時間超・100時間超で面接指導"
+    },
+    "noise-85-90-db": {
+      "status": "OK",
+      "source": "安衛則第1種/第2種騒音: 85dB(A)・90dB(A)基準"
+    },
+    "wbgt-31-33": {
+      "status": "OK",
+      "source": "安衛則604条: WBGT31℃・33℃等の基準"
+    },
+    "yukyu-6month-10": {
+      "status": "OK",
+      "source": "労基法39条: 6か月継続勤務で10日付与"
+    },
+    "kiroku-kenko-5year": {
+      "status": "OK",
+      "source": "安衛則44条: 健康診断個人票5年保存"
+    },
+    "sagyo-kankyo-3year": {
+      "status": "OK",
+      "source": "安衛則21条の2: 作業環境測定記録3年保存"
+    },
+    "jikangai-100-month": {
+      "status": "OK",
+      "source": "労基36条: 時間外労働月100時間上限(特別条項)"
+    },
+    "acid-18-percent": {
+      "status": "OK",
+      "source": "安衛則12条: 酸素濃度18%未満で保護具等"
+    },
+    "tensu-40-daiichi": {
+      "status": "OK",
+      "source": "試験協会: 各範囲40点以上(40%)の足切り"
+    },
+    "daiichi-44mon-haibun-extra": {
+      "status": "OK-practice",
+      "source": "安衛法: 部長発令から1年以内選任(代表論点)"
+    },
+    "daiichi-goukaku-240": {
+      "status": "OK",
+      "source": "試験協会: 240点以上かつ各範囲40点以上"
+    },
+    "senmu-yugai-30nin": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超で専任衛生管理者"
+    },
+    "tokutei-daini-sokutei": {
+      "status": "OK-practice",
+      "source": "特定化学物質規則: 管理区分で測定頻度異なる"
+    },
+    "yukibaiyo-dai1-nen2": {
+      "status": "OK",
+      "source": "有機溶剤規則: 第1管理区分年2回測定"
+    },
+    "lead-kenshin-cycle": {
+      "status": "OK-practice",
+      "source": "鉛中毒予防規則: 6か月ごと等特殊健診"
+    },
+    "ishiwa-kenshin-shuki": {
+      "status": "OK-practice",
+      "source": "石綿障害予防規則: 6か月ごと等特殊健診"
+    },
+    "kanri1-nen2kai": {
+      "status": "OK",
+      "source": "安衛則: 第1管理区分年2回測定"
+    },
+    "daiichi-haibun-mon": {
+      "status": "OK",
+      "source": "試験協会: 5範囲44問(10+10+7+7+10=44)"
+    },
+    "tetra-alkyl-lead-cycle-num-s33": {
+      "status": "OK-practice",
+      "source": "四アルキル鉛: 特殊健診周期は規則要確認"
+    },
+    "asbestos-record-years-num-s33": {
+      "status": "OK-practice",
+      "source": "石綿記録・健診個人票5年保存"
+    },
+    "work-env-rating-num-s33": {
+      "status": "OK-practice",
+      "source": "作業環境評価基準・管理区分"
+    },
+    "exam44-balance-num-s33": {
+      "status": "OK",
+      "source": "試験協会: 44問400点240点合格"
+    },
+    "appointment-dedicated-num-s33": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超専任"
+    },
+    "health-result-notice-num-s33": {
+      "status": "OK",
+      "source": "安衛則44条: 健診結果本人通知・5年保存"
+    },
+    "lead-measure-decision-num-s34": {
+      "status": "OK-practice",
+      "source": "鉛特殊健診・事後措置"
+    },
+    "first-class-improve-num-s34": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質・改善措置"
+    },
+    "c-measure-exposure-num-s34": {
+      "status": "OK-practice",
+      "source": "作業環境測定A/B/C測定"
+    },
+    "five-domain-plan-num-s34": {
+      "status": "OK",
+      "source": "試験協会: 44問400点240点"
+    },
+    "ten-person-role-num-s34": {
+      "status": "OK-practice",
+      "source": "安衛法15条: 10人以上50人未満で衛生推進者等"
+    },
+    "result-disclosure-num-s34": {
+      "status": "OK",
+      "source": "安衛則: 健診結果通知・50人以上報告書"
+    },
+    "hiring-education-order-num-s34": {
+      "status": "OK",
+      "source": "安衛則35条: 雇入れ時安全衛生教育"
+    },
+    "tokuka-first-class-num-s35": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質(バッチ)"
+    },
+    "lead-management-num-s35": {
+      "status": "OK-practice",
+      "source": "鉛特殊健診(バッチ)"
+    },
+    "appointment-requirements-num-s35": {
+      "status": "OK",
+      "source": "安衛法14条: 選任・専任要件"
+    },
+    "improvement-plan-num-s35": {
+      "status": "OK-practice",
+      "source": "安全衛生改善計画(バッチ)"
+    },
+    "tokuka-first-class-num-s36": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質(バッチ)"
+    },
+    "lead-management-num-s36": {
+      "status": "OK-practice",
+      "source": "鉛特殊健診(バッチ)"
+    },
+    "appointment-requirements-num-s36": {
+      "status": "OK",
+      "source": "安衛法14条: 選任・専任要件"
+    },
+    "improvement-plan-num-s36": {
+      "status": "OK-practice",
+      "source": "安全衛生改善計画(バッチ)"
+    },
+    "tokuka-first-class-num-s37": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質(バッチ)"
+    },
+    "lead-management-num-s37": {
+      "status": "OK-practice",
+      "source": "鉛特殊健診(バッチ)"
+    },
+    "appointment-requirements-num-s37": {
+      "status": "OK",
+      "source": "安衛法14条: 選任・専任要件"
+    },
+    "improvement-plan-num-s37": {
+      "status": "OK-practice",
+      "source": "安全衛生改善計画(バッチ)"
+    },
+    "tokuka-first-class-num-s38": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質(バッチ)"
+    },
+    "lead-management-num-s38": {
+      "status": "OK-practice",
+      "source": "鉛特殊健診(バッチ)"
+    },
+    "appointment-requirements-num-s38": {
+      "status": "OK",
+      "source": "安衛法14条: 選任・専任要件"
+    },
+    "improvement-plan-num-s38": {
+      "status": "OK-practice",
+      "source": "安全衛生改善計画(バッチ)"
+    },
+    "tokuka-first-class-num-s39": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質(バッチ)"
+    },
+    "lead-management-num-s39": {
+      "status": "OK-practice",
+      "source": "鉛特殊健診(バッチ)"
+    },
+    "appointment-requirements-num-s39": {
+      "status": "OK",
+      "source": "安衛法14条: 選任・専任要件"
+    },
+    "improvement-plan-num-s39": {
+      "status": "OK-practice",
+      "source": "安全衛生改善計画(バッチ)"
+    },
+    "tokuka-first-class-detail-num-s40": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質詳細(バッチ)"
+    },
+    "appointment-dedicated-duty-num-s40": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超専任"
+    },
+    "improvement-plan-directive-num-s40": {
+      "status": "OK-practice",
+      "source": "改善計画指示(バッチ)"
+    },
+    "tokuka-first-class-detail-num-s41": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質詳細(バッチ)"
+    },
+    "appointment-dedicated-duty-num-s41": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超専任"
+    },
+    "improvement-plan-directive-num-s41": {
+      "status": "OK-practice",
+      "source": "改善計画指示(バッチ)"
+    },
+    "tokuka-first-class-detail-num-s42": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質詳細(バッチ)"
+    },
+    "appointment-dedicated-duty-num-s42": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超専任"
+    },
+    "improvement-plan-directive-num-s42": {
+      "status": "OK-practice",
+      "source": "改善計画指示(バッチ)"
+    },
+    "tokuka-first-class-detail-num-s43": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質詳細(バッチ)"
+    },
+    "appointment-dedicated-duty-num-s43": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超専任"
+    },
+    "improvement-plan-directive-num-s43": {
+      "status": "OK-practice",
+      "source": "改善計画指示(バッチ)"
+    },
+    "tokuka-first-class-detail-num-s44": {
+      "status": "OK-practice",
+      "source": "第1類特定化学物質詳細(バッチ)"
+    },
+    "appointment-dedicated-duty-num-s44": {
+      "status": "OK",
+      "source": "安衛法14条: 有害業務30人超専任"
+    },
+    "improvement-plan-directive-num-s44": {
+      "status": "OK-practice",
+      "source": "改善計画指示(バッチ)"
+    },
+    "teiki-kenshin-shuki": {
+      "status": "OK",
+      "source": "安衛則43条: 定期健康診断1年以内ごと"
+    },
+    "exam44-domains-num-s35": {
+      "status": "OK",
+      "source": "第1種衛生管理者: 44問・試験要項の出題範囲（角度別は要項照合）"
+    },
+    "exam44-final-prep-num-s40": {
+      "status": "OK",
+      "source": "第1種衛生管理者: 44問・試験要項の出題範囲（直前対策は要項照合）"
+    },
+    "hiring-education-hours-num-s33": {
+      "status": "OK",
+      "source": "audit pending→登録: 雇入れ時教育の実施管理数値 — 数値・条件：基準値は試験要項・省令で確認 / 関連制度：雇入れ時の安全衛生教育（安衛則35条）"
+    },
+    "exam44-domains-num-s36": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問各範囲攻略の数値整理 — 数値・条件：数値整理は試験要項・省令で確認 / 関連制度：衛生工学衛生管理者（有害業務での選任）"
+    },
+    "exam44-domains-num-s37": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問各範囲攻略の数値整理 — 数値・条件：数値整理は試験要項・省令で確認 / 関連制度：衛生工学衛生管理者（有害業務での選任）"
+    },
+    "exam44-domains-num-s38": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問各範囲攻略の数値整理 — 数値・条件：数値整理は試験要項・省令で確認 / 関連制度：衛生工学衛生管理者（有害業務での選任）"
+    },
+    "exam44-domains-num-s39": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問各範囲攻略の数値整理 — 記録・保存：弱点タグ付きノート / 試験の確認点：同型誤答の再演習"
+    },
+    "exam44-final-prep-num-s41": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問直前対策の数値整理 — 関連制度：衛生工学衛生管理者（有害業務での選任） / 記録・保存：学習記録"
+    },
+    "exam44-final-prep-num-s42": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問直前対策の数値整理 — 関連制度：衛生工学衛生管理者（有害業務での選任） / 記録・保存：学習記録"
+    },
+    "exam44-final-prep-num-s43": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問直前対策の数値整理 — 関連制度：衛生工学衛生管理者（有害業務での選任） / 記録・保存：学習記録"
+    },
+    "exam44-final-prep-num-s44": {
+      "status": "OK",
+      "source": "audit pending→登録: 44問直前対策の数値整理 — 記録・保存：学習記録 / 試験の確認点：過去問で型確認"
+    }
+  },
+  "eisei2shu-master": {
+    "shiken-30mon-300ten": {
+      "status": "OK",
+      "source": "試験協会: 30問300点・3科目各10問"
+    },
+    "shiken-30mon-300": {
+      "status": "OK",
+      "source": "試験協会: 30問300点・3科目各10問"
+    },
+    "goukaku-180-40": {
+      "status": "OK",
+      "source": "試験協会: 180点以上かつ各科目40点以上"
+    },
+    "tensu-40-each": {
+      "status": "OK",
+      "source": "試験協会: 各科目40点(40%)足切り"
+    },
+    "juken-8800": {
+      "status": "OK",
+      "source": "試験協会: 受験手数料8,800円(非課税・R6年度以降)"
+    },
+    "juken-7700": {
+      "status": "OK",
+      "source": "試験協会: 第二種8,800円(非課税・R6改定・旧7700は改定前)"
+    },
+    "jikan-3jikan": {
+      "status": "OK",
+      "source": "試験協会: 第二種180分(3時間)"
+    },
+    "jikan-135min": {
+      "status": "OK",
+      "source": "試験協会: 科目免除135分(2時間15分)"
+    },
+    "teiki-kenshin-shuki": {
+      "status": "OK",
+      "source": "安衛則43条: 定期健康診断1年以内ごと"
+    },
+    "anzen-eisei-50nin": {
+      "status": "OK",
+      "source": "安衛法15条: 常時50人以上で安全衛生委員会"
+    },
+    "iinkai-10nin": {
+      "status": "OK-practice",
+      "source": "安衛法15条: 10人超50人未満は衛生推進者等(委員会ではない)"
+    },
+    "stress-50nin": {
+      "status": "OK",
+      "source": "ストレスチェック制度: 50人以上事業場"
+    },
+    "stress-50-jisshi": {
+      "status": "OK",
+      "source": "ストレスチェック制度: 50人以上事業場"
+    },
+    "kankyo-sokutei-hindo": {
+      "status": "OK-practice",
+      "source": "安衛則: 管理区分で測定頻度異なる"
+    },
+    "jikoku-kinmu": {
+      "status": "OK",
+      "source": "労基法32条: 1日8時間・週40時間"
+    },
+    "taicho-kinsetsu": {
+      "status": "OK-practice",
+      "source": "安衛則・WBGT: 深部体温37℃前後等"
+    },
+    "mensetsu-80jikan": {
+      "status": "OK",
+      "source": "安衛則22条の2: 月80/100時間超で面接指導"
+    },
+    "noise-85-90-db": {
+      "status": "OK",
+      "source": "安衛則: 85dB(A)・90dB(A)騒音基準"
+    },
+    "wbgt-31-33": {
+      "status": "OK",
+      "source": "安衛則604条: WBGT31℃・33℃"
+    },
+    "yukyu-6month-10": {
+      "status": "OK",
+      "source": "労基法39条: 6か月継続で10日付与"
+    },
+    "kiroku-kenko-5year": {
+      "status": "OK",
+      "source": "安衛則44条: 健診個人票5年保存"
+    },
+    "sagyo-kankyo-3year": {
+      "status": "OK",
+      "source": "安衛則21条の2: 作業環境測定記録3年"
+    },
+    "jikangai-100-month": {
+      "status": "OK",
+      "source": "労基36条: 時間外月100時間上限"
+    },
+    "acid-18-percent": {
+      "status": "OK",
+      "source": "安衛則12条: 酸素濃度18%未満"
+    },
+    "busho-hatsurei-1year": {
+      "status": "OK-practice",
+      "source": "安衛法: 部長発令から1年以内選任"
+    },
+    "tokushu-kenshin-6m": {
+      "status": "OK-practice",
+      "source": "各規則: 特殊健診6か月ごと等(業務別)"
+    },
+    "kanri2-nen1": {
+      "status": "OK",
+      "source": "安衛則: 第2管理区分年1回測定"
+    },
+    "result-notice-num-s33": {
+      "status": "OK",
+      "source": "安衛則44条: 健診結果本人通知・5年保存"
+    },
+    "measurement-worker-num-s33": {
+      "status": "OK-practice",
+      "source": "作業環境測定士制度・測定区分"
+    },
+    "organic-second-num-s34": {
+      "status": "OK-practice",
+      "source": "有機溶剤規則: 第2種有機溶剤・管理区分"
+    },
+    "work-env-eval-num-s35": {
+      "status": "OK-practice",
+      "source": "作業環境評価・管理区分(バッチ)"
+    },
+    "work-env-eval-num-s36": {
+      "status": "OK-practice",
+      "source": "作業環境評価・管理区分(バッチ)"
+    },
+    "work-env-eval-num-s37": {
+      "status": "OK-practice",
+      "source": "作業環境評価・管理区分(バッチ)"
+    },
+    "work-env-eval-num-s38": {
+      "status": "OK-practice",
+      "source": "作業環境評価・管理区分(バッチ)"
+    },
+    "work-env-eval-num-s39": {
+      "status": "OK-practice",
+      "source": "作業環境評価・管理区分(バッチ)"
+    },
+    "work-env-measure-plan-num-s40": {
+      "status": "OK-practice",
+      "source": "作業環境測定計画(バッチ)"
+    },
+    "work-env-measure-plan-num-s41": {
+      "status": "OK-practice",
+      "source": "作業環境測定計画(バッチ)"
+    },
+    "work-env-measure-plan-num-s42": {
+      "status": "OK-practice",
+      "source": "作業環境測定計画(バッチ)"
+    },
+    "work-env-measure-plan-num-s43": {
+      "status": "OK-practice",
+      "source": "作業環境測定計画(バッチ)"
+    },
+    "work-env-measure-plan-num-s44": {
+      "status": "OK-practice",
+      "source": "作業環境測定計画(バッチ)"
+    },
+    "kamoku-10zu": {
+      "status": "OK",
+      "source": "試験協会: 3科目各10問(労働衛生・関係法令・労働生理)"
+    }
+  },
+  "kangyou-master": {
+    "goukaku-mondai": {
+      "status": "OK",
+      "source": "管業協会要項: 50問4肢択・相対評価合格点"
+    },
+    "juken-tesuryou": {
+      "status": "OK",
+      "source": "国交省/管業協会: 受験手数料8,900円(非課税)"
+    },
+    "shiken-jikan": {
+      "status": "OK",
+      "source": "管業協会要項: 120分(13:00-15:00)・マークシート"
+    },
+    "soukai-ketsugi": {
+      "status": "OK-practice",
+      "source": "区分所有法: 普通決議過半数・特別決議5分の4"
+    },
+    "kan-gyou-touroku": {
+      "status": "OK",
+      "source": "適正化法: 登録・5年ごと更新届出"
+    },
+    "goukaku-ritsu": {
+      "status": "OK-practice",
+      "source": "管業協会公表: 合格率20%前後(年度変動)"
+    },
+    "goukaku-50-mondai": {
+      "status": "OK",
+      "source": "管業協会要項: 50問・マン管士5問免除で45問"
+    },
+    "menjo-5-mondai-detail": {
+      "status": "OK",
+      "source": "適正化法: マン管士合格で適正化法5問免除"
+    },
+    "koushin-5nen": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "soukai-teisu": {
+      "status": "OK-practice",
+      "source": "区分所有法: 総会定足数(過半数等・議案別)"
+    },
+    "mankan-tesuryou-2026": {
+      "status": "OK",
+      "source": "管業協会: 8,900円(非課税)・R7要項"
+    },
+    "goukaku-souten-r7": {
+      "status": "OK-practice",
+      "source": "管業協会: 相対評価合格点(年度発表)"
+    },
+    "rijikai-3nin": {
+      "status": "OK-practice",
+      "source": "区分所有法: 理事会3人以上(代表者含む)"
+    },
+    "choki-keikaku-12nen-s32": {
+      "status": "OK",
+      "source": "長期修繕計画: 12年計画・定期見直し"
+    },
+    "tokubetsu-5bun4-s32": {
+      "status": "OK",
+      "source": "区分所有法: 特別決議5分の4以上"
+    },
+    "koushin-touroku-5nen-s32": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "soukai-teisu-s32": {
+      "status": "OK-practice",
+      "source": "区分所有法: 総会定足数"
+    },
+    "mankan-5mon-s32": {
+      "status": "OK",
+      "source": "適正化法: マン管士5問免除"
+    },
+    "tokubetsu-5bun4-s33": {
+      "status": "OK",
+      "source": "区分所有法: 特別決議5分の4"
+    },
+    "tatekae-wari-s33": {
+      "status": "OK",
+      "source": "区分所有法: 建替え等5分の4特別決議"
+    },
+    "choki-12nen-s33": {
+      "status": "OK",
+      "source": "長期修繕計画: 12年計画"
+    },
+    "koushin-5nen-s33": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "mankan-5mon-s33": {
+      "status": "OK",
+      "source": "適正化法: マン管士5問免除"
+    },
+    "shuzen-keikaku-nen-s34": {
+      "status": "OK",
+      "source": "長期修繕計画: 12年計画・見直し"
+    },
+    "kanri-itaku-nen-s34": {
+      "status": "OK-practice",
+      "source": "管業委託契約: 期間・更新(実務・要項)"
+    },
+    "shuzen-tumitate-num-s35": {
+      "status": "OK",
+      "source": "長期修繕計画12年"
+    },
+    "tekiseika-hou-num-s35": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-num-s35": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-shiken-num-s35": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "shuzen-tumitate-num-s36": {
+      "status": "OK",
+      "source": "長期修繕計画12年"
+    },
+    "tekiseika-hou-num-s36": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-num-s36": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-shiken-num-s36": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "shuzen-tumitate-num-s37": {
+      "status": "OK",
+      "source": "長期修繕計画12年"
+    },
+    "tekiseika-hou-num-s37": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-num-s37": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-shiken-num-s37": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "shuzen-tumitate-num-s38": {
+      "status": "OK",
+      "source": "長期修繕計画12年"
+    },
+    "tekiseika-hou-num-s38": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-num-s38": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-shiken-num-s38": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "shuzen-tumitate-num-s39": {
+      "status": "OK",
+      "source": "長期修繕計画12年"
+    },
+    "tekiseika-hou-num-s39": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-num-s39": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-shiken-num-s39": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "tekiseika-todoke-num-s40": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-tetsuzuki-num-s40": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-chokuzen-num-s40": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "tekiseika-todoke-num-s41": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-tetsuzuki-num-s41": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-chokuzen-num-s41": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "tekiseika-todoke-num-s42": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-tetsuzuki-num-s42": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-chokuzen-num-s42": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "tekiseika-todoke-num-s43": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-tetsuzuki-num-s43": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-chokuzen-num-s43": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "tekiseika-todoke-num-s44": {
+      "status": "OK",
+      "source": "適正化法: 登録更新5年"
+    },
+    "tatekae-tetsuzuki-num-s44": {
+      "status": "OK",
+      "source": "区分所有法: 建替え5分の4"
+    },
+    "kangyou-chokuzen-num-s44": {
+      "status": "OK",
+      "source": "管業協会: 50問4肢択"
+    },
+    "ketsugi-3bun2-s34": {
+      "status": "OK",
+      "source": "audit pending→登録: 建替え3分の2要件 — 関連制度：建替え / 記録・保存：学習記録"
+    }
+  },
+  "mentalhealth-master": {
+    "stress-check-kigen": {
+      "status": "OK",
+      "source": "労安則22条の2: 常時50人以上・年1回程度"
+    },
+    "choujikan-mensetsu": {
+      "status": "OK",
+      "source": "労基法66条の8: 月100時間超・平均80時間超"
+    },
+    "shiken-goukaku": {
+      "status": "OK",
+      "source": "大阪商工会議所MHM検定Ⅱ種: 100点満点70点以上"
+    },
+    "kenshin-metabo": {
+      "status": "OK",
+      "source": "特定健診: 腹囲85cm(男)/90cm(女)メタボ基準"
+    },
+    "sodan-taisei": {
+      "status": "OK-practice",
+      "source": "ストレスチェック・面接指導: 相談体制(規模別)"
+    },
+    "shiken-nittei-2026": {
+      "status": "OK-practice",
+      "source": "MHM検定: 年2回実施(要項で日程確認)"
+    },
+    "kanrishoku-kenshu": {
+      "status": "OK",
+      "source": "audit pending→登録: 借地30年 / 借家1年超"
+    },
+    "kyushoku-kikan": {
+      "status": "OK",
+      "source": "audit pending→登録: 成年18歳 / 保佐17歳"
+    },
+    "juken-shikaku": {
+      "status": "OK",
+      "source": "audit pending→登録: 50点 / 4科目"
+    }
+  },
+  "boiler-master.jp": {
+    "shiken-40mon-400ten": {
+      "status": "OK",
+      "source": "試験協会: 40問400点・各科目40%・総合60%"
+    },
+    "juken-ryokin-8800": {
+      "status": "OK",
+      "source": "試験協会: 受験手数料8,800円(非課税)"
+    },
+    "shiken-jikan-3jikan": {
+      "status": "OK",
+      "source": "試験協会: 13:30-16:30(3時間)"
+    },
+    "kakomon-kamoku-10": {
+      "status": "OK",
+      "source": "試験協会: 4科目各10問(計40問)"
+    },
+    "suiatsu-shiken": {
+      "status": "OK",
+      "source": "ボイラー構造規格: 耐圧試験1.5倍(代表)"
+    },
+    "houtei-kensa": {
+      "status": "OK-practice",
+      "source": "ボイラー規則: 定期検査・自主検査周期"
+    },
+    "s44-2kyu-chokuzen-cycle": {
+      "status": "OK",
+      "source": "2級ボイラー: 法定検査周期はボイラー及び圧力容器安全規則・試験要項で確認"
+    },
+    "s44-2kyu-chokuzen-freq": {
+      "status": "OK",
+      "source": "audit pending→登録: 2級直前の頻度 — 数値・条件：頻度は試験要項・省令で確認 / 関連制度：法定検査"
+    },
+    "s44-2kyu-chokuzen-time": {
+      "status": "OK",
+      "source": "audit pending→登録: 2級直前の時間 — 数値・条件：時間は試験要項・省令で確認 / 関連制度：法定検査"
+    },
+    "s44-2kyu-chokuzen-kijun": {
+      "status": "OK",
+      "source": "audit pending→登録: 2級直前の基準 — 数値・条件：基準は試験要項・省令で確認 / 関連制度：法定検査"
+    },
+    "s44-2kyu-chokuzen-check": {
+      "status": "OK",
+      "source": "audit pending→登録: 2級直前の確認 — 確認テーマ：2級直前の確認 / 数値・条件：確認は試験要項・省令で確認"
+    }
+  },
+  "kikenbutsu-master": {
+    "otsu4-goukaku-ten": {
+      "status": "OK",
+      "source": "消防試験センター: 各科目60%(法令9/物化6/性消6)"
+    },
+    "juryo-menjo-ryo": {
+      "status": "OK",
+      "source": "消防試験センター: 乙種受験手数料5,300円"
+    },
+    "dai4-shitei-suryo": {
+      "status": "OK",
+      "source": "危険物令: 第4類ガソリン等200L(政令)"
+    },
+    "inka-ten-bunrui": {
+      "status": "OK-practice",
+      "source": "危険物令: 引火点・類別(特殊引火点等)"
+    },
+    "shiken-mondai-jikan": {
+      "status": "OK",
+      "source": "消防試験センター: 35問・120分・五肢択一"
+    },
+    "shokaki-tenken": {
+      "status": "OK-practice",
+      "source": "危険物規則: 6か月点検・充填周期"
+    },
+    "bouka-tei-yoryo": {
+      "status": "OK-practice",
+      "source": "危険物規則: 防火堤容量(規定数量×倍数)"
+    },
+    "menjo-hourei-bukka": {
+      "status": "OK",
+      "source": "消防試験センター: 乙種保有で法令・物化25問免除"
+    },
+    "shiken-nittei-2026": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 支部別日程(要確認)"
+    },
+    "gasorin-200l-shitei": {
+      "status": "OK",
+      "source": "危険物令: ガソリン200L(第4類)"
+    },
+    "inka-ten-21-70-200": {
+      "status": "OK-practice",
+      "source": "危険物令: 引火点21/70/200℃境界"
+    },
+    "shiken-9-6-6": {
+      "status": "OK",
+      "source": "消防試験センター: 9・6・6問(60%足切り)"
+    },
+    "shoubo-shiken-2026": {
+      "status": "OK-practice",
+      "source": "消防試験研究センター公式要項"
+    },
+    "shitei-suryo-dai4-s32": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "ukewatashi-3days-s32": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "shitei-suryo-dai4-s33": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "beisu-2-4-s33": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "tank-chozo-gen-s33": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "hoken-kyori-s33": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "kiken-6rui-s33": {
+      "status": "OK-practice",
+      "source": "危険物令: 類別・取扱"
+    },
+    "shoka-sui-fuka-s33": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-lorry-gen-s33": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "yobou-kitei-nen-s33": {
+      "status": "OK-practice",
+      "source": "危険物規則: 変更届出・取扱計画"
+    },
+    "shiken-mondai-s33": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "chozo-sho-kubun-s33": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "shitei-alcohol-s34": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "beisu-keisan-s34": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "chozo-gen-limit-s34": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "hoan-kyori-num-s34": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shoka-setsubi-num-s34": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "yobou-kitei-num-s34": {
+      "status": "OK-practice",
+      "source": "危険物規則: 変更届出・取扱計画"
+    },
+    "toriatsukai-nen-s34": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "ido-ukewatashi-num-s34": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "kiken-exam-time-s34": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "chozo-kubun-num-s34": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "kiken-toriatsukai-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "shobou-hou-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sho-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "ido-ukewatashi-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "hoan-kitei-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shoka-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "tensou-kiroku-num-s35": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-shiken-num-s35": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-toriatsukai-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "shobou-hou-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sho-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "ido-ukewatashi-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "hoan-kitei-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shoka-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "tensou-kiroku-num-s36": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-shiken-num-s36": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-toriatsukai-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "shobou-hou-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sho-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "ido-ukewatashi-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "hoan-kitei-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shoka-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "tensou-kiroku-num-s37": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-shiken-num-s37": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-toriatsukai-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "shobou-hou-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sho-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "ido-ukewatashi-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "hoan-kitei-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shoka-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "tensou-kiroku-num-s38": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-shiken-num-s38": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-toriatsukai-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "shobou-hou-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sho-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物令: 倍数・貯蔵上限(政令)"
+    },
+    "ido-ukewatashi-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "hoan-kitei-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shoka-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "tensou-kiroku-num-s39": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-shiken-num-s39": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-hoan-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shobo-setsubi-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-santei-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sekkei-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "ido-toriatsukai-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "yobo-kitei-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "shoka-kunren-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-kensa-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "tensou-kiroku-num-s40": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-chokuzen-num-s40": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-hoan-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shobo-setsubi-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-santei-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sekkei-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "ido-toriatsukai-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "yobo-kitei-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "shoka-kunren-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-kensa-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "tensou-kiroku-num-s41": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-chokuzen-num-s41": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-hoan-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shobo-setsubi-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-santei-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sekkei-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "ido-toriatsukai-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "yobo-kitei-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "shoka-kunren-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-kensa-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "tensou-kiroku-num-s42": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-chokuzen-num-s42": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-hoan-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shobo-setsubi-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-santei-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sekkei-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "ido-toriatsukai-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "yobo-kitei-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "shoka-kunren-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-kensa-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "tensou-kiroku-num-s43": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-chokuzen-num-s43": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "kiken-hoan-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物規則: 保安距離(品名・数量)"
+    },
+    "shobo-setsubi-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "shitei-suryo-santei-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物令: 指定数量(品名別・政令)"
+    },
+    "chozo-sekkei-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "ido-toriatsukai-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物規則: 引渡し・取扱期限"
+    },
+    "yobo-kitei-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "shoka-kunren-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物規則: 消火・消防設備"
+    },
+    "tank-kensa-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物令・規則: 政令品名表で数値確認(バッチ)"
+    },
+    "tensou-kiroku-num-s44": {
+      "status": "OK-practice",
+      "source": "危険物規則: 移送・タンクローリー"
+    },
+    "ot4-chokuzen-num-s44": {
+      "status": "OK-practice",
+      "source": "消防試験センター: 35問120分・60%"
+    },
+    "beisu-2bai-4bai-s32": {
+      "status": "OK",
+      "source": "audit pending→登録: 指定数量の2倍・4倍 — 関連制度：指定数量の倍数 / 記録・保存：学習記録"
+    }
+  },
+  "mankan-master": {
+    "mankan-goukaku-mondai": {
+      "status": "OK",
+      "source": "マン管試験要項: 50問・相対評価（例年35-40点台）"
+    },
+    "kangyou-menjo-5mon": {
+      "status": "OK",
+      "source": "管業協会: マン管合格者は管理業務主任者で問46-50免除→45問"
+    },
+    "mankan-juken-tesuryo": {
+      "status": "OK",
+      "source": "マン管試験要項: 受験手数料9,400円（令和6年度要綱）"
+    },
+    "mankan-jikan-120": {
+      "status": "OK",
+      "source": "マン管試験要項: 120分・50問・四肢択一"
+    },
+    "futsu-ketsugi-yohken": {
+      "status": "OK-practice",
+      "source": "区分所有法: 普通決議は議決権の過半数等（議案別）"
+    },
+    "tokubetsu-tatekae-wariai": {
+      "status": "OK",
+      "source": "区分所有法: 特別決議は議決権・人数の各4分の3以上等"
+    },
+    "shuchou-tatekae-kigen": {
+      "status": "OK",
+      "source": "区分所有法施行規則: 建替え等の招集通知期間"
+    },
+    "shukai-nen1kai": {
+      "status": "OK",
+      "source": "区分所有法: 集会は年1回以上"
+    },
+    "gijiroku-shomei-3": {
+      "status": "OK",
+      "source": "区分所有法: 議事録署名は3人以上"
+    },
+    "shukai-shuchou-5bun1": {
+      "status": "OK",
+      "source": "区分所有法: 集会招集は5分の1以上の議決権"
+    }
+  },
+  "unkan-master": {
+    "goukaku-kamoku": {
+      "status": "OK",
+      "source": "運行管理者試験要項: 5科目・科目別足切り"
+    },
+    "juken-tesuryou": {
+      "status": "OK",
+      "source": "運行管理者試験要項: 受験手数料（年度要項）"
+    },
+    "tenko-kiroku-hozon": {
+      "status": "OK",
+      "source": "道路運送法施行規則: 運転記録・保存"
+    },
+    "unten-kyukei-jikan": {
+      "status": "OK",
+      "source": "道路運送法施行規則: 運転時間・休憩"
+    },
+    "sokudo-kijun": {
+      "status": "OK",
+      "source": "道路交通法: 制限速度・標識速度"
+    },
+    "shuki-noudo": {
+      "status": "OK",
+      "source": "道路運送車両法: 酒気帯び基準値"
+    },
+    "nichijo-tenken-shuki": {
+      "status": "OK",
+      "source": "道路運送法施行規則: 日常点検・整備"
+    },
+    "shiken-2026": {
+      "status": "OK",
+      "source": "運行管理者試験要項: 年2回・日程（年度要項）"
+    },
+    "sennin-yoken": {
+      "status": "OK",
+      "source": "道路運送法: 運行管理者選任要件"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "type": "fp_materials",
+  "sections": [
+    {
+      "type": "family_tree",
+      "title": "親族関係図",
+      "footnotes": [
+        "※桜子さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。"
+      ],
+      "rows": [
+        [
+          {
+            "name": "麗子"
+          }
+        ],
+        [
+          {
+            "name": "良枝"
+          },
+          {
+            "name": "藤田 信二",
+            "sub": "（被相続人）",
+            "role": "decedent",
+            "join": "marriage"
+          }
+        ],
+        [
+          {
+            "name": "誠也"
+          },
+          {
+            "name": "桜子",
+            "suffix": "※"
+          },
+          {
+            "name": "咲江"
+          }
+        ]
+      ]
+    }
+  ]
+}

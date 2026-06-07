@@ -1,0 +1,5 @@
+hub_a,hub_b,kind,similarity,slug_a,slug_b,title_a,title_b
+comparisons.csv,numbers.csv,similar,0.882,s38-hub-diff,s38-hub-cycle,ハブ活用の比較整理（判例・ガイド）,ハブ活用の数値整理（判例・ガイド）
+comparisons.csv,numbers.csv,similar,0.882,s43-taicho-cmp,s43-taicho-num,体調管理の比較整理（判例・ガイド）,体調管理の数値整理（判例・ガイド）
+comparisons.csv,numbers.csv,similar,0.900,s43-motiv-diff,s43-motiv-cycle,モチベーションの比較整理（判例・ガイド）,モチベーションの数値整理（判例・ガイド）
+numbers.csv,numbers.csv,similar,0.909,s32-error-review-cycle,s33-review-cycle,誤答ノート見直し周期,直前誤答ノート見直し周期

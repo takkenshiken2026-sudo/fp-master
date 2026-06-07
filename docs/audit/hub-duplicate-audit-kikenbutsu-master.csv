@@ -1,0 +1,7 @@
+kind,hub,cluster_key,count,members
+angle_batch,compare,ido-ukewatashi,2,ido-ukewatashi-s32:移動・譲渡・引渡しの届出 | ido-ukewatashi-s33:移送と譲渡・引渡し
+angle_batch,compare,tensou-kiroku-cmp,2,tensou-kiroku-cmp-s35:転送記録：譲渡・引渡しの届出と移送の比較 | tensou-kiroku-cmp-s40:転送記録保存：譲渡・引渡しの届出と移送の比較
+angle_batch,numbers,ido-ukewatashi-num,2,ido-ukewatashi-num-s34:引渡し届数量 | ido-ukewatashi-num-s35:移動：政令・品名表で確認の数値
+angle_batch,numbers,shitei-suryo-dai4,2,shitei-suryo-dai4-s32:第4類の指定数量（代表） | shitei-suryo-dai4-s33:第4類指定数量
+angle_batch,numbers,tensou-kiroku-num,2,tensou-kiroku-num-s35:転送記録：政令・品名表確認の数値 | tensou-kiroku-num-s40:転送記録保存：政令・品名表確認の数値
+angle_batch,mistakes,tensou-kiroku-mis,2,tensou-kiroku-mis-s35:転送記録：譲渡・引渡しと移送の混同誤り | tensou-kiroku-mis-s40:転送記録保存：譲渡・引渡しと移送の混同誤り

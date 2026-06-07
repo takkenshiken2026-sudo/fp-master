@@ -1,0 +1,10 @@
+kind,hub,cluster_key,count,members
+angle_batch,compare,kubun-shoyu-senyu,2,kubun-shoyu-senyu-s32:専有部分と共用部分 | kubun-shoyu-senyu-s34:区分所有者と管理者
+angle_batch,compare,sokai-inin,2,sokai-inin-s32:総会と管理者の権限 | sokai-inin-s34:総会決議と管理者権限
+angle_batch,compare,tekiseika-kanrin,2,tekiseika-kanrin-s32:適正化法とマンション管理業法 | tekiseika-kanrin-s34:適正化法とマン管業法
+angle_batch,numbers,kanrinin-kibo,2,kanrinin-kibo-s32:管理員配置の規模基準（構造・取扱い） | kanrinin-kibo-s33:管理員配置基準
+angle_batch,numbers,mankan-5mon,2,mankan-5mon-s32:マン管士合格の管業5問免除 | mankan-5mon-s33:マン管士5問免除
+angle_batch,numbers,tokubetsu-5bun4,2,tokubetsu-5bun4-s32:特別決議の議決権割合 | tokubetsu-5bun4-s33:特別決議5分の4
+angle_batch,mistakes,kanrisha-kiyaku,2,kanrisha-kiyaku-s32:管理者が規約変更できるとする誤り | kanrisha-kiyaku-s34:管理者が規約変更できる誤り
+angle_batch,mistakes,senyu-kyoyo-same,2,senyu-kyoyo-same-s32:専有部分と共用部分を同一視する誤り | senyu-kyoyo-same-s34:専有と共用を混同する誤り
+angle_batch,mistakes,tekisei-mankan-same,2,tekisei-mankan-same-s32:適正化法とマン管業法を同一視する誤り | tekisei-mankan-same-s34:適正化法とマン管業法を混同する誤り

@@ -1,0 +1,21 @@
+# takken-master フェーズ5 — SEO 記事デザイン（2026-05-30）
+# 正本: docs/seo-editorial-rollout-checklist.md
+# 同期しない: build_glossary_pages.py（reading slug・site-only）→ テンプレ root で手動パッチ
+
+seo-editorial.css
+site-pages.css
+
+tools/seo_editorial_chrome.py
+tools/internal_links.py
+tools/seo_body_markup.py
+tools/knowledge_hub_seo.py
+tools/build_article_pages.py
+tools/build_compare_pages.py
+tools/build_numbers_mistakes_pages.py
+tools/build_seo_editorial_preview.py
+tools/verify_seo_editorial_rollout.py
+tools/validate_generated_seo.py
+
+docs/seo-editorial-rollout-template.md
+docs/seo-editorial-rollout-checklist.md
+docs/seo-editorial-typography.md

@@ -1,0 +1,25 @@
+# 2級ボイラーマスター（boiler-master）— 同期で上書きしない追記
+# 内容は tools/template_site_only.paths の「boiler-master」節と同一（参照用）
+
+eisei1-data-glossary.js
+eisei1-data-ichimon.js
+eisei1-data-original.js
+eisei1-master-data.js
+
+data/original_questions.csv
+data/past_questions_marubatsu_all_explanations.csv
+
+tools/csv_to_exam_site_master.py
+tools/csv_to_eisei_ichimon_js.py
+tools/glossary_csv_to_eisei_embed_js.py
+tools/apply_seo_growth.py
+tools/import_boiler_csv.py
+tools/build_exam_guide_articles.py
+tools/export_guide_articles_csv.py
+tools/seo_batch2_data.py
+tools/seo_batch3_guides.py
+tools/seo_batch4_guides.py
+
+tools/build_all.py
+tools/build_glossary_pages.py
+tools/validate_csv.py

@@ -1,0 +1,55 @@
+# 二衛マスター（eisei2shu-master）— 同期で上書きしない追記
+# 内容は tools/template_site_only.paths の「二衛マスター」節と同一（参照用コピー）
+
+# SPA 学習データ
+eisei2-data-glossary.js
+eisei2-data-original.js
+eisei2-master-data.js
+_generated_r7_questions.js
+
+# 本番 CSV（テンプレ名と異なる）
+data/eisei2_past_questions.csv
+data/eisei2_original_questions.csv
+
+# 用語・記事の編集用データ
+docs/glossary-terms-checklist.csv
+docs/glossary-article-slugs.json
+docs/term-question-links.json
+eisei-articles/
+
+# 本番のみの generator（マニフェスト外）
+tools/csv_to_eisei2_master.py
+tools/build_question_pages.py
+tools/question_slug_lib.py
+tools/generate_articles_index.py
+tools/generate_guide_articles_batch.py
+tools/generate_terms_index_html.py
+tools/generate_terms_sitemap.py
+tools/add_35_glossary_articles.py
+tools/add_35_glossary_articles_batch2.py
+tools/add_35_glossary_articles_batch3.py
+tools/build_term_question_links.py
+tools/inject_matome_learning_hub.py
+tools/inject_supabase_into_html.py
+tools/learning_links_lib.py
+tools/render_learning_hub.py
+tools/verify_static_internal_links.py
+tools/verify_supabase_url_in_html.sh
+
+tools/build_all.py
+tools/build_glossary_pages.py
+tools/validate_csv.py
+tools/glossary_term_rules.py
+tools/guide_article_rules.py
+tools/audit_editorial_quality.py
+
+# 統合プライバシー（テンプレの privacy.html とは別）
+privacy-terms.html
+
+# 本番文案を維持（apply_site_config でヘッダーのみ差し替え）
+about.html
+related-sites.html
+articles/
+terms/
+q/
+articles/index.html

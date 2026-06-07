@@ -1,0 +1,3 @@
+kind,hub,cluster_key,count,members
+angle_batch,numbers,koushinryo-1getsu,2,koushinryo-1getsu-s32:合意更新の更新料上限 | koushinryo-1getsu-s33:合意更新の更新料
+angle_batch,mistakes,jutaku-jigyou-same,2,jutaku-jigyou-same-s32:住宅と事業用の規制を同一視する誤り | jutaku-jigyou-same-s34:住宅と事業用規制を混同する誤り

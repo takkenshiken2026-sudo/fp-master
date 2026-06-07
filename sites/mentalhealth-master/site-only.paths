@@ -1,0 +1,29 @@
+# メンタルヘルス二種マスター（mentalhealth-master）— 同期で上書きしない追記
+# 内容は tools/template_site_only.paths の eisei1 節と同一（参照用）
+
+eisei1-data-glossary.js
+eisei1-data-ichimon.js
+eisei1-data-original.js
+eisei1-master-data.js
+
+data/original_questions.csv
+data/past_questions_marubatsu_all_explanations.csv
+
+tools/csv_to_exam_site_master.py
+tools/csv_to_eisei_ichimon_js.py
+tools/glossary_csv_to_eisei_embed_js.py
+tools/build_seo_pipeline.py
+tools/enrich_glossary_terms_phase3.py
+tools/populate_guide_articles_extra.py
+tools/populate_guide_articles_batch20.py
+tools/populate_guide_articles_batch10.py
+tools/populate_guide_articles_phase2.py
+tools/build_chapter_hub_pages.py
+tools/build_q_index_from_master.py
+tools/export_orig_to_past_questions_csv.py
+tools/build_all.py
+tools/build_glossary_pages.py
+tools/validate_csv.py
+tools/glossary_term_rules.py
+tools/guide_article_rules.py
+tools/audit_editorial_quality.py

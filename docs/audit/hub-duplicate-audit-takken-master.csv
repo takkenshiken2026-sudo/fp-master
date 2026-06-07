@@ -1,0 +1,4 @@
+kind,hub,cluster_key,count,members
+angle_batch,numbers,houshuu-baibai,2,s33-houshuu-baibai:売買媒介報酬上限 | s34-houshuu-baibai:売買報酬3%+6万
+angle_batch,mistakes,kon-ju35-ju37,2,s33-kon-ju35-ju37:35条と37条の混同 | s35-kon-ju35-ju37:35条37条深掘りの典型誤答
+angle_batch,mistakes,kon-touki,2,s33-kon-touki:登記移転の混同 | s35-kon-touki:登記の典型誤答

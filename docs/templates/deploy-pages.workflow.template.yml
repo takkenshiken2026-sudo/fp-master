@@ -1,0 +1,67 @@
+# GitHub Pages 標準デプロイ（新規サイト用テンプレ）
+#
+# 使い方:
+#   cp .github/workflows/deploy-pages.workflow.template.yml \
+#      .github/workflows/deploy-pages.yml
+#   concurrency.group / environment.name をサイト ID に合わせて編集
+#
+# GitHub → Settings → Pages → Build and deployment → Source: GitHub Actions
+#
+# サイト固有の CSV→JS 変換がある場合は "Site-specific prep" ステップを追加してから build_all を実行。
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-SITE_ID
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 任意: サイト固有データ（賃管・乙4 等）。不要ならこのブロックごと削除。
+      # - name: Site-specific prep
+      #   run: |
+      #     python3 tools/your_site_csv_script.py
+
+      - name: Build, validate, and bundle public_site
+        run: python3 tools/build_all.py
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: public_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,11 @@
+.DS_Store
+public_site/
+.local-notes/
+visual-smoke/
+
+# 一括運用の生成レポート（コミットしない）
+*_report.txt
+hub_deploy_report.txt
+hub_deploy_final_report.txt
+apply_site_config_report.txt
+mankan_unkan_kangyou_deploy_report.txt

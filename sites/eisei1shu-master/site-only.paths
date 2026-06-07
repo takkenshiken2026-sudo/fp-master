@@ -1,0 +1,28 @@
+# 一衛マスター（eisei1shu-master）— 同期で上書きしない
+# CSV 品質改善後に validate_csv / rules をテンプレ版へ切替予定
+
+eisei1-data-glossary.js
+eisei1-data-ichimon.js
+eisei1-data-original.js
+eisei1-master-data.js
+
+data/eisei1_past_questions.csv
+data/eisei1_original_questions.csv
+
+privacy-terms.html
+
+tools/generate_guide_articles.py
+tools/build_question_pages.py
+tools/csv_to_eisei1_master.py
+tools/import_eisei1_kakomon_csv.py
+tools/glossary_csv_to_embed_js.py
+tools/generate_terms_index_html.py
+tools/generate_terms_sitemap.py
+tools/merge_sitemap_xmls.py
+
+tools/build_all.py
+tools/build_glossary_pages.py
+tools/validate_csv.py
+tools/glossary_term_rules.py
+tools/guide_article_rules.py
+tools/audit_editorial_quality.py
