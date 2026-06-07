@@ -106,6 +106,9 @@ def _render_cf_cell(cell: Any) -> str:
         rowspan = cell.get("rowspan")
         if rowspan:
             attrs.append(f' rowspan="{int(rowspan)}"')
+        if "cf-rate-nested" in cls.split():
+            inner = f'<div class="cf-rate-nested-inner">{text}</div>'
+            return f"<td{''.join(attrs)}>{inner}</td>"
         return f"<td{''.join(attrs)}>{text}</td>"
     text = html.escape(str(cell or ""))
     return f"<td>{text}</td>"

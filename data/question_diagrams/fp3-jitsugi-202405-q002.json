@@ -33,10 +33,7 @@
             "text": "４年後",
             "class": "cf-year-head"
           },
-          {
-            "text": "変動率",
-            "class": "cf-rate-head"
-          }
+          ""
         ],
         [
           {
@@ -85,7 +82,7 @@
           {
             "text": "ライフイベント",
             "colspan": 2,
-            "class": "cf-label"
+            "class": "cf-label cf-life-label"
           },
           "",
           {
@@ -98,7 +95,10 @@
             "class": "cf-event"
           },
           "",
-          ""
+          {
+            "text": "変動率",
+            "class": "cf-rate-nested"
+          }
         ],
         [
           {

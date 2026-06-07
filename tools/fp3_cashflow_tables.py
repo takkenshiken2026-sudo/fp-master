@@ -34,7 +34,7 @@ def _hdr() -> list[Any]:
         {"text": "２年後", "class": "cf-year-head"},
         {"text": "３年後", "class": "cf-year-head"},
         {"text": "４年後", "class": "cf-year-head"},
-        {"text": "変動率", "class": "cf-rate-head"},
+        "",
     ]
 
 
@@ -64,6 +64,19 @@ def _amount(label: str, rate: str, years: list[str]) -> list[Any]:
     return [{"text": label, "colspan": 2, "class": "cf-label"}, *years[:5], rate]
 
 
+def _life_event_row(year_events: dict[int, str]) -> list[Any]:
+    """ライフイベント行（右下に変動率ラベルの入れ子枠 — 公表PDFレイアウト）。"""
+    year_cells: list[Any] = ["", "", "", "", ""]
+    for idx, text in year_events.items():
+        if 0 <= idx < 5:
+            year_cells[idx] = {"text": text, "class": "cf-event"}
+    return [
+        {"text": "ライフイベント", "colspan": 2, "class": "cf-label cf-life-label"},
+        *year_cells,
+        {"text": "変動率", "class": "cf-rate-nested"},
+    ]
+
+
 FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
     "fp3-jitsugi-202405-q002": _cf(
         "東条家のキャッシュフロー表",
@@ -73,15 +86,7 @@ FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
             _member("東条 義雄", "本人", ["３７歳", "３８歳", "３９歳", "４０歳", "４１歳"]),
             _member("　　八重", "妻", ["３５歳", "３６歳", "３７歳", "３８歳", "３９歳"]),
             _member("　　泰彦", "長男", ["　７歳", "　８歳", "　９歳", "１０歳", "１１歳"]),
-            [
-                {"text": "ライフイベント", "colspan": 2, "class": "cf-label"},
-                "",
-                {"text": "泰彦\n小学校入学", "class": "cf-event"},
-                "",
-                {"text": "海外旅行", "class": "cf-event"},
-                "",
-                "",
-            ],
+            _life_event_row({1: "泰彦\n小学校入学", 3: "海外旅行"}),
             _section("収入"),
             _amount("給与収入（本人）", "１％", ["４３０", "", "", "", ""]),
             _amount("給与収入（妻）", "－", ["－", "５０", "７０", "７０", "７０"]),
@@ -111,15 +116,7 @@ FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
             _member("東条 義雄", "本人", ["３１歳", "３２歳", "３３歳", "３４歳", "３５歳"]),
             _member("　　八重", "妻", ["３０歳", "３１歳", "３２歳", "３３歳", "３４歳"]),
             _member("　　泰彦", "長男", ["　３歳", "　４歳", "　５歳", "　６歳", "　７歳"]),
-            [
-                {"text": "ライフイベント", "colspan": 2, "class": "cf-label"},
-                "",
-                {"text": "自動車\n購入", "class": "cf-event"},
-                {"text": "泰彦\n小学校入学", "class": "cf-event"},
-                "",
-                "",
-                "",
-            ],
+            _life_event_row({1: "自動車\n購入", 2: "泰彦\n小学校入学"}),
             _section("収入"),
             _amount("給与収入（本人）", "１％", ["４３０", "", "", "", ""]),
             _amount("給与収入（妻）", "１％", ["３６０", "", "", "", ""]),
@@ -149,15 +146,7 @@ FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
             _member("東条 義雄", "本人", ["３１歳", "３２歳", "３３歳", "３４歳", "３５歳"]),
             _member("　　八重", "妻", ["３０歳", "３１歳", "３２歳", "３３歳", "３４歳"]),
             _member("　　泰彦", "長男", ["　５歳", "　６歳", "　７歳", "　８歳", "　９歳"]),
-            [
-                {"text": "ライフイベント", "colspan": 2, "class": "cf-label"},
-                "",
-                {"text": "泰彦私立\n小学校入学", "class": "cf-event"},
-                "",
-                {"text": "海外旅行", "class": "cf-event"},
-                "",
-                "",
-            ],
+            _life_event_row({1: "泰彦私立\n小学校入学", 3: "海外旅行"}),
             _section("収入"),
             _amount("給与収入（本人）", "１％", ["６３０", "", "", "", ""]),
             _amount("給与収入（妻）", "－", ["８０", "８０", "８０", "８０", "８０"]),
