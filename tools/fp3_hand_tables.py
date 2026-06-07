@@ -90,7 +90,12 @@ FP3_HAND_MATERIALS: dict[str, list[dict[str, Any]]] = {
 
 
 def hand_material_sections(source_id: str) -> list[dict[str, Any]] | None:
+    from tools.fp3_material_tables import material_sections_for
+
     did = source_id_to_diagram_id(source_id)
+    material = material_sections_for(source_id)
+    if material is not None:
+        return material
     sections = FP3_HAND_MATERIALS.get(did)
     if sections:
         return [dict(s) for s in sections]

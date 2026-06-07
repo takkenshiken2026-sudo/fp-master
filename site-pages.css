@@ -5632,19 +5632,25 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   padding: 1.35rem 1.25rem 1.15rem;
   margin: 0.75rem auto;
   background: #fff;
-  max-width: 40rem;
+  max-width: 44rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  --q-ft-line: 3px;
+  --q-ft-stem: 1.35rem;
 }
 .q-ft-genogram-above {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.15rem;
 }
 .q-ft-genogram-above-stem {
-  width: 2px;
-  height: 0.75rem;
+  width: var(--q-ft-line);
+  height: var(--q-ft-stem);
   background: var(--ink);
+  flex-shrink: 0;
 }
 .q-ft-genogram-top {
   display: flex;
@@ -5654,67 +5660,97 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   display: flex;
   align-items: center;
   gap: 0;
+  position: relative;
 }
 .q-ft-marriage-bar {
   width: 2.75rem;
-  border-top: 3px double var(--ink);
+  border-top: var(--q-ft-line) double var(--ink);
   flex-shrink: 0;
   margin: 0 0.15rem;
+  align-self: center;
 }
 .q-ft-genogram-connector {
-  width: 3px;
-  height: 1.25rem;
+  width: var(--q-ft-line);
+  height: var(--q-ft-stem);
   background: var(--ink);
   margin: 0 auto;
+  flex-shrink: 0;
 }
 .q-ft-genogram-children {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 1.5rem 2.5rem;
-  flex-wrap: wrap;
+  gap: 1.75rem 2.75rem;
+  flex-wrap: nowrap;
   position: relative;
-  padding-top: 1.25rem;
   margin-top: 0;
-}
-.q-ft-genogram-children::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 6%;
-  right: 6%;
-  height: 3px;
-  background: var(--ink);
+  padding-top: var(--q-ft-stem);
+  border-top: var(--q-ft-line) solid var(--ink);
+  width: fit-content;
+  max-width: 100%;
 }
 .q-ft-branch {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  min-width: 4.5rem;
+  min-width: 4.75rem;
+  flex-shrink: 0;
 }
 .q-ft-branch-stem {
   position: absolute;
-  top: -1.25rem;
-  width: 3px;
-  height: 1.25rem;
+  top: calc(-1 * var(--q-ft-stem));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--q-ft-line);
+  height: var(--q-ft-stem);
   background: var(--ink);
+  z-index: 1;
+}
+.q-ft-branch:has(.q-ft-descendants) .q-ft-couple::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(-1 * var(--q-ft-stem));
+  transform: translateX(-50%);
+  width: var(--q-ft-line);
+  height: var(--q-ft-stem);
+  background: var(--ink);
+}
+.q-ft-branch:has(.q-ft-descendants) .q-ft-couple {
+  margin-bottom: var(--q-ft-stem);
 }
 .q-ft-descendants {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 0.35rem;
+  margin-top: 0;
 }
 .q-ft-descendants-stem {
-  width: 2px;
-  height: 0.85rem;
-  background: var(--ink);
+  display: none;
 }
 .q-ft-descendants-row {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
+}
+@media (max-width: 520px) {
+  .q-ft-genogram-children {
+    flex-wrap: wrap;
+    justify-content: center;
+    border-top: none;
+    padding-top: 0.5rem;
+    gap: 1.25rem 1.5rem;
+  }
+  .q-ft-genogram-children::before {
+    content: none;
+  }
+  .q-ft-branch-stem {
+    display: none;
+  }
+  .q-ft-genogram-connector {
+    height: 0.85rem;
+  }
 }
 .q-ft-person--marker {
   min-width: 3.5rem;
@@ -5807,6 +5843,27 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   color: var(--text);
   line-height: 1.65;
 }
+/* 親族関係図（公表PDF同一レイアウト SVG） */
+.q-family-tree--svg {
+  margin: 0.75rem auto;
+  max-width: 44rem;
+}
+.q-family-tree--svg .q-ft-svg-wrap {
+  margin: 0;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.q-family-tree--svg .q-ft-svg-genogram {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+.q-family-tree--svg .q-ft-notes {
+  margin-top: 0.65rem;
+  padding-left: 0.25rem;
+  list-style: none;
+}
 .q-fp-table-wrap {
   margin: 0.85rem 0;
 }
@@ -5887,10 +5944,17 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
 .q-fp-cashflow col.cf-rate-col {
   width: 2.75rem;
 }
+.q-fp-cashflow td.q-fp-table-note,
+.q-fp-table td.q-fp-table-note,
 .q-fp-table-note td {
+  text-align: left;
   white-space: normal;
   font-size: var(--fs-caption);
   color: var(--text2);
+  background: #fff;
+  font-weight: 400;
+  padding: 0.5rem 0.65rem;
+  line-height: 1.65;
 }
 .q-fp-table-unit {
   font-size: var(--fs-caption);

@@ -17,7 +17,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.fp3_family_trees import source_id_to_diagram_id
-from tools.fp_table_parser import materials_text_to_diagram
+from tools.fp_table_parser import materials_text_to_diagram, split_question_and_materials
 
 SOURCE = ROOT / "data" / "source" / "fp3" / "fp3_jitsugi_past_questions_all.json"
 OUT_DIR = ROOT / "data" / "question_diagrams"
@@ -46,7 +46,12 @@ def main() -> int:
         source_id = q["id"]
         diagram_id = source_id_to_diagram_id(source_id)
         kind = str(diagram.get("kind") or "")
-        text = (q.get("materialsText") or q.get("prompt") or "").strip()
+        from tools.fp_table_parser import strip_leading_question_from_materials
+
+        text = (q.get("materialsText") or "").strip()
+        if not text:
+            _, text = split_question_and_materials(q.get("prompt") or "")
+        text = strip_leading_question_from_materials(text.strip())
         payload = materials_text_to_diagram(source_id, text, kind=kind)
         path = OUT_DIR / f"{diagram_id}.json"
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

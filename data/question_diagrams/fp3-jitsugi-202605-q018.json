@@ -3,58 +3,115 @@
   "sections": [
     {
       "type": "family_tree",
-      "layout": "genogram",
+      "layout": "svg",
       "title": "親族関係図",
+      "view_w": 500,
+      "view_h": 220,
       "footnotes": [
         "※幹夫さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。"
       ],
-      "spouse": {
-        "left": {
+      "nodes": [
+        {
+          "id": "mo",
           "name": "森 隆男",
+          "role": "decedent",
           "sub": "（被相続人）",
-          "role": "decedent"
+          "x": 140,
+          "y": 18
         },
-        "right": {
-          "name": "綾子"
+        {
+          "id": "ay",
+          "name": "綾子",
+          "x": 280,
+          "y": 28
+        },
+        {
+          "id": "mi",
+          "name": "幹夫",
+          "suffix": "※",
+          "x": 35,
+          "y": 118
+        },
+        {
+          "id": "re",
+          "name": "麗子",
+          "x": 125,
+          "y": 118
+        },
+        {
+          "id": "ka",
+          "name": "夏帆",
+          "x": 230,
+          "y": 118
+        },
+        {
+          "id": "dx",
+          "deceased": true,
+          "x": 330,
+          "y": 108
+        },
+        {
+          "id": "ta",
+          "name": "武志",
+          "x": 420,
+          "y": 118
+        },
+        {
+          "id": "ka2",
+          "name": "寛太",
+          "x": 80,
+          "y": 188
+        },
+        {
+          "id": "ma",
+          "name": "真奈",
+          "x": 375,
+          "y": 188
         }
-      },
-      "child_units": [
+      ],
+      "edges": [
         {
-          "spouse": {
-            "left": {
-              "name": "幹夫",
-              "suffix": "※"
-            },
-            "right": {
-              "name": "麗子"
-            }
-          },
-          "descendants": [
-            {
-              "name": "寛太"
-            }
+          "type": "marriage",
+          "a": "mo",
+          "b": "ay"
+        },
+        {
+          "type": "parent_bus",
+          "from": [
+            "mo",
+            "ay"
+          ],
+          "to": [
+            "mi",
+            "ka",
+            "dx"
           ]
         },
         {
-          "person": {
-            "name": "夏帆"
-          }
+          "type": "marriage",
+          "a": "mi",
+          "b": "re"
         },
         {
-          "spouse": {
-            "left": {
-              "role": "deceased",
-              "sub": "（すでに死亡）"
-            },
-            "right": {
-              "name": "武志"
-            }
-          },
-          "descendants": [
-            {
-              "name": "真奈"
-            }
-          ]
+          "type": "child",
+          "from": [
+            "mi",
+            "re"
+          ],
+          "to": "ka2"
+        },
+        {
+          "type": "marriage",
+          "a": "dx",
+          "b": "ta"
+        },
+        {
+          "type": "child",
+          "from": [
+            "dx",
+            "ta"
+          ],
+          "to": "ma"
         }
       ]
     }

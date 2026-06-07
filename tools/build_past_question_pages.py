@@ -105,9 +105,26 @@ def build_materials_html(row: dict) -> str:
     return f'<div class="q-materials"><p>{html.escape(preamble).replace(chr(10), br)}</p></div>'
 
 
+def resolve_stem_text(row: dict) -> str:
+    from tools.fp_table_parser import split_question_and_materials
+
+    stem = norm(row.get("stem"))
+    if not stem:
+        return ""
+    diagram_id = norm(row.get("diagram_id"))
+    if diagram_id:
+        preamble = norm(row.get("preamble"))
+        raw = stem
+        if preamble and "どれか" not in raw:
+            raw = raw + preamble
+        stem_only, _ = split_question_and_materials(raw)
+        return stem_only or stem
+    return stem
+
+
 def build_stem_html(row: dict) -> str:
     parts: list[str] = []
-    stem = norm(row.get("stem"))
+    stem = resolve_stem_text(row)
     preamble = norm(row.get("preamble"))
     diagram_id = norm(row.get("diagram_id"))
     br = "<br>\n"
@@ -610,7 +627,7 @@ def page_dict(row: dict, line_no: int) -> dict:
     wareki = norm(row.get("exam_wareki"))
     cat = norm(row.get("category"))
     typ = norm(row.get("type")) or "single"
-    stem_plain = norm(row.get("stem"))
+    stem_plain = resolve_stem_text(row)
     exp = norm(row.get("explanation")) or "（解説は未入力です。）"
     return {
         "year": year,

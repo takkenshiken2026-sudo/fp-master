@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.build_past_question_pages import build_materials_html
+from tools.fp_table_parser import split_question_and_materials
 from tools.correct_answer_format import collect_choice_texts, is_valid_correct, parse_correct_js_index
 from tools.past_question_subject import subject_from_row
 from tools.site_config import category_to_field_map, extended_correct_answers
@@ -45,7 +46,15 @@ def build_app_stem_text(row: dict) -> str:
     preamble = norm(row.get("preamble"))
     diagram_id = norm(row.get("diagram_id"))
     if stem:
-        parts.append(stem)
+        if diagram_id:
+            raw = stem
+            pre = norm(row.get("preamble"))
+            if pre and "どれか" not in raw:
+                raw = raw + pre
+            stem_only, _ = split_question_and_materials(raw)
+            parts.append(stem_only or stem)
+        else:
+            parts.append(stem)
     if preamble and not diagram_id:
         parts.append(preamble)
     for lab, key in LABELS:

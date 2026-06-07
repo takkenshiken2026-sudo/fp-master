@@ -9,6 +9,19 @@ from typing import Any
 
 FULLWIDTH_DIGITS = str.maketrans("０１２３４５６７８９", "0123456789")
 
+_QUESTION_STEM_MARKERS = (
+    "正しいものはどれか",
+    "最も適切なものはどれか",
+    "最も不適切なものはどれか",
+    "誤っているものはどれか",
+    "適切なものはどれか",
+    "適切でないものはどれか",
+    "対象とならないものはどれか",
+    "対象となるものはどれか",
+    "支払い対象とならないものはどれか",
+    "いうものとする",
+)
+
 
 def norm(s: str | None) -> str:
     return (s or "").strip()
@@ -16,6 +29,70 @@ def norm(s: str | None) -> str:
 
 def nfkc_line(s: str) -> str:
     return norm(s).translate(FULLWIDTH_DIGITS)
+
+
+def split_question_and_materials(text: str) -> tuple[str, str]:
+    """設問文とそれ以降の資料ブロックを分離する。"""
+    t = norm(text)
+    if not t:
+        return "", ""
+    # 「なお、～こととする。」は設問の定義文として stem に含める（改行で分断されても可）
+    na_m = re.search(r"なお、[^＜]*?こととする\s*。", t, re.DOTALL)
+    if na_m:
+        return t[: na_m.end()].strip(), t[na_m.end() :].strip()
+    compact = re.sub(r"\s+", "", t)
+    if "いうものとする" in compact:
+        pos = compact.find("いうものとする")
+        # 原文上の「。」位置を compact インデックスから復元
+        seen = 0
+        for i, ch in enumerate(t):
+            if ch.isspace():
+                continue
+            if seen == pos + len("いうものとする"):
+                end = t.find("。", i)
+                if end >= 0:
+                    return t[: end + 1].strip(), t[end + 1 :].strip()
+                break
+            seen += 1
+    m = re.search(r"どれ\s*か\s*。", t, re.DOTALL)
+    if m:
+        return t[: m.end()].strip(), t[m.end() :].strip()
+    return t, ""
+
+
+def strip_leading_question_from_materials(text: str) -> str:
+    """資料テキスト先頭に含まれる設問文を除去する。"""
+    t = norm(text)
+    if not t:
+        return t
+    m = re.search(r"＜[^＞]+＞", t)
+    if m and m.start() > 0:
+        before = t[: m.start()].strip()
+        looks_like_stem = (
+            is_question_stem_text(before)
+            or "どれか" in before
+            or before.endswith("下記")
+            or "いうものとする" in before
+        )
+        if looks_like_stem and "経過年数" not in before and "収入合計" not in before:
+            return t[m.start() :].strip()
+    _, tail = split_question_and_materials(t)
+    if tail and tail != t:
+        return strip_leading_question_from_materials(tail)
+    return t
+
+
+def is_question_stem_text(text: str) -> bool:
+    """資料ではなく設問文のみか（表・＜見出し＞を含まない）。"""
+    t = norm(text).replace("\n", "")
+    if not t:
+        return False
+    if "＜" in t or "経過年数" in t or "収入合計" in t:
+        return False
+    if any(m in t for m in _QUESTION_STEM_MARKERS):
+        _, tail = split_question_and_materials(text)
+        return not norm(tail)
+    return False
 
 
 def normalize_jp_linebreaks(text: str) -> str:
@@ -64,51 +141,82 @@ def split_material_sections(text: str) -> list[tuple[str, str]]:
     return sections
 
 
-def parse_tax_bracket_table(body: str) -> dict[str, Any]:
+def _tax_table_title(body: str, section_title: str = "") -> str:
+    blob = f"{section_title}\n{body}"
+    if "生命保険料控除" in blob or ("支払保険料" in body and "控除額" in body):
+        return "所得税の生命保険料控除額の速算表"
+    if "給与所得控除" in blob:
+        return "給与所得控除額の速算表"
+    if "公的年金" in blob:
+        return "公的年金等控除額の速算表"
+    if "課税される所得金額" in body or "所得税の速算表" in blob:
+        return "所得税の速算表"
+    return "相続税の速算表"
+
+
+def _tax_table_headers(body: str, title: str) -> list[str]:
+    if "生命保険料控除" in title:
+        return ["年間の支払保険料の合計", "控除額"]
+    if "給与所得控除" in title:
+        return ["給与等の収入金額", "給与所得控除額"]
+    if "公的年金" in title:
+        return ["納税者区分", "公的年金等の収入金額（Ａ）", "公的年金等控除額"]
+    if "所得税の速算表" in title:
+        return ["課税される所得金額", "税率", "控除額"]
+    return ["法定相続分に応ずる取得金額", "税率", "控除額"]
+
+
+def parse_tax_bracket_table(body: str, *, section_title: str = "") -> dict[str, Any]:
+    title = _tax_table_title(body, section_title)
+    headers = _tax_table_headers(body, title)
     lines = [nfkc_line(ln) for ln in body.splitlines() if norm(ln)]
     rows: list[list[str]] = []
     for ln in lines:
-        if "法定相続分" in ln and "税率" in ln:
+        if ln.startswith("（注）") or ln.startswith("※"):
+            rows.append([{"text": ln, "note": True}])
+            continue
+        if any(h in ln for h in headers if len(h) > 4) and "税率" in ln:
             continue
         s = ln.replace("％", "%")
         m = re.match(r"^(.+?)\s+(\d+%|－|-)\s+(.+)$", s)
         if m:
             rows.append([m.group(1).strip(), m.group(2).strip(), m.group(3).strip()])
             continue
-        if re.search(r"\d", s) and ("%" in s or "万円" in s):
+        if re.search(r"\d", s) and ("%" in s or "万円" in s or "円" in s):
             cells = re.split(r"\s{2,}|\t", s)
             cells = [c.strip() for c in cells if c.strip()]
             if len(cells) >= 3:
                 rows.append(cells[:3])
             elif len(cells) == 2:
-                rows.append([cells[0], cells[1], ""])
-    return {
-        "type": "fp_table",
-        "title": "相続税の速算表",
-        "headers": ["法定相続分に応ずる取得金額", "税率", "控除額"],
-        "rows": rows,
-    }
+                rows.append(cells[:2])
+    return {"type": "fp_table", "title": title, "headers": headers, "rows": rows, "dense": True}
 
 
-def parse_insurance_table(body: str) -> dict[str, Any]:
+def parse_death_insurance_table(body: str) -> dict[str, Any]:
     lines = [ln.strip() for ln in body.splitlines() if norm(ln)]
     headers: list[str] = []
     rows: list[list[str]] = []
     for ln in lines:
-        if "保険契約者" in ln or "被保険者" in ln:
+        if "保険契約者" in ln and "被保険者" in ln:
             headers = re.split(r"\s{2,}|\s(?=被保険者|死亡保険金)", nfkc_line(ln))
             headers = [h.strip() for h in headers if h.strip()]
             continue
-        if "万円" in ln or re.search(r"\d", nfkc_line(ln)):
+        if "万円" in ln:
             cells = re.split(r"\s{2,}|\t", ln)
             cells = [c.strip() for c in cells if c.strip()]
-            if cells:
-                rows.append(cells)
+            if len(cells) >= 4:
+                rows.append(cells[:4])
+            elif len(cells) == 1 and "万円" in cells[0]:
+                parts = cells[0].split()
+                if len(parts) >= 4:
+                    rows.append(parts[:4])
     return {
         "type": "fp_table",
         "title": "遺族が受け取った生命保険の死亡保険金",
-        "headers": headers or ["保険契約者（保険料負担者）", "被保険者", "死亡保険金受取人", "金額"],
+        "headers": headers
+        or ["保険契約者（保険料負担者）", "被保険者", "死亡保険金受取人", "金額"],
         "rows": rows,
+        "dense": True,
     }
 
 
@@ -155,18 +263,24 @@ def parse_simple_amount_block(title: str, body: str) -> dict[str, Any]:
 
 def materials_text_to_diagram(source_id: str, text: str, *, kind: str) -> dict[str, Any]:
     """資料全文から fp_materials JSON を組み立てる。"""
+    from tools.fp3_family_trees import FP3_FAMILY_TREES, source_id_to_diagram_id
     from tools.fp3_hand_tables import hand_material_sections
 
     hand = hand_material_sections(source_id)
     if hand is not None:
-        return {"type": "fp_materials", "sections": hand}
+        sections = list(hand)
+        if kind == "family_tree":
+            fid = source_id_to_diagram_id(source_id)
+            tree = FP3_FAMILY_TREES.get(fid)
+            if tree and not any(s.get("type") == "family_tree" for s in sections):
+                sections.insert(0, tree)
+        return {"type": "fp_materials", "sections": sections}
 
+    text = strip_leading_question_from_materials(text)
     sections = split_material_sections(text)
     blocks: list[dict[str, Any]] = []
 
     if kind == "family_tree":
-        from tools.fp3_family_trees import FP3_FAMILY_TREES, source_id_to_diagram_id
-
         fid = source_id_to_diagram_id(source_id)
         tree = FP3_FAMILY_TREES.get(fid)
         if tree:
@@ -175,17 +289,19 @@ def materials_text_to_diagram(source_id: str, text: str, *, kind: str) -> dict[s
     for title, body in sections:
         if not body and not title:
             continue
-        if "速算表" in title or ("税率" in body and "控除額" in body):
-            blocks.append(parse_tax_bracket_table(body))
-        elif "死亡保険金" in title or "保険契約者" in body:
-            blocks.append(parse_insurance_table(body if body else title))
+        if "遺族が受け取った生命保険" in title:
+            blocks.append(parse_death_insurance_table(body if body else title))
+        elif "速算表" in title or ("税率" in body and "控除額" in body):
+            blocks.append(parse_tax_bracket_table(body, section_title=title))
+        elif "死亡保険金" in title and "遺族" in title:
+            blocks.append(parse_death_insurance_table(body if body else title))
         elif "課税遺産総額" in title:
             amount = norm(body)
             if amount and "万円" in amount and len(amount) < 40:
                 blocks.append(parse_simple_amount_block(title, amount))
         elif "キャッシュフロー" in title or "経過年数" in body or "収入合計" in body:
             blocks.append(parse_cashflow_table(title or "資料表", body, source_id=source_id))
-        elif title and body and kind != "family_tree" and "正しいものはどれか" not in body:
+        elif title and body and kind != "family_tree" and not is_question_stem_text(body):
             blocks.append(
                 {
                     "type": "fp_text_block",
@@ -193,10 +309,23 @@ def materials_text_to_diagram(source_id: str, text: str, *, kind: str) -> dict[s
                     "body": normalize_jp_linebreaks(body),
                 }
             )
+        elif not title and body and kind != "family_tree":
+            mat = normalize_jp_linebreaks(strip_leading_question_from_materials(body))
+            if mat and not is_question_stem_text(mat):
+                if "速算表" in mat or ("税率" in mat and "控除額" in mat):
+                    blocks.append(parse_tax_bracket_table(mat, section_title=""))
+                elif "キャッシュフロー" in mat or "経過年数" in mat or "収入合計" in mat:
+                    blocks.append(parse_cashflow_table("資料表", mat, source_id=source_id))
+                else:
+                    blocks.append({"type": "fp_text_block", "title": "", "body": mat})
 
-    if not blocks and text.strip():
-        blocks.append(
-            {"type": "fp_text_block", "title": "", "body": normalize_jp_linebreaks(text.strip())}
+    blocks = [
+        b
+        for b in blocks
+        if not (
+            b.get("type") == "fp_text_block"
+            and is_question_stem_text(str(b.get("body") or ""))
         )
+    ]
 
     return {"type": "fp_materials", "sections": blocks}

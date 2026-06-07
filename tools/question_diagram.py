@@ -58,7 +58,7 @@ def _person_html(person: dict) -> str:
 
 
 def render_family_tree(data: dict) -> str:
-    if str(data.get("layout") or "") == "genogram":
+    if str(data.get("layout") or "") in {"genogram", "svg"}:
         from tools.fp3_genogram import render_genogram_family_tree
 
         return render_genogram_family_tree(data)

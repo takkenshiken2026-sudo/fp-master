@@ -2,9 +2,19 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_text_block",
+      "type": "fp_table",
       "title": "資料",
-      "body": "支給された退職一時金 ４,４００万円勤続年数 ３８年"
+      "rows": [
+        [
+          "支給された退職一時金",
+          "４,４００万円"
+        ],
+        [
+          "勤続年数",
+          "３８年"
+        ]
+      ],
+      "dense": true
     }
   ]
 }

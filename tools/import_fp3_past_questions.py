@@ -100,15 +100,20 @@ def parse_year_from_id(qid: str) -> int:
 
 def split_stem_preamble(prompt: str, materials_text: str) -> tuple[str, str]:
     """設問文と資料（表・図表テキスト）を分離。図表は preamble に載せる。"""
+    from tools.fp_table_parser import split_question_and_materials
+
     prompt = norm(prompt)
     materials = norm(materials_text)
+    stem, tail = split_question_and_materials(prompt)
+    if tail:
+        return stem, tail
     if materials and materials != prompt:
         lead = prompt
         if materials.startswith(prompt[: min(80, len(prompt))]):
             lead = prompt.split("\n\n")[0] if "\n\n" in prompt else ""
         return lead or prompt.split("＜")[0].strip(), materials
     idx = prompt.find("＜")
-    if idx > 0:
+    if idx > 0 and "が下記のとおり" not in prompt[: idx + 20]:
         return prompt[:idx].strip(), prompt[idx:].strip()
     idx = prompt.find("経過年数")
     if idx > 0:

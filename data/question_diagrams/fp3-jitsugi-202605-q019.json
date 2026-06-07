@@ -3,37 +3,65 @@
   "sections": [
     {
       "type": "family_tree",
-      "layout": "genogram",
+      "layout": "svg",
       "title": "親族関係図",
+      "view_w": 420,
+      "view_h": 160,
       "footnotes": [
         "※桜子さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。"
       ],
-      "spouse": {
-        "left": {
+      "nodes": [
+        {
+          "id": "fu",
           "name": "藤田 信二",
+          "role": "decedent",
           "sub": "（被相続人）",
-          "role": "decedent"
+          "x": 55,
+          "y": 18
         },
-        "right": {
-          "name": "良枝"
+        {
+          "id": "yo",
+          "name": "良枝",
+          "x": 215,
+          "y": 28
+        },
+        {
+          "id": "sa",
+          "name": "咲江",
+          "x": 55,
+          "y": 118
+        },
+        {
+          "id": "se",
+          "name": "誠也",
+          "x": 175,
+          "y": 118
+        },
+        {
+          "id": "sk",
+          "name": "桜子",
+          "suffix": "※",
+          "x": 295,
+          "y": 118
         }
-      },
-      "child_units": [
+      ],
+      "edges": [
         {
-          "person": {
-            "name": "咲江"
-          }
+          "type": "marriage",
+          "a": "fu",
+          "b": "yo"
         },
         {
-          "person": {
-            "name": "誠也"
-          }
-        },
-        {
-          "person": {
-            "name": "桜子",
-            "suffix": "※"
-          }
+          "type": "parent_bus",
+          "from": [
+            "fu",
+            "yo"
+          ],
+          "to": [
+            "sa",
+            "se",
+            "sk"
+          ]
         }
       ]
     }

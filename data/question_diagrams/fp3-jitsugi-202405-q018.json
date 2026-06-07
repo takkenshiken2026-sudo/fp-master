@@ -3,42 +3,77 @@
   "sections": [
     {
       "type": "family_tree",
-      "layout": "genogram",
+      "layout": "svg",
       "title": "親族関係図",
+      "view_w": 500,
+      "view_h": 200,
       "footnotes": [
         "※妙子さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。"
       ],
-      "above": {
-        "name": "妙子",
-        "suffix": "※"
-      },
-      "spouse": {
-        "left": {
+      "nodes": [
+        {
+          "id": "ko",
+          "name": "光貴",
+          "deceased": true,
+          "x": 48,
+          "y": 20
+        },
+        {
+          "id": "ta",
+          "name": "妙子",
+          "suffix": "※",
+          "x": 168,
+          "y": 22
+        },
+        {
+          "id": "yo",
+          "name": "吉春",
+          "x": 55,
+          "y": 118
+        },
+        {
+          "id": "ry",
+          "name": "龍子",
+          "x": 175,
+          "y": 118
+        },
+        {
+          "id": "mo",
           "name": "森 隆男",
+          "role": "decedent",
           "sub": "（被相続人）",
-          "role": "decedent"
+          "x": 295,
+          "y": 108
         },
-        "right": {
-          "name": "綾子"
+        {
+          "id": "ay",
+          "name": "綾子",
+          "x": 405,
+          "y": 118
         }
-      },
-      "child_units": [
+      ],
+      "edges": [
         {
-          "person": {
-            "name": "龍子"
-          }
+          "type": "marriage",
+          "a": "ko",
+          "b": "ta"
         },
         {
-          "person": {
-            "name": "元貴"
-          }
+          "type": "parent_bus",
+          "from": [
+            "ko",
+            "ta"
+          ],
+          "to": [
+            "yo",
+            "ry",
+            "mo"
+          ]
         },
         {
-          "person": {
-            "name": "吉春",
-            "sub": "（すでに死亡）",
-            "role": "deceased"
-          }
+          "type": "marriage",
+          "a": "mo",
+          "b": "ay"
         }
       ]
     }

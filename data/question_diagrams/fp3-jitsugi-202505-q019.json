@@ -3,60 +3,82 @@
   "sections": [
     {
       "type": "family_tree",
-      "layout": "genogram",
+      "layout": "svg",
       "title": "親族関係図",
+      "view_w": 420,
+      "view_h": 160,
       "footnotes": [],
-      "spouse": {
-        "left": {
+      "nodes": [
+        {
+          "id": "fu",
           "name": "藤田 信二",
+          "role": "decedent",
           "sub": "（被相続人）",
-          "role": "decedent"
+          "x": 55,
+          "y": 18
         },
-        "right": {
-          "name": "良枝"
+        {
+          "id": "yo",
+          "name": "良枝",
+          "x": 215,
+          "y": 28
+        },
+        {
+          "id": "sa",
+          "name": "咲江",
+          "x": 55,
+          "y": 118
+        },
+        {
+          "id": "se",
+          "name": "誠也",
+          "x": 175,
+          "y": 118
+        },
+        {
+          "id": "sk",
+          "name": "桜子",
+          "x": 295,
+          "y": 118
         }
-      },
-      "child_units": [
+      ],
+      "edges": [
         {
-          "person": {
-            "name": "誠也"
-          }
+          "type": "marriage",
+          "a": "fu",
+          "b": "yo"
         },
         {
-          "person": {
-            "name": "桜子"
-          }
-        },
-        {
-          "person": {
-            "name": "咲江"
-          }
+          "type": "parent_bus",
+          "from": [
+            "fu",
+            "yo"
+          ],
+          "to": [
+            "sa",
+            "se",
+            "sk"
+          ]
         }
       ]
     },
     {
       "type": "fp_table",
       "title": "遺族が受け取った生命保険の死亡保険金",
+      "rows": [
+        [
+          "信二さん",
+          "信二さん",
+          "良枝さん",
+          "３,０００万円"
+        ]
+      ],
+      "dense": true,
       "headers": [
         "保険契約者（保険料負担者）",
         "被保険者",
         "死亡保険金受取人",
         "金額"
-      ],
-      "rows": []
-    },
-    {
-      "type": "fp_table",
-      "title": "遺族が受け取った生命保険の死亡保険金",
-      "headers": [
-        "（保険料負担者）",
-        "被保険者",
-        "死亡保険金受取人 金額"
-      ],
-      "rows": [
-        [
-          "信二さん 信二さん 良枝さん ３,０００万円"
-        ]
       ]
     }
   ]
