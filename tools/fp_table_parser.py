@@ -18,6 +18,30 @@ def nfkc_line(s: str) -> str:
     return norm(s).translate(FULLWIDTH_DIGITS)
 
 
+def normalize_jp_linebreaks(text: str) -> str:
+    """PDF由来の不自然な改行（例: の保\\n険）を結合する。"""
+    if not text:
+        return text
+    lines = text.split("\n")
+    merged: list[str] = []
+    for line in lines:
+        s = line.strip()
+        if not s:
+            if merged and merged[-1] != "":
+                merged.append("")
+            continue
+        if not merged or merged[-1] == "":
+            merged.append(s)
+            continue
+        prev = merged[-1]
+        if prev and not re.search(r"[。．！？…」』）\)、]$", prev.rstrip()):
+            if re.match(r"^[ぁ-んァ-ヶ一-龠〝〟（(]", s):
+                merged[-1] = prev.rstrip() + s
+                continue
+        merged.append(s)
+    return "\n".join(merged)
+
+
 def split_material_sections(text: str) -> list[tuple[str, str]]:
     """＜見出し＞で区切った (title, body) のリスト。"""
     text = norm(text)
@@ -162,9 +186,17 @@ def materials_text_to_diagram(source_id: str, text: str, *, kind: str) -> dict[s
         elif "キャッシュフロー" in title or "経過年数" in body or "収入合計" in body:
             blocks.append(parse_cashflow_table(title or "資料表", body, source_id=source_id))
         elif title and body and kind != "family_tree" and "正しいものはどれか" not in body:
-            blocks.append({"type": "fp_text_block", "title": title, "body": body})
+            blocks.append(
+                {
+                    "type": "fp_text_block",
+                    "title": title,
+                    "body": normalize_jp_linebreaks(body),
+                }
+            )
 
     if not blocks and text.strip():
-        blocks.append({"type": "fp_text_block", "title": "", "body": text.strip()})
+        blocks.append(
+            {"type": "fp_text_block", "title": "", "body": normalize_jp_linebreaks(text.strip())}
+        )
 
     return {"type": "fp_materials", "sections": blocks}

@@ -1297,41 +1297,48 @@ h2.section-label .tip-icon{width:13px;height:13px;font-size:9px}
 .q-text{font-size:var(--fs-body);line-height:1.8;color:var(--text);font-family:var(--font);white-space:pre-line}
 .q-text.has-materials{white-space:normal}
 .q-text .q-quiz-stem{white-space:pre-line;margin-bottom:1rem}
-#page-quiz .q-materials{margin-top:.25rem}
-#page-quiz .q-materials-title{font-weight:700;font-size:var(--fs-sub);margin:0 0 .5rem;color:var(--text)}
+#page-quiz .q-materials{margin-top:.5rem;color:var(--text);font-size:var(--fs-sub);line-height:1.75}
+#page-quiz .q-materials-title{font-weight:700;font-size:var(--fs-sub);margin:.75rem 0 .4rem;color:var(--ink)}
+#page-quiz .q-materials>:first-child .q-materials-title,#page-quiz .q-materials>figure:first-child>.q-materials-title{margin-top:0}
+#page-quiz .q-fp-text-block{margin:.5rem 0;font-size:var(--fs-sub);line-height:1.8;color:var(--text)}
+#page-quiz .q-fp-text-block p{margin:0;word-break:keep-all;overflow-wrap:anywhere}
+#page-quiz .q-fp-table-wrap{margin:.85rem 0}
+#page-quiz .q-fp-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff;border:1px solid rgba(51,51,51,.28);border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+#page-quiz table.q-fp-table{border-collapse:collapse;width:100%;min-width:20rem;font-size:var(--fs-sub);color:var(--text);background:#fff}
+#page-quiz table.q-fp-table th,#page-quiz table.q-fp-table td{border:1px solid rgba(51,51,51,.22);padding:.45rem .6rem;vertical-align:middle;background:#fff}
+#page-quiz table.q-fp-table th{background:#e8ecf1;color:var(--ink);font-weight:700;text-align:center}
+#page-quiz table.q-fp-table tbody td{background:#fff}
+#page-quiz .q-fp-table-unit{font-size:var(--fs-caption);color:var(--text2);margin:0 0 .35rem}
+#page-quiz .q-fp-cashflow{min-width:36rem;table-layout:fixed}
+#page-quiz .q-fp-cashflow td{white-space:nowrap;text-align:center;border:1px solid rgba(51,51,51,.22)}
+#page-quiz .q-fp-cashflow td.cf-label,#page-quiz .q-fp-cashflow td.cf-section{text-align:left;white-space:normal}
+#page-quiz .q-fp-cashflow td.cf-corner,#page-quiz .q-fp-cashflow td.cf-section{background:#e8ecf1;font-weight:700}
+#page-quiz .q-fp-cashflow td.cf-year-head,#page-quiz .q-fp-cashflow td.cf-rate-head{font-weight:700;background:#f4f6f8}
+#page-quiz .q-family-tree--genogram{margin:.75rem 0}
+#page-quiz .q-family-tree--genogram .q-ft-genogram{border:2px solid var(--ink);padding:1.35rem 1.25rem 1.15rem;margin:0;background:#fff;max-width:40rem;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 #page-quiz .q-family-tree-body{display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:1rem .5rem}
 #page-quiz .q-ft-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:1rem 1.5rem;position:relative}
-#page-quiz .q-ft-row:not(:last-child)::after{content:"";position:absolute;left:50%;bottom:-.5rem;width:2px;height:.5rem;background:var(--ink);transform:translateX(-50%)}
-#page-quiz .q-ft-person{border:2px solid var(--ink);border-radius:var(--r);background:var(--bg);padding:.45rem .65rem;min-width:4.5rem;text-align:center;font-size:var(--fs-sub);line-height:1.35}
-#page-quiz .q-ft-person--decedent{background:var(--bg3);font-weight:700}
-#page-quiz .q-ft-sub,#page-quiz .q-ft-suffix{display:block;font-size:var(--fs-caption);font-weight:500}
+#page-quiz .q-ft-row:not(:last-child)::after{content:"";position:absolute;left:50%;bottom:-.5rem;width:3px;height:.5rem;background:var(--ink);transform:translateX(-50%)}
+#page-quiz .q-ft-couple{display:flex;align-items:center}
+#page-quiz .q-ft-marriage-bar{width:3rem;border-top:3px double var(--ink);margin:0 .2rem;flex-shrink:0}
 #page-quiz .q-ft-marriage{display:flex;align-items:center;gap:.5rem}
 #page-quiz .q-ft-marriage::before{content:"｜";color:var(--text2);font-weight:700}
-#page-quiz .q-ft-notes{margin:.75rem 0 0;padding-left:1.2rem;font-size:var(--fs-caption);color:var(--text2)}
-#page-quiz .q-fp-table-wrap{margin:.75rem 0}
-#page-quiz .q-fp-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-#page-quiz table.q-fp-table{border-collapse:collapse;width:100%;min-width:28rem;font-size:var(--fs-caption)}
-#page-quiz table.q-fp-table th,#page-quiz table.q-fp-table td{border:1px solid var(--border2);padding:.35rem .5rem;vertical-align:top}
-#page-quiz table.q-fp-table th{background:var(--bg3);font-weight:600}
-#page-quiz .q-fp-cashflow{min-width:36rem;table-layout:fixed}
-#page-quiz .q-fp-cashflow td{white-space:nowrap;text-align:center}
-#page-quiz .q-fp-cashflow td.cf-label,#page-quiz .q-fp-cashflow td.cf-section{text-align:left;white-space:normal}
-#page-quiz .q-fp-table-unit{font-size:var(--fs-caption);color:var(--text2);margin:0 0 .35rem}
-#page-quiz .q-fp-text-block{margin:.5rem 0;font-size:var(--fs-sub)}
-#page-quiz .q-family-tree--genogram .q-ft-genogram{border:1.5px solid var(--ink);padding:1rem;margin:.5rem 0;background:var(--bg);max-width:36rem}
-#page-quiz .q-ft-couple{display:flex;align-items:center}
-#page-quiz .q-ft-marriage-bar{width:2.75rem;border-top:3px double var(--ink);margin:0 .15rem}
-#page-quiz .q-ft-genogram-connector{width:2px;height:1.1rem;background:var(--ink);margin:0 auto}
-#page-quiz .q-ft-genogram-children{display:flex;justify-content:center;flex-wrap:wrap;gap:1.25rem 2rem;position:relative;padding-top:1.1rem}
-#page-quiz .q-ft-genogram-children::before{content:"";position:absolute;top:0;left:8%;right:8%;height:2px;background:var(--ink)}
-#page-quiz .q-ft-branch{display:flex;flex-direction:column;align-items:center;position:relative}
-#page-quiz .q-ft-branch-stem{position:absolute;top:-1.1rem;width:2px;height:1.1rem;background:var(--ink)}
-#page-quiz .q-ft-person{border:2px solid var(--ink);border-radius:var(--r);padding:.45rem .65rem;min-width:4.5rem;text-align:center;font-size:var(--fs-sub)}
-#page-quiz .q-ft-person--decedent{background:var(--bg3);font-weight:700}
-#page-quiz .q-ft-sub,#page-quiz .q-ft-suffix{display:block;font-size:var(--fs-caption)}
-#page-quiz table.q-fp-table{border-collapse:collapse;width:100%;min-width:20rem;font-size:var(--fs-caption)}
-#page-quiz table.q-fp-table th,#page-quiz table.q-fp-table td{border:1px solid var(--border2);padding:.35rem .5rem}
-#page-quiz .q-fp-cashflow td{border:1px solid var(--border2)}
+#page-quiz .q-ft-genogram-connector{width:3px;height:1.25rem;background:var(--ink);margin:0 auto}
+#page-quiz .q-ft-genogram-children{display:flex;justify-content:center;flex-wrap:wrap;gap:1.5rem 2.5rem;position:relative;padding-top:1.25rem}
+#page-quiz .q-ft-genogram-children::before{content:"";position:absolute;top:0;left:6%;right:6%;height:3px;background:var(--ink)}
+#page-quiz .q-ft-branch{display:flex;flex-direction:column;align-items:center;position:relative;min-width:5rem}
+#page-quiz .q-ft-branch-stem{position:absolute;top:-1.25rem;width:3px;height:1.25rem;background:var(--ink)}
+#page-quiz .q-ft-descendants{display:flex;flex-direction:column;align-items:center;margin-top:.4rem}
+#page-quiz .q-ft-descendants-stem{width:3px;height:.9rem;background:var(--ink)}
+#page-quiz .q-ft-descendants-row{display:flex;justify-content:center;gap:.5rem}
+#page-quiz .q-ft-person{border:2px solid var(--ink);border-radius:6px;background:#fff;padding:.55rem .75rem;min-width:5rem;text-align:center;font-size:var(--fs-sub);line-height:1.4;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+#page-quiz .q-ft-person--decedent{background:#fff9e8;font-weight:700;border-width:2.5px}
+#page-quiz .q-ft-person--deceased{opacity:.9}
+#page-quiz .q-ft-person--marker{min-width:4rem;min-height:3.25rem;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#page-quiz .q-ft-deceased-x{font-size:1.5rem;font-weight:700;line-height:1;color:var(--ink)}
+#page-quiz .q-ft-name{font-weight:600}
+#page-quiz .q-ft-sub,#page-quiz .q-ft-suffix{display:block;font-size:var(--fs-caption);font-weight:500;color:var(--text2);margin-top:.15rem}
+#page-quiz .q-ft-notes{margin:.85rem 0 0;padding-left:1.1rem;font-size:var(--fs-caption);color:var(--text);line-height:1.65}
 .bookmark-btn{width:38px;height:38px;border-radius:var(--r);border:1.5px solid var(--border2);background:#fff;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;box-shadow:var(--sh)}
 .bookmark-btn--labeled{width:auto;padding:0 11px 0 9px;gap:5px;height:38px}
 .bookmark-btn-label{font-size:12px;font-weight:700;letter-spacing:.02em;line-height:1;white-space:nowrap}

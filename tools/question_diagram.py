@@ -188,8 +188,10 @@ def render_pdf_figure(data: dict) -> str:
 
 
 def render_text_block(data: dict) -> str:
+    from tools.fp_table_parser import normalize_jp_linebreaks
+
     title = html.escape(str(data.get("title") or ""))
-    body = html.escape(str(data.get("body") or "")).replace("\n", "<br>\n")
+    body = html.escape(normalize_jp_linebreaks(str(data.get("body") or ""))).replace("\n", "<br>\n")
     title_html = f'<p class="q-materials-title">{title}</p>' if title else ""
     return f'<div class="q-fp-text-block">{title_html}<p>{body}</p></div>'
 
