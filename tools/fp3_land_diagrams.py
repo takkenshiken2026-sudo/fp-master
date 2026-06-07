@@ -40,9 +40,9 @@ def _road(y_top: float, y_bot: float, x1: float, x2: float, label: str) -> str:
     return (
         f'<line x1="{x1}" y1="{y_top}" x2="{x2}" y2="{y_top}" stroke="#111" stroke-width="{LINE}"/>'
         f'<line x1="{x1}" y1="{y_bot}" x2="{x2}" y2="{y_bot}" stroke="#111" stroke-width="{LINE}"/>'
-        f'<line x1="{mid_x - 30}" y1="{mid_y}" x2="{mid_x + 30}" y2="{mid_y}" stroke="#111" stroke-width="1"/>'
-        f'<line x1="{mid_x - 30}" y1="{mid_y - 3}" x2="{mid_x - 30}" y2="{mid_y + 3}" stroke="#111" stroke-width="1"/>'
-        f'<line x1="{mid_x + 30}" y1="{mid_y - 3}" x2="{mid_x + 30}" y2="{mid_y + 3}" stroke="#111" stroke-width="1"/>'
+        f'<line x1="{mid_x - 36}" y1="{mid_y}" x2="{mid_x + 36}" y2="{mid_y}" stroke="#111" stroke-width="1"/>'
+        f'<line x1="{mid_x - 36}" y1="{mid_y - 3}" x2="{mid_x - 36}" y2="{mid_y + 3}" stroke="#111" stroke-width="1"/>'
+        f'<line x1="{mid_x + 36}" y1="{mid_y - 3}" x2="{mid_x + 36}" y2="{mid_y + 3}" stroke="#111" stroke-width="1"/>'
         f'<text x="{mid_x}" y="{mid_y + 4}" text-anchor="middle" font-family="{FONT}" font-size="11">{_esc(label)}</text>'
     )
 
@@ -60,6 +60,28 @@ def _info_box(x: float, y: float, w: float, h: float, lines: list[str]) -> str:
     return "".join(parts)
 
 
+def _note_box(x: float, y: float, w: float, lines: list[str], *, font_size: int = 10) -> str:
+    line_h = font_size + 5
+    h = line_h * len(lines) + 14
+    parts = [
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="#111" stroke-width="{LINE}"/>'
+    ]
+    ty = y + font_size + 8
+    for line in lines:
+        parts.append(
+            f'<text x="{x + 8}" y="{ty}" font-family="{FONT}" font-size="{font_size}">{_esc(line)}</text>'
+        )
+        ty += line_h
+    return "".join(parts)
+
+
+def _material_frame(x: float, y: float, w: float, h: float, inner: str) -> str:
+    return (
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="#111" stroke-width="1.5"/>'
+        f'<g transform="translate({x},{y})">{inner}</g>'
+    )
+
+
 def _svg_wrap(view_w: int, view_h: int, inner: str, *, title: str = "") -> str:
     cap = f'<figcaption class="q-materials-title">{_esc(title)}</figcaption>' if title else ""
     return (
@@ -73,17 +95,18 @@ def _svg_wrap(view_w: int, view_h: int, inner: str, *, title: str = "") -> str:
 
 
 def render_202405_q009() -> str:
-    x, y, w, h = 40, 30, 150, 75
-    inner = (
+    fx, fy, fw, fh = 8, 8, 484, 132
+    x, y, w, h = 32, 24, 150, 75
+    plot = (
         f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="#111" stroke-width="{LINE}"/>'
         f'<text x="{x + w / 2}" y="{y + h / 2 + 5}" text-anchor="middle" font-family="{FONT}" font-size="14">４５０ｍ²</text>'
         + _dim_bracket_h(x, x + w, y - 14, "３０ｍ")
         + _dim_bracket_v(x + w + 14, y, y + h, "１５ｍ")
-        + _road(y + h, y + h + 22, 20, 220, "幅員　６ｍ　市道")
+        + _road(y + h, y + h + 22, 12, 200, "幅員　６ｍ　市道")
         + _info_box(
-            260,
-            28,
-            220,
+            252,
+            22,
+            210,
             96,
             [
                 "・ 近隣商業地域",
@@ -93,53 +116,71 @@ def render_202405_q009() -> str:
             ],
         )
     )
-    return _svg_wrap(500, 150, inner, title="資料")
+    inner = _material_frame(fx, fy, fw, fh, plot)
+    return _svg_wrap(500, 148, inner, title="資料")
 
 
 def render_202505_q009() -> str:
-    note = (
-        "※甲土地・乙土地が面する道路は建築基準法第４２条第２項に該当する道路で、"
-        "甲土地・乙土地はともにセットバックを要する。また、道路の中心線は現況道路の中心に位置するものとする。"
-        "なお、特定行政庁が指定する幅員６ｍ指定区域ではない。"
+    """公表PDF: 甲土地（上）— 市道 — 乙土地（下）、注記は右側の枠。"""
+    fx, fy, fw, fh = 8, 8, 504, 200
+    scale = 5.5
+    pw, pd = 18 * scale, 10 * scale
+    x0, y0 = 36, 20
+    road_h = 3 * scale
+    y_road = y0 + pd
+    y_b = y_road + road_h
+
+    plot = (
+        f'<rect x="{x0}" y="{y0}" width="{pw}" height="{pd}" fill="none" stroke="#111" stroke-width="{LINE}"/>'
+        f'<text x="{x0 + pw / 2}" y="{y0 + pd / 2 - 4}" text-anchor="middle" font-family="{FONT}" font-size="12">（甲土地）</text>'
+        f'<text x="{x0 + pw / 2}" y="{y0 + pd / 2 + 12}" text-anchor="middle" font-family="{FONT}" font-size="11">１８０ｍ²</text>'
+        + _dim_bracket_h(x0, x0 + pw, y0 - 12, "１８ｍ")
+        + _dim_bracket_v(x0 + pw + 12, y0, y0 + pd, "１０ｍ")
+        + _road(y_road, y_road + road_h, x0 - 8, x0 + pw + 8, "幅員　３ｍ　市道")
+        + f'<rect x="{x0}" y="{y_b}" width="{pw}" height="{pd}" fill="none" stroke="#111" stroke-width="{LINE}"/>'
+        + f'<text x="{x0 + pw / 2}" y="{y_b + pd / 2 + 4}" text-anchor="middle" font-family="{FONT}" font-size="12">（乙土地）</text>'
+        + _note_box(
+            248,
+            16,
+            248,
+            [
+                "※甲土地・乙土地が面する道路は建築基準法第４２条第",
+                "２項に該当する道路で、甲土地・乙土地はともにセット",
+                "バックを要する。また、道路の中心線は現況道路の中心",
+                "に位置するものとする。なお、特定行政庁が指定する幅",
+                "員６ｍ指定区域ではない。",
+            ],
+        )
     )
-    inner = (
-        f'<text x="10" y="16" font-family="{FONT}" font-size="10">{_esc(note)}</text>'
-        f'<rect x="50" y="50" width="70" height="55" fill="none" stroke="#111" stroke-width="{LINE}"/>'
-        f'<text x="85" y="82" text-anchor="middle" font-family="{FONT}" font-size="12">（甲土地）</text>'
-        f'<text x="85" y="98" text-anchor="middle" font-family="{FONT}" font-size="11">１８０ｍ²</text>'
-        + _dim_bracket_h(50, 120, 38, "１０ｍ")
-        + _dim_bracket_v(128, 50, 105, "１８ｍ")
-        + _road(105, 127, 30, 200, "幅員　３ｍ　市道")
-        + f'<rect x="140" y="50" width="70" height="55" fill="none" stroke="#111" stroke-width="{LINE}"/>'
-        + f'<text x="175" y="82" text-anchor="middle" font-family="{FONT}" font-size="12">（乙土地）</text>'
-    )
-    return _svg_wrap(520, 145, inner, title="資料")
+    inner = _material_frame(fx, fy, fw, fh, plot)
+    return _svg_wrap(520, 216, inner, title="資料")
 
 
 def render_202505_q020() -> str:
-    x, y, w, h = 60, 25, 120, 96
+    x, y, w, h = 48, 28, 120, 96
     inner = (
         f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="#111" stroke-width="{LINE}"/>'
         f'<text x="{x + w / 2}" y="{y + h / 2 + 5}" text-anchor="middle" font-family="{FONT}" font-size="14">１８０ｍ²</text>'
         + _dim_bracket_h(x, x + w, y - 14, "１５ｍ")
         + _dim_bracket_v(x - 14, y, y + h, "１２ｍ")
-        + _road(y + h, y + h + 24, 40, 200, "２４０Ｃ")
+        + _road(y + h, y + h + 24, 28, 188, "２４０Ｃ")
     )
-    return _svg_wrap(260, 160, inner)
+    return _svg_wrap(220, 168, inner)
 
 
 def render_202605_q009() -> str:
-    x, y, w, h = 40, 30, 150, 75
-    inner = (
+    fx, fy, fw, fh = 8, 8, 464, 132
+    x, y, w, h = 32, 24, 150, 75
+    plot = (
         f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="#111" stroke-width="{LINE}"/>'
         f'<text x="{x + w / 2}" y="{y + h / 2 + 5}" text-anchor="middle" font-family="{FONT}" font-size="14">３００ｍ²</text>'
         + _dim_bracket_h(x, x + w, y - 14, "３０ｍ")
         + _dim_bracket_v(x + w + 14, y, y + h, "１５ｍ")
-        + _road(y + h, y + h + 22, 20, 220, "幅員　６ｍ　市道")
+        + _road(y + h, y + h + 22, 12, 200, "幅員　６ｍ　市道")
         + _info_box(
-            260,
-            28,
-            200,
+            252,
+            22,
+            190,
             78,
             [
                 "・ 準工業地域",
@@ -149,7 +190,8 @@ def render_202605_q009() -> str:
             ],
         )
     )
-    return _svg_wrap(480, 150, inner, title="資料")
+    inner = _material_frame(fx, fy, fw, fh, plot)
+    return _svg_wrap(480, 148, inner, title="資料")
 
 
 RENDERERS = {
