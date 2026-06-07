@@ -1,123 +1,133 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""FP3級実技 親族関係図の構造化データ（試験解説・資料テキストに基づく手整備）。"""
+"""FP3級実技 親族関係図（公表過去問PDFに合わせた構造化データ）。"""
 
 from __future__ import annotations
 
-# layout: 上から下へ行、各行は左から人物ボックス
-# join: "marriage" で横並び配偶者、"sibling_group" で兄弟姉妹行
+# layout: genogram — tools/fp3_genogram.py で HTML 化
+# spouse: 被相続人を左、配偶者を右（PDF と同じ）
+# child_units: 子世代（単独 person または spouse + descendants）
 
 FP3_FAMILY_TREES: dict[str, dict] = {
     "fp3-jitsugi-202405-q018": {
         "type": "family_tree",
+        "layout": "genogram",
         "title": "親族関係図",
         "footnotes": [
             "※妙子さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。",
         ],
-        "rows": [
-            [{"name": "妙子", "suffix": "※"}],
-            [
-                {"name": "森 隆男", "sub": "（被相続人）", "role": "decedent"},
-                {"name": "綾子", "join": "marriage"},
-            ],
-            [
-                {"name": "龍子"},
-                {"name": "元貴"},
-                {"name": "吉春", "sub": "（すでに死亡）", "role": "deceased"},
-            ],
+        "above": {"name": "妙子", "suffix": "※"},
+        "spouse": {
+            "left": {"name": "森 隆男", "sub": "（被相続人）", "role": "decedent"},
+            "right": {"name": "綾子"},
+        },
+        "child_units": [
+            {"person": {"name": "龍子"}},
+            {"person": {"name": "元貴"}},
+            {"person": {"name": "吉春", "sub": "（すでに死亡）", "role": "deceased"}},
         ],
     },
     "fp3-jitsugi-202405-q019": {
         "type": "family_tree",
+        "layout": "genogram",
         "title": "親族関係図",
         "footnotes": [],
-        "rows": [
-            [
-                {"name": "良枝"},
-                {"name": "藤田 信二", "sub": "（被相続人）", "role": "decedent", "join": "marriage"},
-            ],
-            [{"name": "桜子"}, {"name": "咲江"}],
+        "spouse": {
+            "left": {"name": "藤田 信二", "sub": "（被相続人）", "role": "decedent"},
+            "right": {"name": "良枝"},
+        },
+        "child_units": [
+            {"person": {"name": "桜子"}},
+            {"person": {"name": "咲江"}},
         ],
     },
     "fp3-jitsugi-202505-q018": {
         "type": "family_tree",
+        "layout": "genogram",
         "title": "親族関係図",
         "footnotes": [
             "※幹夫さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。",
         ],
-        "rows": [
-            [{"name": "綾子"}],
-            [{"name": "森 隆男", "sub": "（被相続人）", "role": "decedent"}],
-            [
-                {"name": "夏帆"},
-                {
-                    "name": "（子）",
-                    "sub": "すでに死亡",
-                    "role": "deceased",
-                    "below": [{"name": "真奈", "sub": "代襲相続"}],
+        "spouse": {
+            "left": {"name": "森 隆男", "sub": "（被相続人）", "role": "decedent"},
+            "right": {"name": "綾子"},
+        },
+        "child_units": [
+            {
+                "spouse": {
+                    "left": {"name": "幹夫", "suffix": "※"},
+                    "right": {"name": "麗子"},
                 },
-            ],
-            [
-                {"name": "武志"},
-                {"name": "百合"},
-                {"name": "幹夫", "suffix": "※"},
-            ],
+            },
+            {"person": {"name": "夏帆"}},
+            {
+                "spouse": {
+                    "left": {"role": "deceased", "sub": "（すでに死亡）"},
+                    "right": {"name": "武志"},
+                },
+                "descendants": [{"name": "真奈"}],
+            },
         ],
     },
     "fp3-jitsugi-202505-q019": {
         "type": "family_tree",
+        "layout": "genogram",
         "title": "親族関係図",
         "footnotes": [],
-        "rows": [
-            [
-                {"name": "良枝"},
-                {"name": "藤田 信二", "sub": "（被相続人）", "role": "decedent", "join": "marriage"},
-            ],
-            [{"name": "誠也"}, {"name": "桜子"}, {"name": "咲江"}],
+        "spouse": {
+            "left": {"name": "藤田 信二", "sub": "（被相続人）", "role": "decedent"},
+            "right": {"name": "良枝"},
+        },
+        "child_units": [
+            {"person": {"name": "誠也"}},
+            {"person": {"name": "桜子"}},
+            {"person": {"name": "咲江"}},
         ],
     },
     "fp3-jitsugi-202605-q018": {
         "type": "family_tree",
+        "layout": "genogram",
         "title": "親族関係図",
         "footnotes": [
             "※幹夫さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。",
         ],
-        "rows": [
-            [{"name": "綾子"}],
-            [{"name": "森 隆男", "sub": "（被相続人）", "role": "decedent"}],
-            [
-                {"name": "夏帆"},
-                {
-                    "name": "（子）",
-                    "sub": "すでに死亡",
-                    "role": "deceased",
-                    "below": [{"name": "真奈", "sub": "代襲相続"}],
+        "spouse": {
+            "left": {"name": "森 隆男", "sub": "（被相続人）", "role": "decedent"},
+            "right": {"name": "綾子"},
+        },
+        "child_units": [
+            {
+                "spouse": {
+                    "left": {"name": "幹夫", "suffix": "※"},
+                    "right": {"name": "麗子"},
                 },
-            ],
-            [
-                {"name": "武志"},
-                {"name": "百合"},
-                {"name": "幹夫", "suffix": "※", "below": [{"name": "寛太"}]},
-            ],
+                "descendants": [{"name": "寛太"}],
+            },
+            {"person": {"name": "夏帆"}},
+            {
+                "spouse": {
+                    "left": {"role": "deceased", "sub": "（すでに死亡）"},
+                    "right": {"name": "武志"},
+                },
+                "descendants": [{"name": "真奈"}],
+            },
         ],
     },
     "fp3-jitsugi-202605-q019": {
         "type": "family_tree",
+        "layout": "genogram",
         "title": "親族関係図",
         "footnotes": [
             "※桜子さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。",
         ],
-        "rows": [
-            [{"name": "麗子"}],
-            [
-                {"name": "良枝"},
-                {"name": "藤田 信二", "sub": "（被相続人）", "role": "decedent", "join": "marriage"},
-            ],
-            [
-                {"name": "誠也"},
-                {"name": "桜子", "suffix": "※"},
-                {"name": "咲江"},
-            ],
+        "spouse": {
+            "left": {"name": "藤田 信二", "sub": "（被相続人）", "role": "decedent"},
+            "right": {"name": "良枝"},
+        },
+        "child_units": [
+            {"person": {"name": "咲江"}},
+            {"person": {"name": "誠也"}},
+            {"person": {"name": "桜子", "suffix": "※"}},
         ],
     },
 }

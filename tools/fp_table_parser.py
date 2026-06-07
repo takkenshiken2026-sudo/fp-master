@@ -131,6 +131,12 @@ def parse_simple_amount_block(title: str, body: str) -> dict[str, Any]:
 
 def materials_text_to_diagram(source_id: str, text: str, *, kind: str) -> dict[str, Any]:
     """資料全文から fp_materials JSON を組み立てる。"""
+    from tools.fp3_hand_tables import hand_material_sections
+
+    hand = hand_material_sections(source_id)
+    if hand is not None:
+        return {"type": "fp_materials", "sections": hand}
+
     sections = split_material_sections(text)
     blocks: list[dict[str, Any]] = []
 

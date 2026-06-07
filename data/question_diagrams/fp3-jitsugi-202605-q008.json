@@ -2,9 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "pdf_figure",
-      "src": "assets/q-diagrams/fp3-jitsugi-202605-q008.png",
-      "alt": "試験資料（公表過去問より）"
+      "type": "fp_text_block",
+      "title": "資料",
+      "body": "表面利率：年１.２０％\n発行価格：額面１００円につき１００.５０円\n償還期限：５年"
     }
   ]
 }

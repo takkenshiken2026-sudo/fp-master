@@ -5616,20 +5616,6 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   font-size: var(--fs-body);
 }
 
-/* FP3 実技 — 公表PDFから切り出した資料図 */
-.q-pdf-figure {
-  margin: 0.75rem 0;
-}
-.q-pdf-figure img {
-  display: block;
-  width: 100%;
-  max-width: 42rem;
-  height: auto;
-  margin: 0 auto;
-  border: 1px solid var(--table-border, var(--border2));
-  background: #fff;
-}
-
 /* FP3 実技 — 問題資料（表・親族関係図） */
 .q-static-page .q-materials {
   margin-top: 1rem;
@@ -5639,6 +5625,110 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   font-size: var(--fs-sub);
   margin: 0 0 0.5rem;
   color: var(--ink);
+}
+/* 親族関係図（ジェノグラム — 公表PDFレイアウト） */
+.q-family-tree--genogram .q-ft-genogram {
+  border: 1.5px solid var(--ink);
+  padding: 1.25rem 1rem 1rem;
+  margin: 0.5rem 0;
+  background: var(--bg);
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.q-ft-genogram-above {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+.q-ft-genogram-above-stem {
+  width: 2px;
+  height: 0.75rem;
+  background: var(--ink);
+}
+.q-ft-genogram-top {
+  display: flex;
+  justify-content: center;
+}
+.q-ft-couple {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.q-ft-marriage-bar {
+  width: 2.75rem;
+  border-top: 3px double var(--ink);
+  flex-shrink: 0;
+  margin: 0 0.15rem;
+}
+.q-ft-genogram-connector {
+  width: 2px;
+  height: 1.1rem;
+  background: var(--ink);
+  margin: 0 auto;
+}
+.q-ft-genogram-children {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.25rem 2rem;
+  flex-wrap: wrap;
+  position: relative;
+  padding-top: 1.1rem;
+  margin-top: 0;
+}
+.q-ft-genogram-children::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: var(--ink);
+}
+.q-ft-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 4.5rem;
+}
+.q-ft-branch-stem {
+  position: absolute;
+  top: -1.1rem;
+  width: 2px;
+  height: 1.1rem;
+  background: var(--ink);
+}
+.q-ft-descendants {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+.q-ft-descendants-stem {
+  width: 2px;
+  height: 0.85rem;
+  background: var(--ink);
+}
+.q-ft-descendants-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.q-ft-person--marker {
+  min-width: 3.5rem;
+  min-height: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.q-ft-deceased-x {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
 }
 .q-family-tree-body {
   display: flex;
@@ -5716,10 +5806,22 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-.q-static-page .q-fp-table {
+.q-static-page .q-fp-table,
+.q-fp-table-wrap .q-fp-table {
   width: 100%;
   min-width: 28rem;
   font-size: var(--fs-caption);
+  border-collapse: collapse;
+}
+.q-fp-table-wrap .q-fp-table th,
+.q-fp-table-wrap .q-fp-table td {
+  border: 1px solid var(--table-border, rgba(0, 0, 0, 0.22));
+  padding: 0.35rem 0.5rem;
+  vertical-align: top;
+}
+.q-fp-table-wrap .q-fp-table th {
+  background: var(--bg2);
+  font-weight: 600;
 }
 .q-fp-table--dense td {
   white-space: nowrap;
@@ -5733,6 +5835,11 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   vertical-align: middle;
   text-align: center;
   padding: 0.35rem 0.4rem;
+  border: 1px solid var(--table-border, rgba(0, 0, 0, 0.22));
+}
+.q-fp-cashflow td.cf-corner {
+  font-weight: 600;
+  background: var(--bg2);
 }
 .q-fp-cashflow td.cf-corner,
 .q-fp-cashflow td.cf-label,

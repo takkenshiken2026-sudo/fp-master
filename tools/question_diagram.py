@@ -58,6 +58,11 @@ def _person_html(person: dict) -> str:
 
 
 def render_family_tree(data: dict) -> str:
+    if str(data.get("layout") or "") == "genogram":
+        from tools.fp3_genogram import render_genogram_family_tree
+
+        return render_genogram_family_tree(data)
+
     title = html.escape(str(data.get("title") or "親族関係図"))
     rows_html: list[str] = []
     for row in data.get("rows") or []:

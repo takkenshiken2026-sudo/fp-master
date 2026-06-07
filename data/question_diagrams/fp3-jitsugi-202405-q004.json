@@ -2,9 +2,14 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "pdf_figure",
-      "src": "assets/q-diagrams/fp3-jitsugi-202405-q004.png",
-      "alt": "試験資料（公表過去問より）"
+      "type": "fp_text_block",
+      "title": "資料",
+      "body": "の３つの係数の中から最も適切な係数を選択して計算すること。ま\nた、記載のない事項については一切考慮しないこととする。"
+    },
+    {
+      "type": "fp_text_block",
+      "title": "資料：係数早見表（年利２.０％)",
+      "body": "終価係数 年金終価係数 年金現価係数\n１５年 １.３４６ １７.２９３ １２.８４９\n※記載されている数値は正しいものとする。"
     }
   ]
 }

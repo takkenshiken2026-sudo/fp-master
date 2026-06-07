@@ -2,9 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "pdf_figure",
-      "src": "assets/q-diagrams/fp3-jitsugi-202505-q010.png",
-      "alt": "試験資料（公表過去問より）"
+      "type": "fp_text_block",
+      "title": "土地登記記録の構成",
+      "body": "土地登記記録\n表題部 （ ア ）\n権利部 甲区 （ イ ）\n乙区 （ ウ ）"
     }
   ]
 }

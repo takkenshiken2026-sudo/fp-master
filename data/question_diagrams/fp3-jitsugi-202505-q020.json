@@ -2,9 +2,14 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "pdf_figure",
-      "src": "assets/q-diagrams/fp3-jitsugi-202505-q020.png",
-      "alt": "試験資料（公表過去問より）"
+      "type": "fp_text_block",
+      "title": "資料",
+      "body": "の宅地の借地権（普通借地権）について、路線価方式による相続税評価額として、正し\nいものはどれか。なお、奥行価格補正率は１.０とし、記載のない事項については一切考慮しないこと\nとする。"
+    },
+    {
+      "type": "fp_text_block",
+      "title": "資料",
+      "body": "［借地権割合］\n記号 借地権割合\nＡ ９０％\nＢ ８０％\nＣ ７０％\nＤ ６０％\nＥ ５０％\nＦ ４０％\nＧ ３０％\n\n１２ｍ\n１５ｍ\n２４０Ｃ\n１８０ｍ2"
     }
   ]
 }

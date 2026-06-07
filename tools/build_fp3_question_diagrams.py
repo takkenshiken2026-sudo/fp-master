@@ -22,14 +22,6 @@ from tools.fp_table_parser import materials_text_to_diagram
 SOURCE = ROOT / "data" / "source" / "fp3" / "fp3_jitsugi_past_questions_all.json"
 OUT_DIR = ROOT / "data" / "question_diagrams"
 MANIFEST = ROOT / "data" / "source" / "fp3" / "diagram_manifest.json"
-PDF_MANIFEST = ROOT / "data" / "source" / "fp3" / "pdf_diagram_manifest.json"
-
-
-def load_pdf_figures() -> dict[str, str]:
-    if not PDF_MANIFEST.is_file():
-        return {}
-    data = json.loads(PDF_MANIFEST.read_text(encoding="utf-8"))
-    return data if isinstance(data, dict) else {}
 
 
 def iter_jitsugi_questions() -> list[dict]:
@@ -45,7 +37,6 @@ def main() -> int:
         print(f"ERROR: {SOURCE} がありません", file=sys.stderr)
         return 1
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    pdf_figures = load_pdf_figures()
     written = 0
     for q in iter_jitsugi_questions():
         diagram = q.get("diagram") or {}
@@ -56,20 +47,7 @@ def main() -> int:
         diagram_id = source_id_to_diagram_id(source_id)
         kind = str(diagram.get("kind") or "")
         text = (q.get("materialsText") or q.get("prompt") or "").strip()
-        pdf_src = pdf_figures.get(diagram_id)
-        if pdf_src and (ROOT / pdf_src).is_file():
-            payload = {
-                "type": "fp_materials",
-                "sections": [
-                    {
-                        "type": "pdf_figure",
-                        "src": pdf_src,
-                        "alt": "試験資料（公表過去問より）",
-                    }
-                ],
-            }
-        else:
-            payload = materials_text_to_diagram(source_id, text, kind=kind)
+        payload = materials_text_to_diagram(source_id, text, kind=kind)
         path = OUT_DIR / f"{diagram_id}.json"
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         written += 1

@@ -2,9 +2,62 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "pdf_figure",
-      "src": "assets/q-diagrams/fp3-jitsugi-202505-q019.png",
-      "alt": "試験資料（公表過去問より）"
+      "type": "family_tree",
+      "layout": "genogram",
+      "title": "親族関係図",
+      "footnotes": [],
+      "spouse": {
+        "left": {
+          "name": "藤田 信二",
+          "sub": "（被相続人）",
+          "role": "decedent"
+        },
+        "right": {
+          "name": "良枝"
+        }
+      },
+      "child_units": [
+        {
+          "person": {
+            "name": "誠也"
+          }
+        },
+        {
+          "person": {
+            "name": "桜子"
+          }
+        },
+        {
+          "person": {
+            "name": "咲江"
+          }
+        }
+      ]
+    },
+    {
+      "type": "fp_table",
+      "title": "遺族が受け取った生命保険の死亡保険金",
+      "headers": [
+        "保険契約者（保険料負担者）",
+        "被保険者",
+        "死亡保険金受取人",
+        "金額"
+      ],
+      "rows": []
+    },
+    {
+      "type": "fp_table",
+      "title": "遺族が受け取った生命保険の死亡保険金",
+      "headers": [
+        "（保険料負担者）",
+        "被保険者",
+        "死亡保険金受取人 金額"
+      ],
+      "rows": [
+        [
+          "信二さん 信二さん 良枝さん ３,０００万円"
+        ]
+      ]
     }
   ]
 }
