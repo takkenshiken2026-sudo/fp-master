@@ -129,12 +129,18 @@ def render_fp_cashflow_table(data: dict) -> str:
                 f"{html.escape(str(note))}</td></tr>"
             )
     unit_html = f'<p class="q-fp-table-unit">{unit}</p>' if unit else ""
+    colgroup = (
+        "<colgroup>"
+        '<col class="cf-name-col"><col class="cf-role-col">'
+        '<col class="cf-year-col" span="5"><col class="cf-rate-col">'
+        "</colgroup>"
+    )
     return (
         '<figure class="q-fp-table-wrap q-fp-cashflow-wrap" role="group">'
         f'<figcaption class="q-materials-title">{title}</figcaption>'
         f"{unit_html}"
         '<div class="q-fp-table-scroll"><table class="seo-info-table q-fp-table q-fp-cashflow">'
-        f"<tbody>{''.join(body_rows)}</tbody></table></div></figure>"
+        f"{colgroup}<tbody>{''.join(body_rows)}</tbody></table></div></figure>"
     )
 
 

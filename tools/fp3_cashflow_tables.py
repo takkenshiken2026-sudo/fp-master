@@ -34,14 +34,13 @@ def _hdr() -> list[Any]:
         {"text": "２年後", "class": "cf-year-head"},
         {"text": "３年後", "class": "cf-year-head"},
         {"text": "４年後", "class": "cf-year-head"},
-        "",
+        {"text": "変動率", "class": "cf-rate-head"},
     ]
 
 
 def _family_hdr() -> list[Any]:
     return [
-        {"text": "家族・", "class": "cf-label"},
-        {"text": "年齢", "class": "cf-label"},
+        {"text": "家族・\n年齢", "colspan": 2, "class": "cf-label cf-family-head"},
         "",
         "",
         "",
@@ -62,7 +61,7 @@ def _section(label: str) -> list[Any]:
 def _amount(label: str, rate: str, years: list[str]) -> list[Any]:
     while len(years) < 5:
         years.append("")
-    return [label, "", *years[:5], rate]
+    return [{"text": label, "colspan": 2, "class": "cf-label"}, *years[:5], rate]
 
 
 FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
@@ -81,7 +80,7 @@ FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
                 "",
                 {"text": "海外旅行", "class": "cf-event"},
                 "",
-                {"text": "変動率", "class": "cf-rate-head"},
+                "",
             ],
             _section("収入"),
             _amount("給与収入（本人）", "１％", ["４３０", "", "", "", ""]),
@@ -119,7 +118,7 @@ FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
                 {"text": "泰彦\n小学校入学", "class": "cf-event"},
                 "",
                 "",
-                {"text": "変動率", "class": "cf-rate-head"},
+                "",
             ],
             _section("収入"),
             _amount("給与収入（本人）", "１％", ["４３０", "", "", "", ""]),
@@ -157,7 +156,7 @@ FP3_CASHFLOW_TABLES: dict[str, dict[str, Any]] = {
                 "",
                 {"text": "海外旅行", "class": "cf-event"},
                 "",
-                {"text": "変動率", "class": "cf-rate-head"},
+                "",
             ],
             _section("収入"),
             _amount("給与収入（本人）", "１％", ["６３０", "", "", "", ""]),
