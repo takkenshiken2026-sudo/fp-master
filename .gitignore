@@ -2,6 +2,7 @@
 public_site/
 .local-notes/
 visual-smoke/
+tmp/
 
 # 一括運用の生成レポート（コミットしない）
 *_report.txt
