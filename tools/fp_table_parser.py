@@ -246,11 +246,55 @@ def normalize_jp_linebreaks(text: str) -> str:
             continue
         prev = merged[-1]
         if prev and not re.search(r"[。．！？…」』）\)、]$", prev.rstrip()):
-            if re.match(r"^[ぁ-んァ-ヶ一-龠〝〟（(]", s):
+            if re.match(r"^[ぁ-んァ-ヶー・一-龠〝〟（(]", s):
                 merged[-1] = prev.rstrip() + s
                 continue
         merged.append(s)
     return "\n".join(merged)
+
+
+def format_stem_display_text(text: str) -> str:
+    """設問文の表示用整形: PDF途中改行の除去と、なお・また・箇条書き前の段落改行。"""
+    t = normalize_jp_linebreaks(norm(text))
+    if not t:
+        return t
+    t = t.replace("\n・", "\x00・")
+    t = re.sub(r"(?<!\n)\n(?!\n)", "", t)
+    t = t.replace("\x00・", "\n・")
+    t = re.sub(r"(?<=[^・\n])・ (?=[\u4e00-\u9fff])", "\n・ ", t)
+    t = re.sub(r"。[ \t　]*(?=なお、)", "。\n\n", t)
+    t = re.sub(r"。[ \t　]*(?=また、)", "。\n\n", t)
+    if "・" in t:
+        t = re.sub(r"。[ \t　]*(?=・)", "。\n\n", t)
+    paras: list[str] = []
+    for block in re.split(r"\n\n+", t):
+        block = block.strip()
+        if not block:
+            continue
+        if "\n・" in block or block.startswith("・"):
+            lines = [ln.strip() for ln in block.split("\n") if ln.strip()]
+            paras.append("\n".join(lines))
+        else:
+            paras.append(block)
+    return "\n\n".join(paras)
+
+
+def stem_display_to_html(text: str) -> str:
+    """format_stem_display_text 済みテキストを設問 HTML に変換。"""
+    import html as html_mod
+
+    formatted = format_stem_display_text(text)
+    if not formatted:
+        return "<p>（問題文なし）</p>"
+    br = "<br>\n"
+    parts: list[str] = []
+    for para in formatted.split("\n\n"):
+        para = para.strip()
+        if not para:
+            continue
+        inner = html_mod.escape(para).replace("\n", br)
+        parts.append(f"<p>{inner}</p>")
+    return "\n".join(parts) if parts else "<p>（問題文なし）</p>"
 
 
 def split_material_sections(text: str) -> list[tuple[str, str]]:

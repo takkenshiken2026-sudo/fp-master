@@ -5552,18 +5552,7 @@ function toggleCurrentBookmark(){
 /** 問題文にア〜オで列記された肢があるとき、見出しの前で改行（読み込みは textContent + pre-line） */
 function formatExamQuestionBodyText(raw){
   if(!raw||typeof raw!=='string')return '';
-  let t=raw.replace(/\r/g,'').replace(/\u00a0/g,' ');
-  t=t.replace(/。[ \t\u3000]*・/g,'。\n\n・');
-  t=t.replace(/(\S)\n・/g,'$1\n\n・');
-  const afterMk='(?=[\\s\\u3000\\n]|[\\u4e00-\\u9fff\\u3040-\\u309f]|$)';
-  t=t.replace(new RegExp('([。．!?！？\\uFF1F])[ \\t\\u3000]*([アイウエオ])'+afterMk,'g'),'$1\n\n$2');
-  const reJ=/([\u4e00-\u9fff\u3040-\u309f\u3041-\u3096ー）」])\s*([アイウエオ])(?=[\s\u3000\n]|[\u4e00-\u9fff\u3040-\u309f]|$)/gu;
-  for(let g=0;g<15;g++){
-    const n=t.replace(reJ,'$1\n$2');
-    if(n===t)break;
-    t=n;
-  }
-  return t.replace(/\n{4,}/g,'\n\n').trim();
+  return raw.replace(/\r/g,'').replace(/\u00a0/g,' ').replace(/\n{3,}/g,'\n\n').trim();
 }
 function renderQuizQuestionBody(q){
   const el=document.getElementById('q-body');

@@ -109,6 +109,7 @@ def build_materials_html(row: dict) -> str:
 
 def resolve_stem_text(row: dict) -> str:
     from tools.fp_table_parser import (
+        format_stem_display_text,
         split_question_and_materials,
         strip_embedded_materials_from_stem,
     )
@@ -125,13 +126,16 @@ def resolve_stem_text(row: dict) -> str:
             if "どれか" not in raw:
                 raw = raw + preamble
             stem_only, _ = split_question_and_materials(raw)
-            return stem_only or stem
-        return stem
-    return stem
+            stem = stem_only or stem
+    return format_stem_display_text(stem)
 
 
 def build_stem_html(row: dict) -> str:
-    from tools.fp_table_parser import preamble_is_materials
+    from tools.fp_table_parser import (
+        format_stem_display_text,
+        preamble_is_materials,
+        stem_display_to_html,
+    )
 
     parts: list[str] = []
     stem = resolve_stem_text(row)
@@ -139,9 +143,11 @@ def build_stem_html(row: dict) -> str:
     diagram_id = norm(row.get("diagram_id"))
     br = "<br>\n"
     if stem:
-        parts.append(f"<p>{html.escape(stem).replace(chr(10), br)}</p>")
+        parts.append(stem_display_to_html(stem))
     if preamble and not diagram_id and not preamble_is_materials(preamble):
-        parts.append(f"<p>{html.escape(preamble).replace(chr(10), br)}</p>")
+        parts.append(
+            f"<p>{html.escape(format_stem_display_text(preamble)).replace(chr(10), br)}</p>"
+        )
     stmts: list[tuple[str, str]] = []
     for lab, key in LABELS:
         t = norm(row.get(key))
@@ -677,9 +683,11 @@ def build_question_html(
     title = page_title_seo(page)
     desc = page_meta_description(page)
     context_line = page_context_line(page)
+    from tools.fp_table_parser import stem_display_to_html
+
     lead = norm(page.get("stem_plain"))
     lead_html = (
-        f'<p class="q-page-lead">{html.escape(lead)}</p>' if lead else ""
+        f'<div class="q-page-lead">{stem_display_to_html(lead)}</div>' if lead else ""
     )
     canonical = public_url(base_url, page["rel_path"])
     root_idx = rel_to_root(rel_path)

@@ -695,10 +695,21 @@ a.site-page-brand:hover {
 }
 .q-page-lead {
   margin: -8px 0 20px;
-  max-width: 860px;
   color: var(--ink);
   font-size: var(--fs-body);
   line-height: 1.75;
+}
+.q-page-lead p {
+  margin: 0 0 0.75em;
+}
+.q-page-lead p:last-child {
+  margin-bottom: 0;
+}
+.q-stem p {
+  margin: 0 0 0.75em;
+}
+.q-stem p:last-child {
+  margin-bottom: 0;
 }
 .q-meta code {
   font-size: var(--fs-caption);
