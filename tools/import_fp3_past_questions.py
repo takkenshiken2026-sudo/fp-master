@@ -184,9 +184,13 @@ def mc_to_past_row(
     diagram_id = ""
     if diagram.get("type") in {"html_table", "needs_svg"}:
         diagram_id = source_id_to_diagram_id(q["id"])
-        if preamble:
-            from tools.fp_table_parser import preamble_is_materials
+        from tools.fp_table_parser import (
+            preamble_is_materials,
+            strip_embedded_materials_from_stem,
+        )
 
+        stem = strip_embedded_materials_from_stem(stem)
+        if preamble:
             if preamble_is_materials(preamble):
                 idx = preamble.find("＜")
                 if idx > 0:

@@ -108,21 +108,25 @@ def build_materials_html(row: dict) -> str:
 
 
 def resolve_stem_text(row: dict) -> str:
-    from tools.fp_table_parser import split_question_and_materials
+    from tools.fp_table_parser import (
+        split_question_and_materials,
+        strip_embedded_materials_from_stem,
+    )
 
     stem = norm(row.get("stem"))
     if not stem:
         return ""
     diagram_id = norm(row.get("diagram_id"))
     if diagram_id:
+        stem = strip_embedded_materials_from_stem(stem)
         preamble = norm(row.get("preamble"))
-        if not preamble:
-            return stem
-        raw = stem
-        if "どれか" not in raw:
-            raw = raw + preamble
-        stem_only, _ = split_question_and_materials(raw)
-        return stem_only or stem
+        if preamble:
+            raw = stem
+            if "どれか" not in raw:
+                raw = raw + preamble
+            stem_only, _ = split_question_and_materials(raw)
+            return stem_only or stem
+        return stem
     return stem
 
 
@@ -602,8 +606,8 @@ def split_semicolon(s: str) -> list[str]:
 
 
 def load_rows() -> list[dict]:
-    text = DATA_CSV.read_text(encoding="utf-8-sig")
-    return list(csv.DictReader(text.splitlines()))
+    with DATA_CSV.open(encoding="utf-8-sig", newline="") as f:
+        return list(csv.DictReader(f))
 
 
 def page_dict(row: dict, line_no: int) -> dict:

@@ -82,6 +82,118 @@ def split_question_and_materials(text: str) -> tuple[str, str]:
     return t, ""
 
 
+_MATERIAL_TAIL_MARKERS = (
+    "価格の種類",
+    "公示価格",
+    "運用スタイル",
+    "保険証券",
+    "無配当",
+    "がん保険",
+    "医療保険",
+    "譲渡価額",
+    "支給された退職",
+    "終価係数",
+    "経過年数",
+    "収入合計",
+    "◆",
+    "■ご契約",
+    "■お払い",
+    "表面利率",
+    "青色申告者",
+    "贈与税の速算表",
+    "親族関係図",
+    "キャッシュフロー",
+    "種類 ",
+    "一般定期借地権",
+)
+
+
+def tail_looks_like_materials(tail: str) -> bool:
+    """stem 末尾に混入した資料ブロックかどうか。"""
+    t = norm(tail)
+    if not t:
+        return False
+    if preamble_is_materials(t):
+        return True
+    compact = re.sub(r"\s+", "", t)
+    if compact.startswith("＜資料＞") or compact.startswith("＜贈与"):
+        return True
+    if t.lstrip().startswith("・") and "万円" in t and "贈与" in t:
+        return False
+    return any(m in t for m in _MATERIAL_TAIL_MARKERS)
+
+
+def _stem_keep_naoto_mata(tail: str) -> tuple[list[str], str]:
+    """tail 先頭の「なお／また」定義文を stem 用に取り出す。"""
+    kept: list[str] = []
+    rem = tail.strip()
+    while rem:
+        rem = rem.lstrip()
+        if rem.startswith("なお、") or rem.startswith("また、"):
+            end = rem.find("。")
+            if end >= 0:
+                kept.append(rem[: end + 1].strip())
+                rem = rem[end + 1 :].strip()
+                continue
+            m = re.match(r"なお、下記\s*", rem)
+            if m and not tail_looks_like_materials(rem[m.end() :]):
+                kept.append(m.group(0).strip())
+                rem = rem[m.end() :].strip()
+                continue
+            break
+        break
+    return kept, rem
+
+
+def strip_embedded_materials_from_stem(stem: str) -> str:
+    """diagram 用 HTML がある設問で、stem 列に残った資料テキストを除去する。"""
+    t = norm(stem)
+    if not t:
+        return t
+
+    for pat in (
+        r"(?:^|\n\n)＜資料＞\s*\n",
+        r"\n＜資料＞\s*\n",
+        r"＜資料＞(?:無配当|がん|医療|◆|■|譲渡|支給)",
+    ):
+        m = re.search(pat, t)
+        if m:
+            before = t[: m.start()].strip()
+            tail_ctx = before[-40:]
+            if "のとおり" in tail_ctx or "参照" in tail_ctx or tail_ctx.rstrip().endswith("下記"):
+                continue
+            return before
+
+    dq = re.search(r"どれ\s*か\s*。", t, re.DOTALL)
+    if dq:
+        head = t[: dq.end()].strip()
+        tail = t[dq.end() :].strip()
+        if not tail:
+            return head
+        kept, rem = _stem_keep_naoto_mata(tail)
+        if rem and tail_looks_like_materials(rem):
+            out = head
+            if kept:
+                out += "\n\n" + "\n\n".join(kept)
+            return out.strip()
+        if not rem and tail_looks_like_materials(tail):
+            out = head
+            if kept:
+                out += "\n\n" + "\n\n".join(kept)
+            return out.strip()
+
+    stem_only, tail = split_question_and_materials(t)
+    if tail and tail_looks_like_materials(tail) and stem_only:
+        kept, rem = _stem_keep_naoto_mata(tail)
+        if rem and tail_looks_like_materials(rem):
+            out = stem_only
+            if kept:
+                out += "\n\n" + "\n\n".join(kept)
+            return out.strip()
+
+    return t
+
+
 def strip_leading_question_from_materials(text: str) -> str:
     """資料テキスト先頭に含まれる設問文を除去する。"""
     t = norm(text)

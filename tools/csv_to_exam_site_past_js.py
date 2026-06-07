@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.build_past_question_pages import build_materials_html
-from tools.fp_table_parser import split_question_and_materials
 from tools.correct_answer_format import collect_choice_texts, is_valid_correct, parse_correct_js_index
 from tools.past_question_subject import subject_from_row
 from tools.site_config import category_to_field_map, extended_correct_answers
@@ -41,23 +40,15 @@ def norm(s: str | None) -> str:
 
 def build_app_stem_text(row: dict) -> str:
     """アプリ出題用テキスト。diagram_id がある場合 preamble は資料 HTML 側へ。"""
+    from tools.build_past_question_pages import resolve_stem_text
     from tools.fp_table_parser import preamble_is_materials
 
     parts: list[str] = []
-    stem = norm(row.get("stem"))
+    stem = resolve_stem_text(row) if norm(row.get("diagram_id")) else norm(row.get("stem"))
     preamble = norm(row.get("preamble"))
     diagram_id = norm(row.get("diagram_id"))
     if stem:
-        if diagram_id and not preamble:
-            parts.append(stem)
-        elif diagram_id:
-            raw = stem
-            if "どれか" not in raw:
-                raw = raw + preamble
-            stem_only, _ = split_question_and_materials(raw)
-            parts.append(stem_only or stem)
-        else:
-            parts.append(stem)
+        parts.append(stem)
     if preamble and not diagram_id and not preamble_is_materials(preamble):
         parts.append(preamble)
     for lab, key in LABELS:
@@ -174,8 +165,8 @@ def practice_row_to_obj(row: dict, line_no: int) -> dict | None:
 def load_practice_questions() -> list[dict]:
     if not PRACTICE_CSV.is_file():
         return []
-    text = PRACTICE_CSV.read_text(encoding="utf-8-sig")
-    rows = list(csv.DictReader(text.splitlines()))
+    with PRACTICE_CSV.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
     out: list[dict] = []
     for i, row in enumerate(rows, start=2):
         o = practice_row_to_obj(row, i)
@@ -207,8 +198,8 @@ def main() -> int:
     if not DATA_CSV.is_file():
         print(f"入力がありません: {DATA_CSV}", file=sys.stderr)
         return 1
-    text = DATA_CSV.read_text(encoding="utf-8-sig")
-    rows = list(csv.DictReader(text.splitlines()))
+    with DATA_CSV.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
     objs: list[dict] = []
     year_labels: dict[int, str] = {}
     for i, row in enumerate(rows, start=2):

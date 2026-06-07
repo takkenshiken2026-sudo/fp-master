@@ -30,7 +30,7 @@ def _dim_bracket_v(x: float, y1: float, y2: float, label: str) -> str:
         f'<line x1="{x}" y1="{y1}" x2="{x}" y2="{y2}" stroke="#111" stroke-width="{LINE}"/>'
         f'<line x1="{x - 4}" y1="{y1}" x2="{x + 4}" y2="{y1}" stroke="#111" stroke-width="{LINE}"/>'
         f'<line x1="{x - 4}" y1="{y2}" x2="{x + 4}" y2="{y2}" stroke="#111" stroke-width="{LINE}"/>'
-        f'<text x="{x - 10}" y="{mid + 4}" text-anchor="end" font-family="{FONT}" font-size="12">{_esc(label)}</text>'
+        f'<text x="{x - 12}" y="{mid + 4}" text-anchor="end" font-family="{FONT}" font-size="12">{_esc(label)}</text>'
     )
 
 
@@ -40,9 +40,6 @@ def _road(y_top: float, y_bot: float, x1: float, x2: float, label: str) -> str:
     return (
         f'<line x1="{x1}" y1="{y_top}" x2="{x2}" y2="{y_top}" stroke="#111" stroke-width="{LINE}"/>'
         f'<line x1="{x1}" y1="{y_bot}" x2="{x2}" y2="{y_bot}" stroke="#111" stroke-width="{LINE}"/>'
-        f'<line x1="{mid_x - 36}" y1="{mid_y}" x2="{mid_x + 36}" y2="{mid_y}" stroke="#111" stroke-width="1"/>'
-        f'<line x1="{mid_x - 36}" y1="{mid_y - 3}" x2="{mid_x - 36}" y2="{mid_y + 3}" stroke="#111" stroke-width="1"/>'
-        f'<line x1="{mid_x + 36}" y1="{mid_y - 3}" x2="{mid_x + 36}" y2="{mid_y + 3}" stroke="#111" stroke-width="1"/>'
         f'<text x="{mid_x}" y="{mid_y + 4}" text-anchor="middle" font-family="{FONT}" font-size="11">{_esc(label)}</text>'
     )
 
@@ -104,9 +101,9 @@ def render_202405_q009() -> str:
         + _dim_bracket_v(x + w + 14, y, y + h, "１５ｍ")
         + _road(y + h, y + h + 22, 12, 200, "幅員　６ｍ　市道")
         + _info_box(
-            252,
+            238,
             22,
-            210,
+            228,
             96,
             [
                 "・ 近隣商業地域",

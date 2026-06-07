@@ -5880,6 +5880,10 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   height: auto;
   max-width: 100%;
 }
+.q-land-diagram--svg .q-land-svg text,
+.q-family-tree--svg .q-ft-svg-genogram text {
+  letter-spacing: 0 !important;
+}
 .q-fp-table-wrap {
   margin: 0.85rem 0;
 }
