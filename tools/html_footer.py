@@ -424,6 +424,27 @@ def q_index_tools_close_html() -> str:
     return "</div>"
 
 
+def q_index_subject_row_html(
+    *,
+    gakka_count: int,
+    jitsugi_count: int,
+) -> str:
+    """過去問一覧の学科・実技切替（常時表示）。"""
+    total = gakka_count + jitsugi_count
+    return (
+        '<div class="q-index-subject-row" role="group" aria-label="科目">'
+        '<span class="q-index-subject-label">科目</span>'
+        '<div class="q-index-chips q-index-subject-chips">'
+        f'<button type="button" class="q-index-filter-opt q-index-subject-btn on" data-subject="all">'
+        f"すべて<span class=\"q-index-filter-count\">（{total}）</span></button>"
+        f'<button type="button" class="q-index-filter-opt q-index-subject-btn" data-subject="gakka">'
+        f"学科<span class=\"q-index-filter-count\">（{gakka_count}）</span></button>"
+        f'<button type="button" class="q-index-filter-opt q-index-subject-btn" data-subject="jitsugi">'
+        f"実技<span class=\"q-index-filter-count\">（{jitsugi_count}）</span></button>"
+        "</div></div>"
+    )
+
+
 def q_index_stats_line(*, question_count: int, mode: str, year_count: int = 0, category_count: int = 0) -> str:
     """一覧パネル見出し下の統計（過去問・実践・一問一答で文言を統一）。"""
     n = question_count

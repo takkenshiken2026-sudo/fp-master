@@ -1412,6 +1412,40 @@ a.q-hub-tab-label:hover {
   border-top: none;
   padding-top: 4px;
 }
+.q-index-subject-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px 14px;
+  padding: 10px 0 6px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.q-index-subject-label {
+  flex: 0 0 5.5em;
+  color: var(--text3);
+  font-size: var(--fs-caption);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.q-index-subject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  flex: 1;
+  min-width: 0;
+}
+.q-index-subject-block {
+  margin-top: 14px;
+}
+.q-index-subject-block:first-child {
+  margin-top: 0;
+}
+.q-index-subject-heading {
+  margin: 0 0 8px;
+  font-size: var(--fs-sub);
+  font-weight: 700;
+  color: var(--text2);
+}
 .q-index-chips-label {
   flex: 0 0 5.5em;
   color: var(--text3);

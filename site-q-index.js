@@ -16,7 +16,7 @@
     searchInputLabel: '過去問検索',
     searchPlaceholder: '例：第1問、分野名、問題文…',
     emptyTitle: '条件に一致する過去問がありません',
-    emptyHint: '検索語を短くするか、分野・学習状況を「すべて」に戻してお試しください。',
+    emptyHint: '検索語を短くするか、科目・分野・学習状況を「すべて」に戻してお試しください。',
     appLinkTemplate: '../index.html#past-play-{id}',
     appLinkLabel: '演習',
     rowLabelField: 'qno',
@@ -63,6 +63,7 @@
 
   const q = document.getElementById('q-index-q');
   const chips = $$('.q-index-chip-btn[data-cat]');
+  const subjectChips = $$('.q-index-subject-btn[data-subject]');
   const statusChips = $$('.q-index-status-btn[data-status]');
   const viewBtns = $$('.q-index-view-btn[data-view]');
   const hit = document.getElementById('q-index-hit');
@@ -81,6 +82,7 @@
   const catMount = document.getElementById('q-index-cat-mount');
 
   let activeCat = 'all';
+  let activeSubject = 'all';
   let activeStatus = 'all';
   let activeView = 'year';
   let page = 1;
@@ -138,16 +140,22 @@
     return true;
   }
 
+  function matchesSubject(item) {
+    if (activeSubject === 'all') return true;
+    return item.subject === activeSubject;
+  }
+
   function itemVisible(item) {
     const tokens = parseSearchTokens(q?.value || '');
     const catOk = activeCat === 'all' || item.category === activeCat;
-    return catOk && matchesSearch(item, tokens) && matchesStatus(item);
+    return catOk && matchesSubject(item) && matchesSearch(item, tokens) && matchesStatus(item);
   }
 
   function hasActiveFilters() {
     return (
       !!(q?.value || '').trim() ||
       activeCat !== 'all' ||
+      activeSubject !== 'all' ||
       activeStatus !== 'all'
     );
   }
@@ -228,7 +236,7 @@
     const preview = item.preview
       ? highlightText(item.preview, query)
       : '<span class="q-year-table-desc--empty">問題文は各ページで確認できます</span>';
-    return `<tr class="q-year-table-row" tabindex="0" data-app-id="${escapeHtml(String(item.appId))}" data-href="${escapeHtml(item.href)}" data-category="${escapeHtml(item.category)}">
+    return `<tr class="q-year-table-row" tabindex="0" data-app-id="${escapeHtml(String(item.appId))}" data-href="${escapeHtml(item.href)}" data-category="${escapeHtml(item.category)}" data-subject="${escapeHtml(item.subject || '')}">
 <td class="q-year-table-no" data-label="問"><a href="${escapeHtml(item.href)}" onclick="event.stopPropagation()">${escapeHtml(rowLabel(item))}</a></td>
 <td class="q-year-table-cat" data-label="分野">${escapeHtml(item.category)}</td>
 <td class="q-year-table-tags" data-label="タグ">${tagBadges(item)}</td>
@@ -270,6 +278,10 @@
     const query = (q?.value || '').trim();
     if (query) tags.push({ type: 'q', label: `検索: ${query}` });
     if (activeCat !== 'all') tags.push({ type: 'cat', label: activeCat });
+    if (activeSubject !== 'all') {
+      const subjectLabels = { gakka: '学科', jitsugi: '実技' };
+      tags.push({ type: 'subject', label: subjectLabels[activeSubject] || activeSubject });
+    }
     if (activeStatus !== 'all') {
       const labels = {
         wrong: '不正解のみ',
@@ -301,6 +313,12 @@
           activeCat = 'all';
           chips.forEach((b) => b.classList.toggle('on', (b.dataset.cat || 'all') === 'all'));
         }
+        if (t === 'subject') {
+          activeSubject = 'all';
+          subjectChips.forEach((b) =>
+            b.classList.toggle('on', (b.dataset.subject || 'all') === 'all')
+          );
+        }
         if (t === 'status') {
           activeStatus = 'all';
           statusChips.forEach((b) => b.classList.toggle('on', (b.dataset.status || 'all') === 'all'));
@@ -317,6 +335,7 @@
       const query = (q?.value || '').trim();
       if (query) params.set('q', query);
       if (activeCat !== 'all') params.set('cat', activeCat);
+      if (activeSubject !== 'all') params.set('subject', activeSubject);
       if (activeStatus !== 'all') params.set('status', activeStatus);
       if (page > 1) params.set('page', String(page));
       const qs = params.toString();
@@ -340,6 +359,10 @@
       activeCat = 'all';
       changed = true;
     }
+    if (activeSubject !== 'all' && !['gakka', 'jitsugi'].includes(activeSubject)) {
+      activeSubject = 'all';
+      changed = true;
+    }
     if (activeStatus !== 'all' && !allowedStatusValues().has(activeStatus)) {
       activeStatus = 'all';
       changed = true;
@@ -350,6 +373,9 @@
     }
     if (changed) {
       chips.forEach((b) => b.classList.toggle('on', (b.dataset.cat || 'all') === activeCat));
+      subjectChips.forEach((b) =>
+        b.classList.toggle('on', (b.dataset.subject || 'all') === activeSubject)
+      );
       statusChips.forEach((b) =>
         b.classList.toggle('on', (b.dataset.status || 'all') === activeStatus)
       );
@@ -361,6 +387,7 @@
     const params = new URLSearchParams(location.search);
     if (params.has('q') && q) q.value = params.get('q') || '';
     activeCat = params.get('cat') || 'all';
+    activeSubject = params.get('subject') || 'all';
     activeStatus = params.get('status') || 'all';
     activeView = 'year';
     page = Math.max(1, parseInt(params.get('page') || '1', 10) || 1);
@@ -432,18 +459,34 @@
     }
     const ids = new Set(visible.map((x) => String(x.appId)));
     $$('.q-index-year-block', yearView).forEach((block) => {
-      const rows = $$('.q-year-table-row', block);
+      const subjectBlocks = $$('.q-index-subject-block', block);
       let shown = 0;
-      rows.forEach((row) => {
-        const id = row.dataset.appId;
-        const ok = ids.has(id);
-        row.classList.toggle('hide', !ok);
-        if (ok) shown++;
-      });
+      if (subjectBlocks.length) {
+        subjectBlocks.forEach((subBlock) => {
+          const rows = $$('.q-year-table-row', subBlock);
+          let subShown = 0;
+          rows.forEach((row) => {
+            const ok = ids.has(row.dataset.appId);
+            row.classList.toggle('hide', !ok);
+            if (ok) {
+              subShown++;
+              shown++;
+            }
+          });
+          subBlock.classList.toggle('hide', subShown === 0);
+        });
+      } else {
+        const rows = $$('.q-year-table-row', block);
+        rows.forEach((row) => {
+          const ok = ids.has(row.dataset.appId);
+          row.classList.toggle('hide', !ok);
+          if (ok) shown++;
+        });
+      }
       block.classList.toggle('hide', shown === 0);
       const countEl = $('.q-index-year-count', block);
       if (countEl) {
-        const total = Number(countEl.dataset.total) || rows.length;
+        const total = Number(countEl.dataset.total) || $$('.q-year-table-row', block).length;
         countEl.textContent = shown === total ? `${total}問` : `${shown} / ${total}問`;
       }
     });
@@ -531,9 +574,13 @@ ${items.map((it) => rowHtml(it, query)).join('')}
   function resetAll() {
     if (q) q.value = '';
     activeCat = 'all';
+    activeSubject = 'all';
     activeStatus = 'all';
     page = 1;
     chips.forEach((b) => b.classList.toggle('on', (b.dataset.cat || 'all') === 'all'));
+    subjectChips.forEach((b) =>
+      b.classList.toggle('on', (b.dataset.subject || 'all') === 'all')
+    );
     statusChips.forEach((b) => b.classList.toggle('on', (b.dataset.status || 'all') === 'all'));
     apply();
     q?.focus();
@@ -604,6 +651,15 @@ ${items.map((it) => rowHtml(it, query)).join('')}
       apply();
     });
   });
+  subjectChips.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      subjectChips.forEach((b) => b.classList.remove('on'));
+      btn.classList.add('on');
+      activeSubject = btn.dataset.subject || 'all';
+      page = 1;
+      apply();
+    });
+  });
   statusChips.forEach((btn) => {
     btn.addEventListener('click', () => {
       statusChips.forEach((b) => b.classList.remove('on'));
@@ -654,6 +710,9 @@ ${items.map((it) => rowHtml(it, query)).join('')}
 
   readUrl();
   chips.forEach((b) => b.classList.toggle('on', (b.dataset.cat || 'all') === activeCat));
+  subjectChips.forEach((b) =>
+    b.classList.toggle('on', (b.dataset.subject || 'all') === activeSubject)
+  );
   statusChips.forEach((b) => b.classList.toggle('on', (b.dataset.status || 'all') === activeStatus));
   ensureYearLayout();
   initYearCollapse();

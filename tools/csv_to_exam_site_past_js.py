@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.correct_answer_format import collect_choice_texts, is_valid_correct, parse_correct_js_index
+from tools.past_question_subject import subject_from_row
 from tools.site_config import category_to_field_map, extended_correct_answers
 
 DATA_CSV = ROOT / "data" / "past_questions.csv"
@@ -90,6 +91,7 @@ def row_to_obj(row: dict, line_no: int) -> dict | None:
         "year": year,
         "num": qno,
         "field": field,
+        "subject": subject_from_row(row, qno=qno),
         "text": text,
         "opts": opts,
         "ans": 0 if cor is None else cor,

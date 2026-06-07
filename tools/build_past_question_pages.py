@@ -41,6 +41,7 @@ from tools.html_footer import (
     breadcrumb_html,
     q_hub_links_html,
     q_index_filters_details_html,
+    q_index_subject_row_html,
     q_index_stats_line,
     q_index_tools_close_html,
     q_index_tools_open_html,
@@ -52,6 +53,7 @@ from tools.html_footer import (
     static_footer_block,
     static_site_header,
 )
+from tools.past_question_subject import subject_display, subject_from_row
 from tools.seo_editorial_chrome import seo_brand_asset_tags
 from tools.site_config import brand_name, clean_origin, exam_name
 
@@ -282,11 +284,15 @@ def index_item_dict(page: dict) -> dict:
         preview,
         *tags,
     ]
+    subject = page.get("subject") or ""
+    if subject:
+        search_bits.append(subject_display(subject))
     return {
         "appId": page["app_id"],
         "year": page["year"],
         "qno": page["qno"],
         "category": page["category"],
+        "subject": subject,
         "wareki": page.get("wareki", ""),
         "href": page["href_rel"],
         "preview": preview,
@@ -319,7 +325,8 @@ def build_index_table_row(page: dict) -> str:
         '<tr class="q-year-table-row" tabindex="0"'
         f' data-app-id="{page["app_id"]}"'
         f' data-href="{html.escape(page["href_rel"], quote=True)}"'
-        f' data-category="{html.escape(page["category"], quote=True)}">'
+        f' data-category="{html.escape(page["category"], quote=True)}"'
+        f' data-subject="{html.escape(page.get("subject") or "", quote=True)}">'
         f'<td class="q-year-table-no" data-label="問"><a href="{href}">{html.escape(label)}</a></td>'
         f'<td class="q-year-table-cat" data-label="分野">{html.escape(page["category"])}</td>'
         f'<td class="q-year-table-desc" data-label="問題文">{preview_cell}</td>'
@@ -623,6 +630,7 @@ def page_dict(row: dict, line_no: int) -> dict:
         "id": f"past-{year}-{qno:02d}",
         "app_id": year * 100 + qno,
         "tags": parse_tags(norm(row.get("tags"))),
+        "subject": subject_from_row(row, qno=qno),
         "rel_path": f"q/past/y{year}/q{qno:02d}/index.html",
     }
 
@@ -802,23 +810,50 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
     sorted_years = sorted(by_year.keys(), reverse=True)
     open_years = set(sorted_years[:2])
 
+    subject_order = (("gakka", "学科"), ("jitsugi", "実技"))
+    gakka_count = sum(1 for pg in index_pages if pg.get("subject") == "gakka")
+    jitsugi_count = sum(1 for pg in index_pages if pg.get("subject") == "jitsugi")
+
+    def subject_sections(year: int, year_pages: list[dict]) -> str:
+        by_subject: dict[str, list[dict]] = {}
+        for pg in year_pages:
+            by_subject.setdefault(pg.get("subject") or "gakka", []).append(pg)
+        parts: list[str] = []
+        for sid, label in subject_order:
+            subset = by_subject.get(sid, [])
+            if not subset:
+                continue
+            rows_html = "".join(build_index_table_row(pg) for pg in subset)
+            tags = subset[0].get("tags") or []
+            sub_note = "（三答択）" if sid == "gakka" and "三答択" in tags else ""
+            subheading = f"{label}{sub_note}"
+            parts.append(
+                f'<section class="q-index-subject-block" id="year-{year}-{sid}" data-subject="{sid}">'
+                f'<h3 class="q-index-subject-heading">{html.escape(subheading)}</h3>'
+                f'<div class="q-year-table-wrap">'
+                f'<table class="q-year-table" aria-label="{html.escape(subheading)}">'
+                "<thead><tr>"
+                '<th scope="col">問</th><th scope="col">分野</th>'
+                '<th scope="col">問題文（抜粋）</th>'
+                "</tr></thead>"
+                f"<tbody>{rows_html}</tbody>"
+                "</table></div></section>"
+            )
+        return "".join(parts)
+
     year_blocks = []
     year_jump_links = []
     for y in sorted_years:
-        rows_html = "".join(build_index_table_row(pg) for pg in by_year[y])
-        sample = by_year[y][0]
+        year_pages = by_year[y]
+        sample = year_pages[0]
         year_label = norm(sample.get("year_label") or "")
-        heading = year_label or (
-            sample["wareki"]
-            if y > 9999
-            else f"{y}年（{sample['wareki']}）"
-        )
+        heading = year_label or (f"{y}年" if y <= 9999 else sample["wareki"])
         jump_label = year_label or (f"{y}年" if y <= 9999 else sample["wareki"])
         expanded = "true" if y in open_years else "false"
         collapsed = "" if y in open_years else " is-collapsed"
         year_jump_links.append(
             f'<a class="q-index-filter-opt q-index-year-link" href="#year-{y}" data-year="{y}">'
-            f'{html.escape(jump_label)}<span class="q-index-filter-count">（{len(by_year[y])}）</span></a>'
+            f'{html.escape(jump_label)}<span class="q-index-filter-count">（{len(year_pages)}）</span></a>'
         )
         year_blocks.append(
             f'<section class="q-index-year-block{collapsed}" id="year-{y}">'
@@ -828,16 +863,11 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
             f'aria-controls="year-body-{y}"><span class="q-index-year-chevron" aria-hidden="true"></span></button>'
             f'<h2 id="year-{y}-heading">{html.escape(heading)}</h2>'
             f"</div>"
-            f'<span class="q-index-year-count" data-total="{len(by_year[y])}">{len(by_year[y])}問</span>'
+            f'<span class="q-index-year-count" data-total="{len(year_pages)}">{len(year_pages)}問</span>'
             f"</div>"
-            f'<div class="q-year-table-wrap" id="year-body-{y}">'
-            f'<table class="q-year-table" aria-labelledby="year-{y}-heading">'
-            "<thead><tr>"
-            '<th scope="col">問</th><th scope="col">分野</th>'
-            '<th scope="col">問題文（抜粋）</th>'
-            "</tr></thead>"
-            f"<tbody>{rows_html}</tbody>"
-            "</table></div></section>"
+            f'<div class="q-index-year-body" id="year-body-{y}">'
+            f"{subject_sections(y, year_pages)}"
+            f"</div></section>"
         )
     year_blocks_html = (
         "".join(year_blocks).replace("<motion ", "<div ").replace("</motion>", "</div>")
@@ -929,16 +959,18 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
         search_placeholder=search_placeholder,
         hit_text=f"{len(pages)} / {len(pages)} 問",
     )}
+      {q_index_subject_row_html(gakka_count=gakka_count, jitsugi_count=jitsugi_count)}
       {q_index_filters_details_html(
           year_row_label="年度",
           year_jump_html=year_jump_html,
           category_chips_html=category_chips_html,
           status_chips_html=status_chips_html,
+          filters_hint="年度・分野・学習状況",
       )}
     {q_index_tools_close_html()}
     <div class="q-index-empty-panel hide" id="q-index-empty" role="status">
       <p class="q-index-empty-title">条件に一致する過去問がありません</p>
-      <p class="q-index-empty-hint">検索語を短くするか、分野・学習状況を「すべて」に戻してお試しください。</p>
+      <p class="q-index-empty-hint">検索語を短くするか、科目・分野・学習状況を「すべて」に戻してお試しください。</p>
       <button type="button" class="q-index-reset" id="q-index-empty-reset">条件をクリア</button>
     </div>
     <div class="q-index-layout">
