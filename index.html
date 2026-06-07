@@ -1109,6 +1109,29 @@ h2.section-label .tip-icon{width:13px;height:13px;font-size:9px}
 .q-meta-value{font-size:12px;color:var(--text);font-weight:600;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
 .q-num{font-size:14px;font-family:var(--mono);color:var(--text3)}
 .q-text{font-size:var(--fs-body);line-height:1.8;color:var(--text);font-family:var(--font);white-space:pre-line}
+.q-text.has-materials{white-space:normal}
+.q-text .q-quiz-stem{white-space:pre-line;margin-bottom:1rem}
+#page-quiz .q-materials{margin-top:.25rem}
+#page-quiz .q-materials-title{font-weight:700;font-size:var(--fs-sub);margin:0 0 .5rem;color:var(--text)}
+#page-quiz .q-family-tree-body{display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:1rem .5rem}
+#page-quiz .q-ft-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:1rem 1.5rem;position:relative}
+#page-quiz .q-ft-row:not(:last-child)::after{content:"";position:absolute;left:50%;bottom:-.5rem;width:2px;height:.5rem;background:var(--ink);transform:translateX(-50%)}
+#page-quiz .q-ft-person{border:2px solid var(--ink);border-radius:var(--r);background:var(--bg);padding:.45rem .65rem;min-width:4.5rem;text-align:center;font-size:var(--fs-sub);line-height:1.35}
+#page-quiz .q-ft-person--decedent{background:var(--bg3);font-weight:700}
+#page-quiz .q-ft-sub,#page-quiz .q-ft-suffix{display:block;font-size:var(--fs-caption);font-weight:500}
+#page-quiz .q-ft-marriage{display:flex;align-items:center;gap:.5rem}
+#page-quiz .q-ft-marriage::before{content:"｜";color:var(--text2);font-weight:700}
+#page-quiz .q-ft-notes{margin:.75rem 0 0;padding-left:1.2rem;font-size:var(--fs-caption);color:var(--text2)}
+#page-quiz .q-fp-table-wrap{margin:.75rem 0}
+#page-quiz .q-fp-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#page-quiz table.q-fp-table{border-collapse:collapse;width:100%;min-width:28rem;font-size:var(--fs-caption)}
+#page-quiz table.q-fp-table th,#page-quiz table.q-fp-table td{border:1px solid var(--border2);padding:.35rem .5rem;vertical-align:top}
+#page-quiz table.q-fp-table th{background:var(--bg3);font-weight:600}
+#page-quiz .q-fp-cashflow{min-width:36rem;table-layout:fixed}
+#page-quiz .q-fp-cashflow td{white-space:nowrap;text-align:center}
+#page-quiz .q-fp-cashflow td.cf-label,#page-quiz .q-fp-cashflow td.cf-section{text-align:left;white-space:normal}
+#page-quiz .q-fp-table-unit{font-size:var(--fs-caption);color:var(--text2);margin:0 0 .35rem}
+#page-quiz .q-fp-text-block{margin:.5rem 0;font-size:var(--fs-sub)}
 .bookmark-btn{width:38px;height:38px;border-radius:var(--r);border:1.5px solid var(--border2);background:#fff;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;box-shadow:var(--sh)}
 .bookmark-btn--labeled{width:auto;padding:0 11px 0 9px;gap:5px;height:38px}
 .bookmark-btn-label{font-size:12px;font-weight:700;letter-spacing:.02em;line-height:1;white-space:nowrap}
@@ -5038,6 +5061,26 @@ function formatExamQuestionBodyText(raw){
   }
   return t.replace(/\n{4,}/g,'\n\n').trim();
 }
+function renderQuizQuestionBody(q){
+  const el=document.getElementById('q-body');
+  if(!el)return;
+  const stem=formatExamQuestionBodyText(q&&q.text?q.text:'');
+  const materials=q&&q.materialsHtml?q.materialsHtml:'';
+  el.classList.toggle('has-materials',!!materials);
+  if(!materials){
+    el.textContent=stem;
+    return;
+  }
+  el.textContent='';
+  const stemEl=document.createElement('div');
+  stemEl.className='q-quiz-stem';
+  stemEl.textContent=stem;
+  el.appendChild(stemEl);
+  const matWrap=document.createElement('div');
+  matWrap.className='q-quiz-materials';
+  matWrap.innerHTML=materials;
+  el.appendChild(matWrap);
+}
 function updateOptsKeyHint(show,optCount){
   const el=document.getElementById('opts-key-hint');
   if(!el) return;
@@ -5061,7 +5104,7 @@ function renderQScoreReplay(sr){
     <span class="q-meta-item q-meta-field"><span class="q-meta-label">${f.name}</span></span>
     <span class="q-meta-item q-meta-year"><span class="q-meta-value">${sourceLabel}</span></span>${starsHTML}`;
   updateBookmarkButton(q);
-  document.getElementById('q-body').textContent=formatExamQuestionBodyText(q.text||'');
+  renderQuizQuestionBody(q);
   document.getElementById('opts').innerHTML=q.opts.map((o,j)=>
     `<div class="opt disabled" id="opt${j}"><span class="opt-num">${j+1}</span><span>${o}</span></div>`).join('');
   updateOptsKeyHint(false);
@@ -5122,7 +5165,7 @@ function renderQ(){ window.scrollTo({top:0,behavior:"instant"});
 	    <span class="q-meta-item q-meta-field"><span class="q-meta-label">${f.name}</span></span>
 	    <span class="q-meta-item q-meta-year"><span class="q-meta-value">${sourceLabel}</span></span>${starsHTML}`;
 	  updateBookmarkButton(q);
-	  document.getElementById('q-body').textContent=formatExamQuestionBodyText(q.text||'');
+	  renderQuizQuestionBody(q);
   document.getElementById('opts').innerHTML=q.opts.map((o,i)=>
     `<div class="opt" id="opt${i}" onclick="pickOpt(${i})"><span class="opt-num">${i+1}</span><span>${o}</span></div>`).join('');
   updateOptsKeyHint(true,q.opts.length);
