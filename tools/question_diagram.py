@@ -170,6 +170,18 @@ def render_fp_table(data: dict) -> str:
     )
 
 
+def render_pdf_figure(data: dict) -> str:
+    src = str(data.get("src") or "").strip()
+    if not src:
+        return ""
+    alt = html.escape(str(data.get("alt") or "試験資料図"))
+    return (
+        '<figure class="q-pdf-figure" role="group">'
+        f'<img src="/{src.lstrip("/")}" alt="{alt}" loading="lazy" decoding="async">'
+        "</figure>"
+    )
+
+
 def render_text_block(data: dict) -> str:
     title = html.escape(str(data.get("title") or ""))
     body = html.escape(str(data.get("body") or "")).replace("\n", "<br>\n")
@@ -185,6 +197,8 @@ def render_section(section: dict) -> str:
         return render_fp_table(section)
     if stype == "fp_text_block":
         return render_text_block(section)
+    if stype == "pdf_figure":
+        return render_pdf_figure(section)
     return ""
 
 

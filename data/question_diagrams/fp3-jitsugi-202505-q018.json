@@ -2,53 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "family_tree",
-      "title": "親族関係図",
-      "footnotes": [
-        "※幹夫さんは期限内に家庭裁判所で手続きを行い、適法に相続を放棄した。"
-      ],
-      "rows": [
-        [
-          {
-            "name": "綾子"
-          }
-        ],
-        [
-          {
-            "name": "森 隆男",
-            "sub": "（被相続人）",
-            "role": "decedent"
-          }
-        ],
-        [
-          {
-            "name": "夏帆"
-          },
-          {
-            "name": "（子）",
-            "sub": "すでに死亡",
-            "role": "deceased",
-            "below": [
-              {
-                "name": "真奈",
-                "sub": "代襲相続"
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "name": "武志"
-          },
-          {
-            "name": "百合"
-          },
-          {
-            "name": "幹夫",
-            "suffix": "※"
-          }
-        ]
-      ]
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202505-q018.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }

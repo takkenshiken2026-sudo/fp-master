@@ -2,9 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "・ 商業地域\n・ 指定建蔽率  ８０％\n・ 指定容積率 ４００％\n・ 前面道路の幅員に対する\n法定乗数 ６／１０\n幅員６ｍ市道\n１５ｍ\n２０ｍ\n３００ｍ2"
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202605-q009.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }

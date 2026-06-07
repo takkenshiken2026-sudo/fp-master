@@ -5616,6 +5616,20 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   font-size: var(--fs-body);
 }
 
+/* FP3 実技 — 公表PDFから切り出した資料図 */
+.q-pdf-figure {
+  margin: 0.75rem 0;
+}
+.q-pdf-figure img {
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid var(--table-border, var(--border2));
+  background: #fff;
+}
+
 /* FP3 実技 — 問題資料（表・親族関係図） */
 .q-static-page .q-materials {
   margin-top: 1rem;

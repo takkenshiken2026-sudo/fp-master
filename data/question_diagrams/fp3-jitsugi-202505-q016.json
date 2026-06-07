@@ -2,14 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "に記載のあ\nるデータ以外の扶養控除の要件はすべて満たしているものとする。"
-    },
-    {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "氏名 続柄 年齢（※） 収入等\n近藤 敏彦 本人 ４７歳 給与収入７００万円\n   陽子 妻 ４８歳 パート収入８０万円\n   早紀 長女 ２０歳 なし\n   賢一 長男 １５歳 なし\n（※）当年１２月３１日時点の年齢である。"
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202505-q016.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }

@@ -2,9 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "支給された退職一時金 ４,４００万円\n勤続年数 ３８年"
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202405-q016.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }

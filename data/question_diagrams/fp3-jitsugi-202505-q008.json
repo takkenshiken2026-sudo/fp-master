@@ -2,9 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "株価（１株当たり）\n第１回 １,２００円\n第２回 ２,０００円\n第３回 ２,０００円\n第４回 １,５００円"
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202505-q008.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }

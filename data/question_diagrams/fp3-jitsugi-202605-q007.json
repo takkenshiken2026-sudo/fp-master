@@ -2,9 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "約定日の基準価額（１万口当たり） １２,１３５円\n購入時手数料（税込み） ２.２０％\n運用管理費用（信託報酬・税込み） 年１.６２％"
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202605-q007.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }

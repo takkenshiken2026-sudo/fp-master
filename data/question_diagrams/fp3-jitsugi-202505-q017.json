@@ -2,22 +2,9 @@
   "type": "fp_materials",
   "sections": [
     {
-      "type": "fp_table",
-      "title": "遺族が受け取った生命保険の死亡保険金",
-      "headers": [
-        "保険契約者・保険料負担者 高橋さん"
-      ],
-      "rows": [
-        [
-          "保険期間 １０年"
-        ],
-        [
-          "満期保険金額 ６５０万円"
-        ],
-        [
-          "支払保険料の総額 ５００万円"
-        ]
-      ]
+      "type": "pdf_figure",
+      "src": "assets/q-diagrams/fp3-jitsugi-202505-q017.png",
+      "alt": "試験資料（公表過去問より）"
     }
   ]
 }
