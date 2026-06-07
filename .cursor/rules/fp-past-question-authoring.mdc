@@ -1,0 +1,51 @@
+---
+description: FP過去問・実技問の追加・修正時の資料・表・図の品質基準
+globs:
+  - "**/data/past_questions.csv"
+  - "**/data/question_diagrams/**"
+  - "**/tools/import_fp3_past_questions.py"
+  - "**/tools/fp3_*.py"
+  - "**/tools/fp_table_parser.py"
+  - "**/tools/question_diagram.py"
+  - "**/tools/build_fp3_question_diagrams.py"
+  - "**/tools/clean_past_stem_pollution.py"
+  - "**/tools/csv_to_exam_site_past_js.py"
+  - "**/tools/build_past_question_pages.py"
+alwaysApply: false
+---
+
+# FP 過去問・実技問の作成・更新
+
+公表PDFの見た目とデータ構造を崩さないこと。表示バグの多くは **取り込み時のデータ分離ミス** が原因。
+
+## 設問文（stem）と資料の分離
+
+- **stem** = 設問文のみ（「なお／また」、箇条書きの条件まで可）
+- **資料**（表・図・約款・＜資料＞）は `diagram_id` + 手整備 HTML（`fp3_material_tables.py` / `fp3_cashflow_tables.py` / `fp3_land_diagrams.py` 等）へ。stem に表本文を残さない
+- `diagram_id` がある行は import 時に `strip_embedded_materials_from_stem()` が効く想定。手入力でも資料テキストを stem に書かない
+
+## 改行
+
+- PDF 由来の **語中改行**（例: `キャッシュフロ` + 改行 + `ー`）は CSV に入れない。入った場合は `normalize_jp_linebreaks` / `format_stem_display_text` で解消されるが、正本は最初から1文にする
+- 意図する改行は **段落**（`なお、` `また、` の前）と **箇条書き**（`・` の前）だけ
+- CSV の複数行フィールドは **quoted フィールドのまま** 保存。読み込みは `open(..., newline="")` + `csv.DictReader(f)`。**`splitlines()` して DictReader しない**
+
+## 表・図のレイアウト（公表PDF準拠）
+
+- キャッシュフロー表: 8列（ラベル2 + 年5 + 変動率）。`fp3_cashflow_tables.py` を正本とする
+  - 1行目ヘッダー右端は空欄
+  - **変動率**はライフイベント行右下の入れ子枠（`cf-rate-nested`）。ヘッダー行に置かない
+  - 収入・支出ラベルは `colspan=2`
+- 土地図・家系図: SVG の `letter-spacing: 0`、道路線が文字に重ならない、注記が枠からはみ出さない
+- 公表と違う複雑レイアウトは **手整備**（パーサ任せにしない）。足りなければ `fp3_*` に renderer を追加
+
+## 作業後の必須手順
+
+```bash
+python3 tools/clean_past_stem_pollution.py   # stem 汚染があるとき
+python3 tools/build_fp3_question_diagrams.py
+python3 tools/validate_fp3_diagrams.py
+python3 tools/build_all.py
+```
+
+静的ページ（`q/past/`）とアプリ（`exam-site-data-past.js`）の **両方** で、設問文・資料の二重表示・列ずれ・不自然改行がないか確認する。
