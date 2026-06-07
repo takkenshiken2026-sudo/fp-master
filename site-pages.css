@@ -5864,6 +5864,22 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   padding-left: 0.25rem;
   list-style: none;
 }
+/* 土地利用・路線価配置図（SVG） */
+.q-land-diagram--svg {
+  margin: 0.75rem auto;
+  max-width: 44rem;
+}
+.q-land-diagram--svg .q-land-svg-wrap {
+  margin: 0;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.q-land-diagram--svg .q-land-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
 .q-fp-table-wrap {
   margin: 0.85rem 0;
 }

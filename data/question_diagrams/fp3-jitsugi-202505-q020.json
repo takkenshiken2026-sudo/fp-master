@@ -41,9 +41,9 @@
       "dense": true
     },
     {
-      "type": "fp_text_block",
-      "title": "資料",
-      "body": "１２ｍ\n１５ｍ\n２４０Ｃ\n１８０ｍ²"
+      "type": "land_diagram",
+      "layout": "svg",
+      "diagram_id": "fp3-jitsugi-202505-q020"
     }
   ]
 }

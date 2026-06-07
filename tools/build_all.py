@@ -32,6 +32,7 @@ def main() -> int:
     run([py, "tools/generate_brand_assets.py"])
     run([py, "tools/apply_site_config.py"])
     run([py, "tools/build_fp3_question_diagrams.py"])
+    run([py, "tools/validate_fp3_diagrams.py"])
     run([py, "tools/csv_to_exam_site_past_js.py"])
     run([py, "tools/csv_to_exam_site_ichimondou_js.py"])
     run([py, "tools/build_past_question_pages.py"])

@@ -56,14 +56,9 @@
       ]
     },
     {
-      "type": "fp_table",
+      "type": "fp_text_block",
       "title": "相続に係る相続税の課税遺産総額（課税価格の合計額から遺産に係る基礎控除額を控除した金額）",
-      "rows": [
-        [
-          "８,０００万円"
-        ]
-      ],
-      "dense": true
+      "body": "８,０００万円"
     },
     {
       "type": "fp_table",

@@ -206,6 +206,10 @@ def render_section(section: dict) -> str:
         return render_text_block(section)
     if stype == "pdf_figure":
         return render_pdf_figure(section)
+    if stype == "land_diagram":
+        from tools.fp3_land_diagrams import render_land_diagram
+
+        return render_land_diagram(section)
     return ""
 
 

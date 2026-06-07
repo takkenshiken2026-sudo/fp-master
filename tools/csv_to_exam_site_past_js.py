@@ -41,21 +41,24 @@ def norm(s: str | None) -> str:
 
 def build_app_stem_text(row: dict) -> str:
     """アプリ出題用テキスト。diagram_id がある場合 preamble は資料 HTML 側へ。"""
+    from tools.fp_table_parser import preamble_is_materials
+
     parts: list[str] = []
     stem = norm(row.get("stem"))
     preamble = norm(row.get("preamble"))
     diagram_id = norm(row.get("diagram_id"))
     if stem:
-        if diagram_id:
+        if diagram_id and not preamble:
+            parts.append(stem)
+        elif diagram_id:
             raw = stem
-            pre = norm(row.get("preamble"))
-            if pre and "どれか" not in raw:
-                raw = raw + pre
+            if "どれか" not in raw:
+                raw = raw + preamble
             stem_only, _ = split_question_and_materials(raw)
             parts.append(stem_only or stem)
         else:
             parts.append(stem)
-    if preamble and not diagram_id:
+    if preamble and not diagram_id and not preamble_is_materials(preamble):
         parts.append(preamble)
     for lab, key in LABELS:
         t = norm(row.get(key))

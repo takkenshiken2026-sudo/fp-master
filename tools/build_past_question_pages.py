@@ -91,6 +91,8 @@ def parse_correct(raw: str, *, max_choice: int = 5) -> int | str | None:
 
 
 def build_materials_html(row: dict) -> str:
+    from tools.fp_table_parser import preamble_is_materials
+
     diagram_id = norm(row.get("diagram_id"))
     if diagram_id:
         from tools.question_diagram import diagram_body_html
@@ -99,7 +101,7 @@ def build_materials_html(row: dict) -> str:
         if rendered:
             return rendered
     preamble = norm(row.get("preamble"))
-    if not preamble:
+    if not preamble or not preamble_is_materials(preamble):
         return ""
     br = "<br>\n"
     return f'<div class="q-materials"><p>{html.escape(preamble).replace(chr(10), br)}</p></div>'
@@ -114,8 +116,10 @@ def resolve_stem_text(row: dict) -> str:
     diagram_id = norm(row.get("diagram_id"))
     if diagram_id:
         preamble = norm(row.get("preamble"))
+        if not preamble:
+            return stem
         raw = stem
-        if preamble and "どれか" not in raw:
+        if "どれか" not in raw:
             raw = raw + preamble
         stem_only, _ = split_question_and_materials(raw)
         return stem_only or stem
@@ -123,6 +127,8 @@ def resolve_stem_text(row: dict) -> str:
 
 
 def build_stem_html(row: dict) -> str:
+    from tools.fp_table_parser import preamble_is_materials
+
     parts: list[str] = []
     stem = resolve_stem_text(row)
     preamble = norm(row.get("preamble"))
@@ -130,7 +136,7 @@ def build_stem_html(row: dict) -> str:
     br = "<br>\n"
     if stem:
         parts.append(f"<p>{html.escape(stem).replace(chr(10), br)}</p>")
-    if preamble and not diagram_id:
+    if preamble and not diagram_id and not preamble_is_materials(preamble):
         parts.append(f"<p>{html.escape(preamble).replace(chr(10), br)}</p>")
     stmts: list[tuple[str, str]] = []
     for lab, key in LABELS:

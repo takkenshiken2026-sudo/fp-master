@@ -184,6 +184,16 @@ def mc_to_past_row(
     diagram_id = ""
     if diagram.get("type") in {"html_table", "needs_svg"}:
         diagram_id = source_id_to_diagram_id(q["id"])
+        if preamble:
+            from tools.fp_table_parser import preamble_is_materials
+
+            if preamble_is_materials(preamble):
+                idx = preamble.find("＜")
+                if idx > 0:
+                    stem = norm(stem) + "\n\n" + preamble[:idx].strip()
+            else:
+                stem = norm(stem) + "\n\n" + preamble
+            preamble = ""
     row = {col: "" for col in PAST_COLUMNS}
     row.update(
         {

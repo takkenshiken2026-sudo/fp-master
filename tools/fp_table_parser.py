@@ -27,6 +27,24 @@ def norm(s: str | None) -> str:
     return (s or "").strip()
 
 
+def preamble_is_materials(preamble: str) -> bool:
+    """CSV preamble が資料ブロック（表・図）かどうか。設問文の続き（穴埋め等）は False。"""
+    p = norm(preamble)
+    if not p:
+        return False
+    if p.startswith("＜") or p.startswith("<"):
+        return True
+    markers = (
+        "速算表",
+        "親族関係図",
+        "キャッシュフロー",
+        "バランスシート",
+        "借地権割合",
+        "係数早見表",
+    )
+    return any(m in p for m in markers)
+
+
 def nfkc_line(s: str) -> str:
     return norm(s).translate(FULLWIDTH_DIGITS)
 
@@ -37,7 +55,11 @@ def split_question_and_materials(text: str) -> tuple[str, str]:
     if not t:
         return "", ""
     # 「なお、～こととする。」は設問の定義文として stem に含める（改行で分断されても可）
-    na_m = re.search(r"なお、[^＜]*?こととする\s*。", t, re.DOTALL)
+    na_m = re.search(
+        r"なお、[^＜]*?(?:こととする|こと\s*\n\s*とする)\s*。",
+        t,
+        re.DOTALL,
+    )
     if na_m:
         return t[: na_m.end()].strip(), t[na_m.end() :].strip()
     compact = re.sub(r"\s+", "", t)
