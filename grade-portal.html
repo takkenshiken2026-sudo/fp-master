@@ -71,9 +71,169 @@
     var(--page-bg);
   overflow: hidden;
 }
+.grade-portal-hero-layout {
+  position: relative;
+  width: min(var(--site-content-w), calc(100vw - 32px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  gap: clamp(20px, 3.5vw, 44px);
+  align-items: center;
+}
 .grade-portal-hero-inner {
   position: relative;
-  max-width: 40rem;
+  min-width: 0;
+}
+.grade-portal-hero-visual {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+a.grade-portal-preview {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+a.grade-portal-preview:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow:
+    0 22px 48px color-mix(in srgb, var(--ink) 12%, transparent),
+    0 4px 12px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.grade-portal-preview {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, var(--border));
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 18px 40px color-mix(in srgb, var(--ink) 10%, transparent),
+    0 2px 8px color-mix(in srgb, var(--ink) 6%, transparent);
+  overflow: hidden;
+  transform: rotate(-1.2deg);
+}
+.grade-portal-preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.grade-portal-preview-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 18%, var(--bg3));
+}
+.grade-portal-preview-url {
+  flex: 1;
+  margin-left: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.grade-portal-preview-body {
+  padding: 14px 14px 16px;
+  background: #fff;
+}
+.grade-portal-preview-topnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.grade-portal-preview-mark {
+  min-width: 42px;
+  min-height: 28px;
+  padding: 4px 7px 3px;
+  border-radius: 4px;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+.grade-portal-preview-mark-sub { font-size: 7px; letter-spacing: 0.04em; }
+.grade-portal-preview-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.grade-portal-preview-nav span {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text3);
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--bg2);
+}
+.grade-portal-preview-nav span.is-on {
+  color: var(--accent-emphasis);
+  background: var(--accent-soft);
+}
+.grade-portal-preview-title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #121212;
+}
+.grade-portal-preview-sub {
+  margin: 0 0 12px;
+  font-size: 10px;
+  color: var(--text2);
+}
+.grade-portal-preview-question {
+  margin-top: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+}
+.grade-portal-preview-qmeta {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-emphasis);
+  margin-bottom: 6px;
+}
+.grade-portal-preview-qtext {
+  margin: 0 0 10px;
+  font-size: 10px;
+  line-height: 1.6;
+  color: #121212;
+}
+.grade-portal-preview-opts {
+  display: grid;
+  gap: 6px;
+}
+.grade-portal-preview-opt {
+  padding: 7px 9px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 9px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.grade-portal-preview-opt.is-sel {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
 }
 .grade-portal-eyebrow {
   display: inline-flex;
@@ -310,6 +470,18 @@
 }
 .grade-portal-footer a:hover { text-decoration: underline; }
 @media (max-width: 900px) {
+  .grade-portal-hero-layout {
+    grid-template-columns: 1fr;
+  }
+  .grade-portal-hero-visual {
+    justify-content: center;
+    max-width: 380px;
+    margin: 4px auto 0;
+  }
+  .grade-portal-preview {
+    transform: none;
+    max-width: none;
+  }
   .grade-portal-highlights {
     grid-template-columns: 1fr;
   }
@@ -365,13 +537,49 @@
 </header>
 <main class="grade-portal-main">
   <section class="grade-portal-hero" aria-labelledby="grade-portal-hero-title">
-    <div class="grade-portal-hero-inner">
-      <p class="grade-portal-eyebrow">ファイナンシャル・プランナー試験 無料学習プラットフォーム</p>
-      <h1 class="grade-portal-hero-title" id="grade-portal-hero-title"><em>FPマスター</em>とは</h1>
-      <p class="grade-portal-lead">
-        日本FP協会の<strong>FP技能検定</strong>（FP3級・FP2級）の受験対策に特化した無料Webサイトです。
-        過去問の演習に加え、オリジナルの実践問題・一問一答・用語解説・試験ガイドを、会員登録なしでブラウザから利用できます。
-      </p>
+    <div class="grade-portal-hero-layout">
+      <div class="grade-portal-hero-inner">
+        <p class="grade-portal-eyebrow">ファイナンシャル・プランナー試験 無料学習プラットフォーム</p>
+        <h1 class="grade-portal-hero-title" id="grade-portal-hero-title"><em>FPマスター</em>とは</h1>
+        <p class="grade-portal-lead">
+          日本FP協会の<strong>FP技能検定</strong>（FP3級・FP2級）の受験対策に特化した無料Webサイトです。
+          過去問の演習に加え、オリジナルの実践問題・一問一答・用語解説・試験ガイドを、会員登録なしでブラウザから利用できます。
+        </p>
+      </div>
+      <div class="grade-portal-hero-visual">
+        <a class="grade-portal-preview" href="/fp3/" aria-label="FP3級マスターの学習画面のイメージ。クリックで学習を始める">
+          <div class="grade-portal-preview-bar">
+            <span class="grade-portal-preview-dot"></span>
+            <span class="grade-portal-preview-dot"></span>
+            <span class="grade-portal-preview-dot"></span>
+            <span class="grade-portal-preview-url">fp-master.jp/fp3/</span>
+          </div>
+          <div class="grade-portal-preview-body">
+            <div class="grade-portal-preview-topnav">
+              <div class="grade-portal-preview-mark" aria-hidden="true">
+                <span>FP3級</span>
+                <span class="grade-portal-preview-mark-sub">マスター</span>
+              </div>
+              <div class="grade-portal-preview-nav" aria-hidden="true">
+                <span>過去問</span>
+                <span class="is-on">実践演習</span>
+                <span>一問一答</span>
+              </div>
+            </div>
+            <p class="grade-portal-preview-title">実践演習</p>
+            <p class="grade-portal-preview-sub">第128問 · 金融資産運用</p>
+            <div class="grade-portal-preview-question" aria-hidden="true">
+              <div class="grade-portal-preview-qmeta">実践演習 · 金融資産運用</div>
+              <p class="grade-portal-preview-qtext">投資信託の基準価額に関する次の記述のうち、最も適切なものはどれか。</p>
+              <div class="grade-portal-preview-opts">
+                <div class="grade-portal-preview-opt">（1）基準価額は毎営業日算出される</div>
+                <div class="grade-portal-preview-opt is-sel">（2）分配金落ち日は基準価額が下がる</div>
+                <div class="grade-portal-preview-opt">（3）信託報酬は基準価額に含まれない</div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
     </div>
   </section>
   <div class="grade-portal-highlights" role="list">
