@@ -71,17 +71,6 @@
     var(--page-bg);
   overflow: hidden;
 }
-.grade-portal-hero::before {
-  content: "";
-  position: absolute;
-  top: -120px;
-  right: -80px;
-  width: min(420px, 55vw);
-  height: min(420px, 55vw);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
-  pointer-events: none;
-}
 .grade-portal-hero-inner {
   position: relative;
   max-width: 40rem;
@@ -95,33 +84,37 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: none;
-  color: var(--accent-emphasis);
+  color: #121212;
 }
 .grade-portal-eyebrow::before {
   content: "";
   width: 28px;
   height: 2px;
-  background: var(--accent);
+  background: #121212;
   border-radius: 1px;
 }
 .grade-portal-hero-title {
   margin: 0 0 16px;
   font-size: clamp(1.75rem, 3.6vw + 0.5rem, 2.5rem);
   font-weight: 700;
-  color: var(--text);
+  color: #121212;
   letter-spacing: -0.03em;
   line-height: 1.2;
 }
 .grade-portal-hero-title em {
   font-style: normal;
-  color: var(--accent-emphasis);
+  color: #121212;
 }
 .grade-portal-lead {
   margin: 0;
   max-width: 38rem;
-  color: var(--ink);
+  color: #121212;
   line-height: 1.85;
   font-size: var(--fs-body);
+}
+.grade-portal-lead strong {
+  color: #121212;
+  font-weight: 700;
 }
 .grade-portal-highlights {
   position: relative;
