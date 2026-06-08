@@ -100,5 +100,5 @@ if grep -q 'site-spa.css' "$OUT/fp3/index.html" 2>/dev/null && [[ ! -f "$OUT/fp3
   echo "prepare_public_site.sh: fp3/index.html が site-spa.css を参照していますが fp3 にありません。" >&2
   exit 1
 fi
-n="$(find "$OUT" -type file | wc -l | tr -d ' ')"
+n="$(find "$OUT"/. -type f 2>/dev/null | wc -l | tr -d ' ')"
 echo "prepare_public_site.sh: $OUT に $n ファイルを配置しました（/ + /fp3/ + /fp2/ + リダイレクト）。"
