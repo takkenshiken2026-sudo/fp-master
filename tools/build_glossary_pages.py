@@ -463,13 +463,17 @@ def field_hub_slug(category: str) -> str:
     return f"field-{safe}" if safe and safe != "field" else "field-other"
 
 
-def load_guide_slugs() -> list[dict[str, str]]:
+def load_guide_slugs(*, published_only: bool = False) -> list[dict[str, str]]:
+    from tools.editorial_quality import is_published_guide
+
     path = ROOT / "data" / "guide_articles.csv"
     if not path.is_file():
         return []
     text = path.read_text(encoding="utf-8-sig")
     rows: list[dict[str, str]] = []
     for row in csv.DictReader(text.splitlines()):
+        if published_only and not is_published_guide(row):
+            continue
         slug = norm(row.get("slug"))
         title = norm(row.get("title"))
         if slug and title:
@@ -490,12 +494,17 @@ def load_guide_slugs() -> list[dict[str, str]]:
     return rows
 
 
+def load_linkable_guides() -> list[dict[str, str]]:
+    """公開済み（HTML 生成対象）の試験ガイドのみ。"""
+    return load_guide_slugs(published_only=True)
+
+
 GUIDE_LINK_FALLBACK_SLUGS = (
-    "exam-overview",
-    "study-plan",
-    "past-question-strategy",
-    "glossary-how-to",
-    "self-study-roadmap",
+    "tools-free-past-question-sites",
+    "tools-ichimon-vs-past",
+    "faq-study-hours",
+    "attr-zero-knowledge-start",
+    "field-life-plan",
 )
 
 
@@ -534,6 +543,10 @@ def guide_related_link_items(
         picked.append(
             f'<a class="related-link" href="{articles_prefix}{html.escape(slug)}/">'
             f"{html.escape(g['title'])}</a>"
+        )
+    if not picked:
+        picked.append(
+            f'<a class="related-link" href="{articles_prefix}index.html">試験ガイド一覧</a>'
         )
     return picked
 
@@ -1433,7 +1446,7 @@ def main() -> int:
     entries = load_glossary_entries()
     term_lookup = make_term_lookup(entries)
     entries_by_term = {e["term"]: e for e in entries}
-    guides = load_guide_slugs()
+    guides = load_linkable_guides()
 
     TERMS_DIR.mkdir(parents=True, exist_ok=True)
     for stale in TERMS_DIR.glob("*.html"):

@@ -415,17 +415,17 @@ def normalize_glossary_href(href: str) -> str:
 
 
 GUIDE_LINK_FALLBACK_SLUGS = (
-    "past-question-strategy",
-    "study-plan",
-    "exam-overview",
-    "glossary-how-to",
+    "tools-free-past-question-sites",
+    "tools-ichimon-vs-past",
+    "faq-study-hours",
+    "attr-zero-knowledge-start",
 )
 
 
 def load_guide_articles() -> list[dict[str, str]]:
-    from tools.build_glossary_pages import load_guide_slugs
+    from tools.build_glossary_pages import load_linkable_guides
 
-    return load_guide_slugs()
+    return load_linkable_guides()
 
 
 def guide_links_for_page(category: str, guides: list[dict[str, str]], *, limit: int = 2) -> list[tuple[str, str]]:
@@ -452,6 +452,8 @@ def guide_links_for_page(category: str, guides: list[dict[str, str]], *, limit: 
         if g and slug not in seen:
             seen.add(slug)
             picked.append((f"articles/{slug}/index.html", g["title"]))
+    if not picked:
+        picked.append(("articles/index.html", "試験ガイド一覧"))
     return picked
 
 

@@ -423,9 +423,7 @@ def _header_learning_nav(root: Path) -> list[Issue]:
         "tnav-dash": spa_hash_href("#dash"),
         "tnav-review": spa_hash_href("#review"),
     }
-    article_sample = root / "articles" / "field-law-basics" / "index.html"
-    if not article_sample.is_file():
-        article_sample = root / "articles" / "exam-overview" / "index.html"
+    article_sample = root / "articles" / "index.html"
     samples: list[tuple[str, Path]] = [
         ("articles sample", article_sample),
         ("terms/index.html", root / "terms" / "index.html"),

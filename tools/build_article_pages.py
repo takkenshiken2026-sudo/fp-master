@@ -155,7 +155,13 @@ def sanitize_guide_text(text: str, slug: str = "") -> str:
 
 
 from tools.affiliate_links import affiliate_article_is_buildable  # noqa: E402
+from tools.editorial_quality import is_published_guide  # noqa: E402
 from tools.seo_body_markup import seo_section_body_html  # noqa: E402
+
+
+def guide_article_is_buildable(row: dict[str, str]) -> bool:
+    """公開可能な試験ガイドのみ HTML を生成する（draft は一覧のみ）。"""
+    return is_published_guide(row) and affiliate_article_is_buildable(row)
 
 
 def paragraphs(text: str) -> str:
@@ -371,7 +377,12 @@ def parse_related_links(
             )
             if len(links) >= 2:
                 break
-        for slug in ("exam-overview", "study-plan", "past-question-strategy", "glossary-how-to"):
+        for slug in (
+            "tools-free-past-question-sites",
+            "tools-ichimon-vs-past",
+            "faq-study-hours",
+            "attr-zero-knowledge-start",
+        ):
             if len(links) >= 2:
                 break
             if slug in by_slug and slug not in seen and slug != current_slug:
@@ -660,12 +671,56 @@ def sort_articles_for_index(articles: list[dict[str, str]]) -> list[dict[str, st
     )
 
 
-def build_index_html(articles: list[dict[str, str]]) -> str:
+def article_index_card_html(article: dict[str, str], *, published: bool) -> str:
+    title_text = apply_vars(article["title"])
+    desc_text = meta_description(apply_vars(article.get("meta_description") or article.get("lead") or title_text), 130)
+    genre = apply_vars(article.get("genre", "試験ガイド"))
+    style = guide_genre_style_by_label().get(genre, "meta")
+    all_tags = split_semicolon(apply_vars(article.get("tags", "")))
+    display_tags = public_display_tags(all_tags)
+    tags = " / ".join(display_tags)
+    search_text = " ".join([title_text, desc_text, genre, tags, apply_vars(article.get("lead", ""))])
+    draft_class = "" if published else " is-draft"
+    if published:
+        inner = (
+            f'<a class="article-index-card-link" href="{html.escape(article["slug"])}/">'
+            f'<span class="article-index-card-genre">{html.escape(genre)}</span>'
+            f"<h2>{html.escape(title_text)}</h2>"
+            f"<p>{html.escape(desc_text)}</p>"
+            + (f'<div class="article-index-card-tags">{html.escape(tags)}</div>' if tags else "")
+            + "</a>"
+        )
+    else:
+        inner = (
+            '<div class="article-index-card-link is-disabled" aria-disabled="true">'
+            f'<span class="article-index-card-genre">{html.escape(genre)}</span>'
+            '<span class="article-index-card-soon">準備中</span>'
+            f"<h2>{html.escape(title_text)}</h2>"
+            f"<p>{html.escape(desc_text)}</p>"
+            + (f'<div class="article-index-card-tags">{html.escape(tags)}</div>' if tags else "")
+            + "</div>"
+        )
+    return (
+        '<article class="article-index-card'
+        + draft_class
+        + '" '
+        f'data-genre="{html.escape(genre, quote=True)}" '
+        f'data-genre-style="{html.escape(style, quote=True)}" '
+        f'data-search="{html.escape(search_text, quote=True)}" '
+        f'data-published="{"1" if published else "0"}">'
+        + inner
+        + "</article>"
+    )
+
+
+def build_index_html(catalog: list[dict[str, str]], published_articles: list[dict[str, str]]) -> str:
     rel_path = Path("articles/index.html")
-    articles = sort_articles_for_index(articles)
+    catalog = sort_articles_for_index(catalog)
+    published_articles = sort_articles_for_index(published_articles)
+    published_slugs = {norm(a.get("slug")) for a in published_articles if norm(a.get("slug"))}
     genre_styles = guide_genre_style_by_label()
     by_genre: dict[str, list[dict[str, str]]] = {}
-    for article in articles:
+    for article in catalog:
         by_genre.setdefault(apply_vars(article.get("genre", "試験ガイド")), []).append(article)
     genre_counts = {genre: len(group) for genre, group in by_genre.items()}
     genre_chips = ['<button type="button" class="article-index-chip on" data-genre="all">すべて</button>']
@@ -680,28 +735,12 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
             f'data-genre-style="{html.escape(style, quote=True)}">'
             f"{html.escape(genre)}<span>{count}</span></button>"
         )
-    article_cards: list[str] = []
-    for article in articles:
-        title_text = apply_vars(article["title"])
-        desc_text = meta_description(apply_vars(article.get("meta_description") or article.get("lead") or title_text), 130)
-        genre = apply_vars(article.get("genre", "試験ガイド"))
-        style = genre_styles.get(genre, "meta")
-        all_tags = split_semicolon(apply_vars(article.get("tags", "")))
-        display_tags = public_display_tags(all_tags)
-        tags = " / ".join(display_tags)
-        search_text = " ".join([title_text, desc_text, genre, tags, apply_vars(article.get("lead", ""))])
-        article_cards.append(
-            '<article class="article-index-card" '
-            f'data-genre="{html.escape(genre, quote=True)}" '
-            f'data-genre-style="{html.escape(style, quote=True)}" '
-            f'data-search="{html.escape(search_text, quote=True)}">'
-            f'<a class="article-index-card-link" href="{html.escape(article["slug"])}/">'
-            f'<span class="article-index-card-genre">{html.escape(genre)}</span>'
-            f"<h2>{html.escape(title_text)}</h2>"
-            f"<p>{html.escape(desc_text)}</p>"
-            + (f'<div class="article-index-card-tags">{html.escape(tags)}</div>' if tags else "")
-            + "</a></article>"
-        )
+    article_cards = [
+        article_index_card_html(article, published=norm(article.get("slug")) in published_slugs)
+        for article in catalog
+    ]
+    published_count = len(published_articles)
+    total_count = len(catalog)
     article_index_script = """<script>
 (() => {
   const q = document.getElementById('article-index-q');
@@ -721,7 +760,12 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
       card.classList.toggle('hide', !ok);
       if (ok) shown++;
     });
-    if (hit) hit.textContent = `${shown} / ${cards.length} 記事`;
+    if (hit) {
+      const pub = cards.filter((c) => c.dataset.published === '1').length;
+      hit.textContent = shown === cards.length
+        ? `公開 ${pub} / 全 ${cards.length} 記事`
+        : `表示 ${shown} / 全 ${cards.length} 記事（公開 ${pub}）`;
+    }
     if (empty) empty.classList.toggle('hide', shown !== 0);
   }
   q?.addEventListener('input', apply);
@@ -741,7 +785,7 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
     desc = f"{exam_name()}の受験フェーズ別ガイド（制度・学習計画・演習・直前・再受験）一覧です。用語の定義は用語解説（知識ハブ）をご覧ください。"
     item_list = [
         {"@type": "ListItem", "position": i, "name": apply_vars(a["title"]), "item": public_url(f"articles/{a['slug']}/")}
-        for i, a in enumerate(articles, start=1)
+        for i, a in enumerate(published_articles, start=1)
     ]
     articles_idx_crumbs = static_crumb_items(("試験ガイド", None))
     ld_json = json.dumps(
@@ -751,7 +795,7 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
                 {
                     "@type": "ItemList",
                     "name": f"{exam_name()} 試験ガイド",
-                    "numberOfItems": len(articles),
+                    "numberOfItems": published_count,
                     "itemListElement": item_list,
                 },
                 {
@@ -796,9 +840,9 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
     <div class="article-index-head">
       <div>
         <h2 id="article-index-heading">記事一覧</h2>
-        <p>全{len(articles)}記事。キーワード検索とジャンルで絞り込めます。</p>
+        <p>全{total_count}記事（公開 {published_count}）。キーワード検索とジャンルで絞り込めます。準備中の記事はタイトルのみ表示し、本文公開まで開けません。</p>
       </div>
-      <span id="article-index-hit" class="article-index-hit">{len(articles)} / {len(articles)} 記事</span>
+      <span id="article-index-hit" class="article-index-hit">公開 {published_count} / 全 {total_count} 記事</span>
     </div>
     <div class="article-index-tools">
       <label class="article-index-search" for="article-index-q">
@@ -841,8 +885,8 @@ def clean_generated_dirs() -> None:
 
 def main() -> int:
     articles = load_articles()
-    buildable = [article for article in articles if affiliate_article_is_buildable(article)]
-    skipped_affiliate = len(articles) - len(buildable)
+    buildable = [article for article in articles if guide_article_is_buildable(article)]
+    skipped = len(articles) - len(buildable)
     by_slug = {norm(a.get("slug")): a for a in buildable if norm(a.get("slug"))}
     term_hrefs: dict[str, str] | None = None
     glossary_categories: list[str] = []
@@ -876,10 +920,10 @@ def main() -> int:
             ),
             encoding="utf-8",
         )
-    (ARTICLES_DIR / "index.html").write_text(build_index_html(buildable), encoding="utf-8")
+    (ARTICLES_DIR / "index.html").write_text(build_index_html(articles, buildable), encoding="utf-8")
     msg = f"Wrote {len(buildable)} guide articles under {ARTICLES_DIR}"
-    if skipped_affiliate:
-        msg += f" (skipped {skipped_affiliate} affiliate without ASP links)"
+    if skipped:
+        msg += f" (catalog {len(articles)} rows; skipped {skipped} draft/unpublished or affiliate without ASP links)"
     print(msg)
     print(f"Wrote {ARTICLES_DIR / 'index.html'}")
     return 0

@@ -3497,6 +3497,36 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
   font-size: var(--fs-caption);
   font-weight: 600;
 }
+.article-index-card-link.is-disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.88;
+  transform: none;
+  box-shadow: var(--sh);
+}
+.article-index-card-link.is-disabled:hover {
+  background: var(--bg);
+  border-color: var(--border2);
+  box-shadow: var(--sh);
+  transform: none;
+  opacity: 0.88;
+}
+.article-index-card.is-draft h2 {
+  color: var(--text2);
+}
+.article-index-card-soon {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  background: #f3f3f4;
+  color: #666;
+  border: 1px solid #d8d8da;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 9px;
+}
 .article-index-empty {
   margin: 14px 0 0;
   padding: 20px;
