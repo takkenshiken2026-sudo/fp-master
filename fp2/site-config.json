@@ -1,7 +1,10 @@
 {
-  "brandName": "FPマスター",
-  "brandLogoText": "FPマスター",
-  "brandMark": "FP",
+  "portalBrandName": "FPマスター",
+  "brandName": "FP2級マスター",
+  "brandLogoTop": "FP2級",
+  "brandLogoBottom": "マスター",
+  "brandLogoText": "FP2級",
+  "brandMark": "FP2",
   "examGrade": "FP2",
   "examName": "ファイナンシャル・プランナー試験（FP2級）",
   "basePath": "/fp2",

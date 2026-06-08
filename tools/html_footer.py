@@ -245,7 +245,10 @@ def _breadcrumb_ol(rel_path: Path, items: list[tuple[str, str | None]]) -> str:
     lis: list[str] = []
     for text, href in items:
         if href:
-            h = footer_href(rel_path, href) if not href.startswith("http") else href
+            if href.startswith("http://") or href.startswith("https://") or href.startswith("/"):
+                h = href
+            else:
+                h = footer_href(rel_path, href)
             lis.append(f'<li><a href="{html.escape(h)}">{html.escape(text)}</a></li>')
         else:
             lis.append(f'<li aria-current="page">{html.escape(text)}</li>')

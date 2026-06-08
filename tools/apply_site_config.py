@@ -36,6 +36,7 @@ from tools.site_config import (
 )
 from tools.html_footer import site_page_footer, site_page_header, site_shell_footer
 from tools.brand_assets import inject_brand_head
+from tools.breadcrumb_seo import spa_breadcrumb_prefix_li
 from tools.index_seo_head import (
     INDEX_SEO_MARKER_END,
     INDEX_SEO_MARKER_START,
@@ -69,14 +70,15 @@ STATIC_PAGE_CURRENTS = {
 }
 
 
-_SPA_BREADCRUMB_TOP_RE = re.compile(
-    r'(<li class="breadcrumb-item"><a href="/" onclick="event\.preventDefault\(\);gotoPage\(\'quiz-start\'\)" title=")[^"]*(">)[^<]*(</a></li>)',
+_SPA_BREADCRUMB_HOME_RE = re.compile(
+    r'<li class="breadcrumb-item"><a href="[^"]*"[^>]*onclick="event\.preventDefault\(\);gotoPage\(\'quiz-start\'\)"[^>]*>[^<]*</a></li>',
 )
 
 
-def fix_spa_breadcrumb_top(text: str) -> str:
-    """SPA 内パンくず1段目はサイト名ではなく「トップ」に統一する。"""
-    return _SPA_BREADCRUMB_TOP_RE.sub(r"\1トップ\2トップ\3", text)
+def update_spa_breadcrumbs(text: str) -> str:
+    """SPA パンくず先頭を portal + 級ブランド階層に揃える（SEO・内部リンク）。"""
+    prefix = spa_breadcrumb_prefix_li()
+    return _SPA_BREADCRUMB_HOME_RE.sub(prefix, text)
 
 
 def patch_spa_absolute_paths(text: str) -> str:
@@ -111,6 +113,9 @@ def replace_all(text: str) -> str:
     replacements = [
         ("© 2026 Sampleマスター学習支援・YOUR-DOMAIN.example", copyright_text()),
         ("Sampleマスター", brand_name()),
+        ("マン管マスター", brand_name()),
+        ("マンション管理士試験", exam_name()),
+        ("FPマスター", brand_name()),
         ("◯◯試験（プレースホルダー）", exam_name()),
         ("YOUR-DOMAIN.example", host),
         ("https://YOUR-DOMAIN.example", origin),
@@ -282,6 +287,13 @@ def _ensure_topnav_logo_stack(text: str) -> str:
 
 def update_index_brand_mark(text: str) -> str:
     mark = _index_logo_mark_html()
+    aria = html.escape(f"{brand_name()}、{exam_name()}対策のトップへ")
+    text = re.sub(
+        r'(<a class="topnav-logo"[^>]*\s)aria-label="[^"]*"',
+        rf'\1aria-label="{aria}"',
+        text,
+        count=1,
+    )
 
     text = _TOPNAV_LOGO_MARK_RE.sub(mark, text, count=1)
     text = _ensure_topnav_logo_stack(text)
@@ -438,7 +450,7 @@ def main() -> int:
             new = inject_index_noscript(new)
             new = inject_index_fields_fallback(new)
             new = update_index_spa_seo_js(new)
-            new = fix_spa_breadcrumb_top(new)
+            new = update_spa_breadcrumbs(new)
             new = patch_spa_absolute_paths(new)
             new = ensure_index_theme(new)
             new = update_index_shell_footer(new)

@@ -51,6 +51,7 @@ from tools.build_past_question_pages import (  # noqa: E402
     stem_preview,
     text_to_html,
 )
+from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items  # noqa: E402
 from tools.html_footer import (  # noqa: E402
     breadcrumb_html,
     q_hub_links_html,
@@ -402,22 +403,17 @@ def build_practice_question_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
-                    {"@type": "ListItem", "position": 2, "name": "実践演習一覧", "item": public_url(base_url, "q/practice/index.html")},
-                    {"@type": "ListItem", "position": 3, "name": heading, "item": canonical},
-                ],
+                "itemListElement": crumb_json_ld(
+                    static_crumb_items(("実践演習一覧", "q/practice/index.html"), (heading, None)),
+                    last_item_url=canonical,
+                ),
             },
         ],
     }
     site_header = site_page_header(rel_path, current="practice")
     site_breadcrumb = breadcrumb_html(
         rel_path,
-        [
-            ("トップ", "index.html"),
-            ("実践演習一覧", "q/practice/index.html"),
-            (heading, None),
-        ],
+        static_crumb_items(("実践演習一覧", "q/practice/index.html"), (heading, None)),
     )
     site_footer = site_page_footer(rel_path, current="practice")
 
@@ -547,22 +543,17 @@ def build_ichimon_question_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
-                    {"@type": "ListItem", "position": 2, "name": "一問一答一覧", "item": public_url(base_url, "q/ichimon/index.html")},
-                    {"@type": "ListItem", "position": 3, "name": heading, "item": canonical},
-                ],
+                "itemListElement": crumb_json_ld(
+                    static_crumb_items(("一問一答一覧", "q/ichimon/index.html"), (heading, None)),
+                    last_item_url=canonical,
+                ),
             },
         ],
     }
     site_header = site_page_header(rel_path, current="ichimon")
     site_breadcrumb = breadcrumb_html(
         rel_path,
-        [
-            ("トップ", "index.html"),
-            ("一問一答一覧", "q/ichimon/index.html"),
-            (heading, None),
-        ],
+        static_crumb_items(("一問一答一覧", "q/ichimon/index.html"), (heading, None)),
     )
     site_footer = site_page_footer(rel_path, current="ichimon")
     exp_html = build_ichimon_explanation_html(page, row)
@@ -777,9 +768,7 @@ def build_mode_index(
     group_label = cfg["groupLabel"]
 
     header = site_page_header(rel_path, current=current)
-    breadcrumb = breadcrumb_html(
-        rel_path, [("トップ", "index.html"), (f"{h1}一覧", None)]
-    )
+    breadcrumb = breadcrumb_html(rel_path, static_crumb_items((f"{h1}一覧", None)))
     footer = site_page_footer(rel_path, current=current)
     list_aria = f"{group_label}別{h1}"
 

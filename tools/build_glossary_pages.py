@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items
 from tools.html_footer import (
     ROBOTS_INDEX_FOLLOW,
     breadcrumb_html,
@@ -836,10 +837,7 @@ def build_term_html(
         meta_bits.append(f"<span>{html.escape(category)}</span>")
     meta_line = " · ".join(meta_bits)
 
-    crumb_items: list[tuple[str, str | None]] = [
-        ("トップ", "index.html"),
-        ("用語解説一覧", "terms/index.html"),
-    ]
+    crumb_items = static_crumb_items(("用語解説一覧", "terms/index.html"))
     if field_hub and category:
         crumb_items.append((category, f"{field_hub}/index.html"))
     crumb_items.append((term, None))
@@ -969,22 +967,7 @@ def build_term_html(
     citations = [link["url"] for link in official_links_ld if link.get("url")]
     if citations:
         defined_term["citation"] = citations
-    breadcrumb_items = [
-        {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
-        {"@type": "ListItem", "position": 2, "name": "用語解説", "item": public_url(base_url, "terms/index.html")},
-    ]
-    pos = 3
-    if field_hub and category:
-        breadcrumb_items.append(
-            {
-                "@type": "ListItem",
-                "position": pos,
-                "name": category,
-                "item": public_url(base_url, f"terms/{field_hub}/index.html"),
-            }
-        )
-        pos += 1
-    breadcrumb_items.append({"@type": "ListItem", "position": pos, "name": term, "item": canonical})
+    breadcrumb_items = crumb_json_ld(crumb_items, last_item_url=canonical)
     graph: list[dict] = [
         defined_term,
         {
@@ -1088,11 +1071,7 @@ def build_field_hub_html(
         for e in sorted(cat_entries, key=lambda x: x["term"])
     ]
     list_html = "\n".join(lis)
-    crumb_items = [
-        ("トップ", "index.html"),
-        ("用語解説一覧", "terms/index.html"),
-        (category, None),
-    ]
+    crumb_items = static_crumb_items(("用語解説一覧", "terms/index.html"), (category, None))
     page_header = site_page_header(rel_path, current="terms")
     page_breadcrumb = breadcrumb_html(rel_path, crumb_items)
     page_footer = site_page_footer(rel_path, current="terms")
@@ -1114,11 +1093,7 @@ def build_field_hub_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
-                    {"@type": "ListItem", "position": 2, "name": "用語解説", "item": public_url(base_url, "terms/index.html")},
-                    {"@type": "ListItem", "position": 3, "name": category, "item": canonical},
-                ],
+                "itemListElement": crumb_json_ld(crumb_items, last_item_url=canonical),
             },
         ],
     }
@@ -1216,13 +1191,23 @@ def build_terms_index(entries: list[dict], base_url: str) -> str:
                 }
             )
             pos += 1
+    terms_idx_crumbs = static_crumb_items(("用語解説", None))
+    canonical = public_url(base_url, "terms/index.html")
     ld = {
         "@context": "https://schema.org",
-        "@type": "ItemList",
-        "name": f"{exam_name()} 用語解説一覧",
-        "description": "試験で出やすい用語ごとの解説記事への索引です。",
-        "numberOfItems": n_terms,
-        "itemListElement": list_items_ld,
+        "@graph": [
+            {
+                "@type": "ItemList",
+                "name": f"{exam_name()} 用語解説一覧",
+                "description": "試験で出やすい用語ごとの解説記事への索引です。",
+                "numberOfItems": n_terms,
+                "itemListElement": list_items_ld,
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": crumb_json_ld(terms_idx_crumbs, last_item_url=canonical),
+            },
+        ],
     }
     ld_json = json.dumps(ld, ensure_ascii=False, indent=2)
     json_data = json.dumps(
@@ -1233,9 +1218,7 @@ def build_terms_index(entries: list[dict], base_url: str) -> str:
     idx_path = Path("terms/index.html")
     terms_header = site_page_header(idx_path, current="terms", wide=True)
     terms_footer = site_page_footer(idx_path, current="terms", wide=True)
-    page_breadcrumb = breadcrumb_html(idx_path, [("トップ", "index.html"), ("用語解説", None)])
-
-    canonical = public_url(base_url, "terms/index.html")
+    page_breadcrumb = breadcrumb_html(idx_path, terms_idx_crumbs)
     title = f"用語解説｜{brand_name()}（{exam_name()}）"
     desc = (
         f"{exam_name()}の重要用語を一覧し、各用語の解説記事へリンクします。"

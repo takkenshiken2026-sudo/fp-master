@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items
 from tools.html_footer import (  # noqa: E402
     ROBOTS_INDEX_FOLLOW,
     breadcrumb_html,
@@ -58,7 +59,10 @@ def apply_vars(value: str) -> str:
     text = norm(value)
     return (
         text.replace("Sampleマスター", brand_name())
+        .replace("FPマスター", brand_name())
+        .replace("マン管マスター", brand_name())
         .replace("◯◯試験（プレースホルダー）", exam_name())
+        .replace("マンション管理士試験", exam_name())
         .replace("◯◯試験", exam_name())
     )
 
@@ -554,7 +558,7 @@ def build_article_html(
         "本人に割り当てられた試験会場は受験票の表記が正本です。</p></blockquote></section>"
     )
     info_table = article_info_table(article)
-    crumb_items = [("トップ", "index.html"), ("試験ガイド", "articles/index.html"), (title, None)]
+    crumb_items = static_crumb_items(("試験ガイド", "articles/index.html"), (title, None))
     article_schema = {
         "@type": "Article",
         "@id": canonical + "#article",
@@ -580,11 +584,7 @@ def build_article_html(
             {"@type": "WebPage", "@id": canonical + "#webpage", "url": canonical, "name": title, "description": desc, "inLanguage": "ja-JP"},
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url("index.html")},
-                    {"@type": "ListItem", "position": 2, "name": "試験ガイド", "item": public_url("articles/index.html")},
-                    {"@type": "ListItem", "position": 3, "name": title, "item": canonical},
-                ],
+                "itemListElement": crumb_json_ld(crumb_items, last_item_url=canonical),
             },
         ],
     }
@@ -743,8 +743,23 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
         {"@type": "ListItem", "position": i, "name": apply_vars(a["title"]), "item": public_url(f"articles/{a['slug']}/")}
         for i, a in enumerate(articles, start=1)
     ]
+    articles_idx_crumbs = static_crumb_items(("試験ガイド", None))
     ld_json = json.dumps(
-        {"@context": "https://schema.org", "@type": "ItemList", "name": f"{exam_name()} 試験ガイド", "numberOfItems": len(articles), "itemListElement": item_list},
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "ItemList",
+                    "name": f"{exam_name()} 試験ガイド",
+                    "numberOfItems": len(articles),
+                    "itemListElement": item_list,
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": crumb_json_ld(articles_idx_crumbs, last_item_url=canonical),
+                },
+            ],
+        },
         ensure_ascii=False,
         indent=2,
     )
@@ -774,7 +789,7 @@ def build_index_html(articles: list[dict[str, str]]) -> str:
 {site_page_wrap_open()}
 {site_page_header(rel_path, current="articles")}
 <main class="site-page-main">
-  {breadcrumb_html(rel_path, [("トップ", "index.html"), ("試験ガイド", None)])}
+  {breadcrumb_html(rel_path, articles_idx_crumbs)}
   <h1>試験ガイド</h1>
   <p class="site-page-lead">{html.escape(exam_name())}の制度理解から学習計画・演習・直前対策まで、受験フェーズ別の<strong>進め方</strong>をまとめています。用語の意味・比較・数値は<a href="../terms/index.html">用語解説（知識ハブ）</a>、問題演習は<a href="../q/index.html">過去問一覧</a>からどうぞ。</p>
   <section class="article-index-panel" aria-labelledby="article-index-heading">

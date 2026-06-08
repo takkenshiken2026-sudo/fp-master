@@ -1,6 +1,6 @@
 window.SITE_CONFIG = {
-  "brandName": "FPマスター",
-  "brandMark": "FP",
+  "brandName": "FP3級マスター",
+  "brandMark": "FP3",
   "examName": "ファイナンシャル・プランナー試験（FP3級）",
   "examGrade": "FP3",
   "basePath": "/fp3",

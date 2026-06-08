@@ -36,6 +36,7 @@ if str(ROOT) not in sys.path:
 
 from tools.q_explanation import build_explanation_html
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog
+from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items
 from tools.html_footer import (
     ROBOTS_INDEX_FOLLOW,
     breadcrumb_html,
@@ -741,11 +742,10 @@ def build_question_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
-                    {"@type": "ListItem", "position": 2, "name": "過去問一覧", "item": public_url(base_url, "q/index.html")},
-                    {"@type": "ListItem", "position": 3, "name": heading, "item": canonical},
-                ],
+                "itemListElement": crumb_json_ld(
+                    static_crumb_items(("過去問一覧", "q/index.html"), (heading, None)),
+                    last_item_url=canonical,
+                ),
             },
         ],
     }
@@ -756,7 +756,7 @@ def build_question_html(
     )
     site_breadcrumb = breadcrumb_html(
         rel_path,
-        [("トップ", "index.html"), ("過去問一覧", "q/index.html"), (heading, None)],
+        static_crumb_items(("過去問一覧", "q/index.html"), (heading, None)),
     )
     site_footer = site_page_footer(rel_path, current="q")
     from tools.q_page_seo import study_modes_note_html
@@ -937,7 +937,7 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
         rel_path,
         current="q",
     )
-    q_index_breadcrumb = breadcrumb_html(rel_path, [("トップ", "index.html"), ("過去問一覧", None)])
+    q_index_breadcrumb = breadcrumb_html(rel_path, static_crumb_items(("過去問一覧", None)))
     q_index_footer = site_page_footer(rel_path, current="q")
 
     from tools.q_page_seo import (

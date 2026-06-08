@@ -1,7 +1,10 @@
 {
-  "brandName": "FPマスター",
-  "brandLogoText": "FPマスター",
-  "brandMark": "FP",
+  "portalBrandName": "FPマスター",
+  "brandName": "FP3級マスター",
+  "brandLogoTop": "FP3級",
+  "brandLogoBottom": "マスター",
+  "brandLogoText": "FP3級",
+  "brandMark": "FP3",
   "examGrade": "FP3",
   "examName": "ファイナンシャル・プランナー試験（FP3級）",
   "basePath": "/fp3",

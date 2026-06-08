@@ -9,6 +9,7 @@ import json
 import re
 
 from tools.brand_assets import theme_ink
+from tools.breadcrumb_seo import index_home_breadcrumb_json_ld
 from tools.site_config import base_path, brand_name, clean_origin, exam_name, fields, public_url
 
 INDEX_SEO_MARKER_START = "<!--INDEX_SEO_HEAD-->"
@@ -64,6 +65,7 @@ def index_keywords() -> str:
 
 def index_json_ld_graph() -> list[dict]:
     origin = clean_origin()
+    home_url = index_canonical_url()
     alt = f"{exam_name()}対策サイト"
     platform_desc = (
         f"{exam_name()}の過去問・実践演習・一問一答・用語解説を"
@@ -72,8 +74,8 @@ def index_json_ld_graph() -> list[dict]:
     return [
         {
             "@type": "WebSite",
-            "@id": f"{origin}/#website",
-            "url": f"{origin}/",
+            "@id": f"{home_url}#website",
+            "url": home_url,
             "name": brand_name(),
             "alternateName": alt,
             "description": platform_desc,
@@ -81,7 +83,7 @@ def index_json_ld_graph() -> list[dict]:
         },
         {
             "@type": "EducationalApplication",
-            "@id": f"{origin}/#app",
+            "@id": f"{home_url}#app",
             "name": brand_name(),
             "alternateName": alt,
             "description": platform_desc,
@@ -101,15 +103,7 @@ def index_json_ld_graph() -> list[dict]:
                 },
             ],
         },
-        {
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "トップ", "item": f"{origin}/"},
-                {"@type": "ListItem", "position": 2, "name": "過去問", "item": f"{origin}/#past"},
-                {"@type": "ListItem", "position": 3, "name": "実践演習", "item": f"{origin}/#orig"},
-                {"@type": "ListItem", "position": 4, "name": "用語解説", "item": public_url("terms/")},
-            ],
-        },
+        index_home_breadcrumb_json_ld(),
     ]
 
 
@@ -212,6 +206,31 @@ def _strip_duplicate_seo_after_marker(text: str) -> str:
     return text[:tail_start] + tail[consumed:]
 
 
+def _strip_all_orphan_seo_after_first_marker(text: str) -> str:
+    """最初の INDEX_SEO 終端マーカー以降に蓄積した重複 SEO を一括除去。"""
+    end = text.find(INDEX_SEO_MARKER_END)
+    if end < 0:
+        return text
+    tail_start = end + len(INDEX_SEO_MARKER_END)
+    tail = text[tail_start:]
+    anchor = re.search(r'<meta name="format-detection"', tail)
+    if anchor:
+        junk = tail[: anchor.start()]
+        if (
+            INDEX_SEO_MARKER_END in junk
+            or "<title>" in junk
+            or 'name="application-name"' in junk
+            or 'property="og:title"' in junk
+        ):
+            return text[:tail_start] + tail[anchor.start() :]
+    while True:
+        prev = text
+        text = _strip_duplicate_seo_after_marker(text)
+        if text == prev:
+            break
+    return text
+
+
 def inject_index_seo_head(text: str) -> str:
     """Replace or insert site-config driven SEO head for SPA index.html."""
     block_inner = index_seo_head_inner()
@@ -233,7 +252,7 @@ def inject_index_seo_head(text: str) -> str:
             )
         else:
             text = re.sub(r'(<meta charset="UTF-8">)', r"\1\n" + block, text, count=1)
-    return _strip_duplicate_seo_after_marker(text)
+    return _strip_all_orphan_seo_after_first_marker(text)
 
 
 def migrate_legacy_takken_leaks(text: str) -> str:
@@ -248,6 +267,10 @@ def migrate_legacy_takken_leaks(text: str) -> str:
         ("宅建マスター", bn),
         ("宅地建物取引士試験対策サイト", f"{en}対策サイト"),
         ("宅地建物取引士試験", en),
+        ("マン管マスター", bn),
+        ("マンション管理士試験対策サイト", f"{en}対策サイト"),
+        ("マンション管理士試験", en),
+        ("FPマスター", bn),
     ]
     for src, dst in replacements:
         text = text.replace(src, dst)
