@@ -8,6 +8,9 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://fp-master.jp/">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site-pages.css">
 <link rel="stylesheet" href="/site-theme.css">
 <style>
@@ -16,92 +19,213 @@
   display: flex;
   flex-direction: column;
   background: var(--page-bg);
+  font-family: var(--font);
+}
+.grade-portal-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.grade-portal-header-inner {
+  width: min(var(--site-nav-w), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 14px 0;
+  display: flex;
+  align-items: center;
+}
+.grade-portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.grade-portal-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+.grade-portal-brand-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.grade-portal-brand-sub {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text2);
 }
 .grade-portal-main {
   flex: 1;
-  width: min(720px, calc(100% - 32px));
+  width: min(var(--site-content-w), calc(100% - 32px));
   margin: 0 auto;
-  padding: 48px 0 80px;
+  padding: 40px 0 64px;
 }
-.grade-portal-hero {
-  text-align: center;
-  margin-bottom: 32px;
+.grade-portal-intro {
+  max-width: 42rem;
+  margin-bottom: 28px;
 }
-.grade-portal-mark {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 64px;
-  min-height: 42px;
-  padding: 8px 14px 7px;
-  border-radius: 6px;
-  background: var(--accent);
-  color: var(--accent-text);
-  font-weight: 700;
-  line-height: 1.05;
-  margin-bottom: 16px;
-}
-.grade-portal-mark-sub { font-size: 12px; letter-spacing: .04em; }
-.grade-portal-mark-top { font-size: 14px; }
-.grade-portal-hero h1 {
+.grade-portal-intro h1 {
   margin: 0 0 10px;
-  font-size: 1.75rem;
+  font-size: clamp(1.375rem, 2.5vw + 0.75rem, 1.75rem);
+  font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.35;
 }
 .grade-portal-lead {
   margin: 0;
   color: var(--text2);
-  line-height: 1.7;
-  font-size: 1rem;
+  line-height: 1.75;
+  font-size: var(--fs-sub);
 }
-.grade-portal-cards {
+.grade-portal-grid {
   display: grid;
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 .grade-portal-card {
-  display: block;
-  padding: 22px 24px;
-  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+  padding: 22px 22px 20px;
+  border: 1px solid var(--border2);
   border-radius: var(--r2);
   background: var(--bg);
+  box-shadow: var(--sh);
   text-decoration: none;
   color: inherit;
-  box-shadow: var(--sh);
-  transition: border-color .15s ease, transform .15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 .grade-portal-card:hover {
-  border-color: var(--accent-border);
+  text-decoration: none;
+  color: inherit;
+}
+.grade-portal-card--primary:hover {
+  border-color: var(--accent-hover-border);
+  box-shadow: 0 8px 24px var(--accent-shadow);
+  transform: translateY(-2px);
+}
+.grade-portal-card--muted {
+  background: color-mix(in srgb, var(--bg) 92%, var(--page-bg));
+}
+.grade-portal-card--muted:hover {
+  border-color: color-mix(in srgb, var(--ink) 18%, var(--border));
   transform: translateY(-1px);
 }
-.grade-portal-card h2 {
-  margin: 0 0 8px;
-  font-size: 1.25rem;
-  color: var(--text);
+.grade-portal-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
-.grade-portal-card p {
-  margin: 0;
+.grade-portal-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+.grade-portal-badge--live {
+  background: var(--accent-soft);
+  color: var(--accent-emphasis);
+  border: 1px solid var(--accent-border);
+}
+.grade-portal-badge--soon {
+  background: var(--bg2);
   color: var(--text2);
-  line-height: 1.65;
-  font-size: .95rem;
+  border: 1px solid var(--border2);
 }
-.grade-portal-card-meta {
-  margin-top: 12px;
-  font-size: .85rem;
+.grade-portal-card h2 {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+}
+.grade-portal-card-desc {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-sub);
+  line-height: 1.75;
+}
+.grade-portal-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.grade-portal-features li {
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  font-size: var(--fs-caption);
   font-weight: 600;
+  color: var(--text2);
+  line-height: 1.3;
+}
+.grade-portal-card--primary .grade-portal-features li {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
   color: var(--accent-emphasis);
 }
-.grade-portal-card.is-soon {
-  opacity: .88;
-  border-style: dashed;
+.grade-portal-cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--r);
+  font-size: var(--fs-sub);
+  font-weight: 700;
+  line-height: 1.3;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.grade-portal-card--primary .grade-portal-cta {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.grade-portal-card--primary:hover .grade-portal-cta {
+  background: color-mix(in srgb, var(--accent) 88%, #000);
+}
+.grade-portal-card--muted .grade-portal-cta {
+  background: var(--bg);
+  color: var(--text2);
+  border: 1px solid var(--border2);
 }
 .grade-portal-footer {
-  text-align: center;
+  margin-top: auto;
   padding: 20px 16px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  text-align: center;
+  font-size: var(--fs-caption);
   color: var(--text2);
-  font-size: .85rem;
+  line-height: 1.65;
 }
-.grade-portal-footer a { color: var(--text2); }
+.grade-portal-footer p { margin: 0 0 8px; }
+.grade-portal-footer p:last-child { margin-bottom: 0; }
+.grade-portal-footer a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.grade-portal-footer a:hover { text-decoration: underline; }
+@media (max-width: 720px) {
+  .grade-portal-main { padding-top: 28px; }
+  .grade-portal-grid { grid-template-columns: 1fr; }
+  .grade-portal-brand-sub { max-width: 14rem; line-height: 1.35; }
+}
 </style>
 <script>
 (function () {
@@ -113,26 +237,62 @@
 })();
 </script>
 </head>
-<body class="grade-portal-page site-shell-column-page">
-<main class="grade-portal-main">
-  <div class="grade-portal-hero">
-    <div class="grade-portal-mark" aria-hidden="true">
-      <span class="grade-portal-mark-top">FP</span>
-      <span class="grade-portal-mark-sub">マスター</span>
-    </div>
-    <h1>受験する級を選ぶ</h1>
-    <p class="grade-portal-lead">ファイナンシャル・プランナー試験（FP技能検定）の学習サイトです。対象の級を選んで学習を始めてください。</p>
-  </div>
-  <div class="grade-portal-cards">
-    <a class="grade-portal-card" href="/fp3/">
-      <h2>FP3級マスター</h2>
-      <p>過去問・実践演習600問以上・一問一答・用語解説・試験ガイド。FP3級学科試験対策のメインコンテンツです。</p>
-      <div class="grade-portal-card-meta">FP3級で学習を始める →</div>
+<body class="grade-portal-page">
+<header class="grade-portal-header">
+  <div class="grade-portal-header-inner">
+    <a class="grade-portal-brand" href="/" aria-label="FPマスター、トップへ">
+      <div class="topnav-logo-mark" aria-hidden="true">
+        <span class="logo-mark-line">FP</span>
+        <span class="logo-mark-line logo-mark-line--sub">マスター</span>
+      </div>
+      <span class="grade-portal-brand-text">
+        <span class="grade-portal-brand-name">FPマスター</span>
+        <span class="grade-portal-brand-sub">ファイナンシャル・プランナー試験 学習サイト</span>
+      </span>
     </a>
-    <a class="grade-portal-card is-soon" href="/fp2/">
-      <h2>FP2級</h2>
-      <p>FP2級向けの過去問・演習コンテンツを準備中です。骨組みのみ公開しています。</p>
-      <div class="grade-portal-card-meta">準備中ページへ →</div>
+  </div>
+</header>
+<main class="grade-portal-main">
+  <section class="grade-portal-intro">
+    <h1>受験する級を選ぶ</h1>
+    <p class="grade-portal-lead">FP2級・FP3級それぞれの学習コンテンツへ進めます。まずは対象の級を選んでください。</p>
+  </section>
+  <div class="grade-portal-grid">
+    <a class="grade-portal-card grade-portal-card--primary" href="/fp3/">
+      <div class="grade-portal-card-head">
+        <div class="topnav-logo-mark logo-mark--narrow" aria-hidden="true">
+          <span class="logo-mark-line">FP3級</span>
+          <span class="logo-mark-line logo-mark-line--sub">マスター</span>
+        </div>
+        <span class="grade-portal-badge grade-portal-badge--live">公開中</span>
+      </div>
+      <h2>FP3級マスター</h2>
+      <p class="grade-portal-card-desc">学科試験対策のメインサイト。過去問・実践演習・一問一答・用語解説・試験ガイドを無料で利用できます。</p>
+      <ul class="grade-portal-features" aria-label="主なコンテンツ">
+        <li>過去問</li>
+        <li>実践600問</li>
+        <li>一問一答</li>
+        <li>用語解説</li>
+        <li>試験ガイド</li>
+      </ul>
+      <span class="grade-portal-cta">FP3級で学習を始める</span>
+    </a>
+    <a class="grade-portal-card grade-portal-card--muted" href="/fp2/">
+      <div class="grade-portal-card-head">
+        <div class="topnav-logo-mark logo-mark--narrow" aria-hidden="true">
+          <span class="logo-mark-line">FP2級</span>
+          <span class="logo-mark-line logo-mark-line--sub">マスター</span>
+        </div>
+        <span class="grade-portal-badge grade-portal-badge--soon">準備中</span>
+      </div>
+      <h2>FP2級マスター</h2>
+      <p class="grade-portal-card-desc">AFP・CFP（FP2級）向けの過去問・演習コンテンツを順次公開予定です。現時点では準備ページのみです。</p>
+      <ul class="grade-portal-features" aria-label="公開予定">
+        <li>過去問</li>
+        <li>実践演習</li>
+        <li>学科対策</li>
+      </ul>
+      <span class="grade-portal-cta">準備状況を見る</span>
     </a>
   </div>
 </main>
