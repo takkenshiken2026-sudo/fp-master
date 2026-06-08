@@ -18,6 +18,8 @@ from pathlib import Path
 from urllib.parse import unquote, urldefrag
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 # index.html SPA: hash routes are handled by JS (see gotoPage / boot routing).
 INDEX_HASH_WHITELIST = frozenset(
@@ -122,6 +124,21 @@ class InternalLinkValidator:
             ("http://", "https://", "mailto:", "tel:", "javascript:", "data:")
         )
 
+    @staticmethod
+    def _strip_deploy_base(path_part: str) -> str:
+        from tools.site_config import base_path
+
+        bp = base_path()
+        if not bp or not path_part.startswith("/"):
+            return path_part
+        if path_part in (bp, f"{bp}/"):
+            return "/"
+        prefix = f"{bp}/"
+        if path_part.startswith(prefix):
+            rest = path_part[len(bp) :]
+            return rest if rest.startswith("/") else f"/{rest.lstrip('/')}"
+        return path_part
+
     def resolve_target(self, page: Path, href: str) -> tuple[Path | None, str]:
         href = unquote(href.strip())
         if not href or href == "#":
@@ -129,7 +146,14 @@ class InternalLinkValidator:
         path_part, fragment = urldefrag(href)
         if self.is_external(path_part or href):
             return None, fragment
+        if path_part.startswith("/fp2/") or path_part in ("/fp2", "/fp2/"):
+            rel = path_part[len("/fp2") :].lstrip("/") or "index.html"
+            if rel.endswith("/"):
+                rel += "index.html"
+            target = (ROOT / "fp2" / rel).resolve()
+            return target, fragment
         if path_part.startswith("/"):
+            path_part = self._strip_deploy_base(path_part)
             target = (ROOT / path_part.lstrip("/")).resolve()
         elif path_part:
             target = (page.parent / path_part).resolve()

@@ -1,0 +1,16 @@
+:root {
+  --sel: #1a4a7a;
+  --accent: #1a4a7a;
+  --accent-text: #ffffff;
+  --accent-soft: color-mix(in srgb, #1a4a7a 11%, #ffffff);
+  --accent-border: color-mix(in srgb, #1a4a7a 26%, #ffffff);
+  --accent-emphasis: color-mix(in srgb, #1a4a7a 42%, #333333);
+  --bg: #ffffff;
+  --bg2: #f4f4f5;
+  --page-bg: #f0f0f1;
+  --text: #111111;
+  --text2: #555555;
+  --border: rgba(0, 0, 0, 0.09);
+  --r2: 10px;
+}
+body { background: var(--page-bg); }

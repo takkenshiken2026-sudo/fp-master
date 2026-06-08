@@ -104,8 +104,14 @@ def _q_index(q_index: Path) -> list[Issue]:
         issues.append(Issue("q/index.html: q_hub_links_html（3モードタブ）がありません"))
     if 'aria-current="page">過去問</span>' not in text and "is-current" not in text:
         issues.append(Issue("q/index.html: 過去問タブの current 表示がありません"))
+    try:
+        from tools.site_config import site_href
+
+        practice_hub = site_href("q/practice/index.html")
+    except Exception:
+        practice_hub = "/q/practice/index.html"
     if (
-        "/q/orig/index.html" not in text
+        practice_hub not in text
         and "/q/practice/index.html" not in text
         and 'href="practice/index.html"' not in text
     ):
@@ -313,8 +319,32 @@ def _mode_index_hub_tabs(mode: str, index_path: Path) -> list[Issue]:
     issues: list[Issue] = []
     if "q-hub-links" not in text:
         issues.append(Issue(f"q/{mode}/index.html: q_hub_links_html（3モードタブ）がありません"))
-    for href in ("/q/index.html", "/q/practice/index.html", "/q/ichimon/index.html"):
-        if href not in text and href.replace("/q/", "") not in text:
+    try:
+        from tools.site_config import site_href
+
+        hub_hrefs = (
+            site_href("q/index.html"),
+            site_href("q/practice/index.html"),
+            site_href("q/ichimon/index.html"),
+        )
+    except Exception:
+        hub_hrefs = (
+            "/q/index.html",
+            "/q/practice/index.html",
+            "/q/ichimon/index.html",
+        )
+    current_rel = {
+        "past": "q/index.html",
+        "practice": "q/practice/index.html",
+        "ichimon": "q/ichimon/index.html",
+    }.get(mode, "")
+    for rel, href in zip(
+        ("q/index.html", "q/practice/index.html", "q/ichimon/index.html"),
+        hub_hrefs,
+    ):
+        if rel == current_rel:
+            continue
+        if href not in text and href.replace("/q/", "q/") not in text and href.lstrip("/") not in text:
             issues.append(Issue(f"q/{mode}/index.html: タブリンク {href} がありません"))
     return issues
 
@@ -384,12 +414,14 @@ def _html_footer_source(root: Path) -> list[Issue]:
 
 def _header_learning_nav(root: Path) -> list[Issue]:
     """静的ページの学習ナビ href / q/index の active 状態（site-chrome.md §3, §7）。"""
+    from tools.site_config import spa_hash_href
+
     spa_hash = {
-        "tnav-ichimondou": "/#ichimondou",
-        "tnav-orig": "/#orig",
-        "tnav-past": "/#past",
-        "tnav-dash": "/#dash",
-        "tnav-review": "/#review",
+        "tnav-ichimondou": spa_hash_href("#ichimondou"),
+        "tnav-orig": spa_hash_href("#orig"),
+        "tnav-past": spa_hash_href("#past"),
+        "tnav-dash": spa_hash_href("#dash"),
+        "tnav-review": spa_hash_href("#review"),
     }
     article_sample = root / "articles" / "field-law-basics" / "index.html"
     if not article_sample.is_file():
@@ -526,25 +558,28 @@ def _viewport_and_static_css(root: Path) -> list[Issue]:
         elif 'property="og:title"' not in text:
             issues.append(Issue("index.html: og:title がありません（SNSカード用 SEO head 未適用）"))
         else:
+            from tools.index_seo_head import index_canonical_url
+
             head = text.split("</head>", 1)[0]
             origin = clean_origin().rstrip("/")
+            expected_canon = index_canonical_url().rstrip("/")
             og_url_m = re.search(r'property="og:url"\s+content="([^"]+)"', head)
-            if og_url_m and og_url_m.group(1).rstrip("/") != origin:
+            if og_url_m and og_url_m.group(1).rstrip("/") != expected_canon:
                 issues.append(
                     Issue(
-                        f"index.html: og:url が siteOrigin と不一致です"
-                        f"（現在: {og_url_m.group(1)!r}、期待: {origin + '/'}）"
+                        f"index.html: og:url が正規URLと不一致です"
+                        f"（現在: {og_url_m.group(1)!r}、期待: {index_canonical_url()!r}）"
                         " — tools/apply_site_config.py を実行してください"
                     )
                 )
             canon_m = re.search(r'id="canonical-link"\s+href="([^"]+)"', head)
             if not canon_m:
                 canon_m = re.search(r'rel="canonical"\s+href="([^"]+)"', head)
-            if canon_m and canon_m.group(1).rstrip("/") != origin:
+            if canon_m and canon_m.group(1).rstrip("/") != expected_canon:
                 issues.append(
                     Issue(
-                        f"index.html: canonical が siteOrigin と不一致です"
-                        f"（現在: {canon_m.group(1)!r}、期待: {origin + '/'}）"
+                        f"index.html: canonical が正規URLと不一致です"
+                        f"（現在: {canon_m.group(1)!r}、期待: {index_canonical_url()!r}）"
                         " — tools/apply_site_config.py を実行してください"
                     )
                 )

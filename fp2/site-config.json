@@ -1,0 +1,60 @@
+{
+  "brandName": "FPマスター",
+  "brandLogoText": "FPマスター",
+  "brandMark": "FP",
+  "examGrade": "FP2",
+  "examName": "ファイナンシャル・プランナー試験（FP2級）",
+  "basePath": "/fp2",
+  "gradePortalHref": "/",
+  "siteOrigin": "https://fp-master.jp",
+  "contactUrl": "https://fp-master.jp/contact",
+  "ga4MeasurementId": "",
+  "copyright": "",
+  "footerDisclaimer": "学習用のコンテンツです。出題・法令・税制の正確な内容は日本FP協会の公式情報で必ず確認してください。",
+  "officialOrganization": "一般社団法人 日本FP協会",
+  "extendedCorrectAnswers": false,
+  "seoCopy": {
+    "mockExam": "模試・模擬試験",
+    "studyModes": "過去問・実践演習・一問一答"
+  },
+  "theme": {
+    "accent": "#1a4a7a",
+    "accentText": "#ffffff",
+    "background": "#f0f0f1",
+    "surface": "#ffffff",
+    "surfaceAlt": "#f4f4f5",
+    "text": "#111111",
+    "textMuted": "#555555",
+    "border": "rgba(0, 0, 0, 0.09)",
+    "radius": "10px",
+    "navWidth": "1080px",
+    "contentWidth": "1080px"
+  },
+  "navigation": {
+    "header": [
+      { "label": "級選択", "href": "/", "key": "portal" },
+      { "label": "FP3級", "href": "/fp3/", "key": "fp3" },
+      { "label": "プライバシー", "href": "privacy.html", "key": "privacy" }
+    ],
+    "footer": [
+      { "label": "級選択", "href": "/", "key": "portal" },
+      { "label": "FP3級", "href": "/fp3/", "key": "fp3" },
+      { "label": "プライバシー", "href": "privacy.html", "key": "privacy" },
+      { "label": "お問い合わせ", "href": "__CONTACT__", "key": "contact" }
+    ]
+  },
+  "fields": [
+    { "id": "life", "name": "ライフプランニングと資金計画", "aliases": [], "legacyGlossaryCat": "life" },
+    { "id": "risk", "name": "リスク管理", "aliases": [], "legacyGlossaryCat": "risk" },
+    { "id": "asset", "name": "金融資産運用", "aliases": [], "legacyGlossaryCat": "asset" },
+    { "id": "tax", "name": "タックスプランニング", "aliases": [], "legacyGlossaryCat": "tax" },
+    { "id": "inheritance", "name": "相続・事業承継", "aliases": [], "legacyGlossaryCat": "inheritance" }
+  ],
+  "externalLinks": [
+    {
+      "label": "日本FP協会（公式）",
+      "url": "https://www.jafp.or.jp/",
+      "description": "FP技能検定の試験日程・要項・合格発表などの公式情報を確認してください。"
+    }
+  ]
+}

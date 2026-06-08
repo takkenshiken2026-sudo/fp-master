@@ -1,7 +1,10 @@
 window.SITE_CONFIG = {
   "brandName": "FPマスター",
   "brandMark": "FP",
-  "examName": "ファイナンシャル・プランナー試験（FP2級・FP3級）",
+  "examName": "ファイナンシャル・プランナー試験（FP3級）",
+  "examGrade": "FP3",
+  "basePath": "/fp3",
+  "gradePortalHref": "/",
   "siteOrigin": "https://fp-master.jp",
   "contactUrl": "https://fp-master.jp/contact",
   "ga4MeasurementId": "",

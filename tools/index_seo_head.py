@@ -9,7 +9,7 @@ import json
 import re
 
 from tools.brand_assets import theme_ink
-from tools.site_config import brand_name, clean_origin, exam_name, fields, public_url
+from tools.site_config import base_path, brand_name, clean_origin, exam_name, fields, public_url
 
 INDEX_SEO_MARKER_START = "<!--INDEX_SEO_HEAD-->"
 INDEX_SEO_MARKER_END = "<!--/INDEX_SEO_HEAD-->"
@@ -25,6 +25,14 @@ def index_og_title() -> str:
 
 def index_site_label() -> str:
     return f"{brand_name()}（{exam_name()}）"
+
+
+def index_canonical_url() -> str:
+    origin = clean_origin()
+    bp = base_path()
+    if bp:
+        return f"{origin}{bp}/"
+    return f"{origin}/"
 
 
 def index_description() -> str:
@@ -129,11 +137,11 @@ def index_seo_head_inner() -> str:
 <meta name="keywords" content="{html.escape(keywords)}">
 <meta name="robots" content="index, follow">
 <meta name="application-name" content="{html.escape(site_label)}">
-<link rel="canonical" href="{html.escape(origin)}/" id="canonical-link">
+<link rel="canonical" href="{html.escape(index_canonical_url())}" id="canonical-link">
 
 <!-- Open Graph (SNS・Slack等でのリッチ表示) -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="{html.escape(origin)}/">
+<meta property="og:url" content="{html.escape(index_canonical_url())}">
 <meta property="og:title" content="{html.escape(og_title)}">
 <meta property="og:description" content="{html.escape(desc_short)}">
 <meta property="og:locale" content="ja_JP">

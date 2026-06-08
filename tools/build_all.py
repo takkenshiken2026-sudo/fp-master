@@ -30,6 +30,7 @@ def main() -> int:
     py = sys.executable
     run([py, "tools/validate_csv.py"])
     run([py, "tools/generate_brand_assets.py"])
+    run([py, "tools/build_fp2_grade_shell.py"])
     run([py, "tools/apply_site_config.py"])
     run([py, "tools/build_fp3_question_diagrams.py"])
     run([py, "tools/validate_fp3_diagrams.py"])

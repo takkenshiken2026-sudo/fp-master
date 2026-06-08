@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.site_config import (
+    base_path,
     brand_logo_lines,
     brand_logo_size_class,
     brand_mark,
@@ -28,6 +29,8 @@ from tools.site_config import (
     learning_nav_label,
     official_organization,
     primary_external_link,
+    site_href,
+    spa_hash_href,
     sync_config_files,
     fields,
 )
@@ -74,6 +77,30 @@ _SPA_BREADCRUMB_TOP_RE = re.compile(
 def fix_spa_breadcrumb_top(text: str) -> str:
     """SPA 内パンくず1段目はサイト名ではなく「トップ」に統一する。"""
     return _SPA_BREADCRUMB_TOP_RE.sub(r"\1トップ\2トップ\3", text)
+
+
+def patch_spa_absolute_paths(text: str) -> str:
+    """basePath 配下の SPA 用にルート絶対リンク（/#hash, /）を書き換える。"""
+    if not base_path():
+        return text
+    text = text.replace('href="/fp3#/#', 'href="/fp3#')
+    spa_top = site_href("index.html")
+
+    def _hash_repl(match: re.Match[str]) -> str:
+        return f'href="{html.escape(spa_hash_href(match.group(1)))}"'
+
+    text = re.sub(r'href="/(#[^"]*)"', _hash_repl, text)
+    text = re.sub(
+        r'(<a[^>]*?)href="/"(\s+onclick="event\.preventDefault\(\);gotoPage)',
+        rf'\1href="{html.escape(spa_top)}"\2',
+        text,
+    )
+    text = re.sub(
+        r'(<li class="breadcrumb-item"><a )href="/"(\s+onclick="event\.preventDefault\(\);gotoPage)',
+        rf'\1href="{html.escape(spa_top)}"\2',
+        text,
+    )
+    return text
 
 
 def replace_all(text: str) -> str:
@@ -412,6 +439,7 @@ def main() -> int:
             new = inject_index_fields_fallback(new)
             new = update_index_spa_seo_js(new)
             new = fix_spa_breadcrumb_top(new)
+            new = patch_spa_absolute_paths(new)
             new = ensure_index_theme(new)
             new = update_index_shell_footer(new)
             new = update_index_brand_mark(new)

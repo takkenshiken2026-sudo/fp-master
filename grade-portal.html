@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPマスター｜FP2級・FP3級 学習サイト</title>
+<meta name="description" content="ファイナンシャル・プランナー試験（FP2級・FP3級）の無料学習サイト。受験する級を選んで、過去問・実践演習・一問一答・用語解説で学習を始められます。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://fp-master.jp/">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="stylesheet" href="/site-pages.css">
+<link rel="stylesheet" href="/site-theme.css">
+<style>
+.grade-portal-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-bg);
+}
+.grade-portal-main {
+  flex: 1;
+  width: min(720px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+.grade-portal-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.grade-portal-mark {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 42px;
+  padding: 8px 14px 7px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 16px;
+}
+.grade-portal-mark-sub { font-size: 12px; letter-spacing: .04em; }
+.grade-portal-mark-top { font-size: 14px; }
+.grade-portal-hero h1 {
+  margin: 0 0 10px;
+  font-size: 1.75rem;
+  color: var(--text);
+}
+.grade-portal-lead {
+  margin: 0;
+  color: var(--text2);
+  line-height: 1.7;
+  font-size: 1rem;
+}
+.grade-portal-cards {
+  display: grid;
+  gap: 16px;
+}
+.grade-portal-card {
+  display: block;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  background: var(--bg);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--sh);
+  transition: border-color .15s ease, transform .15s ease;
+}
+.grade-portal-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-1px);
+}
+.grade-portal-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+.grade-portal-card p {
+  margin: 0;
+  color: var(--text2);
+  line-height: 1.65;
+  font-size: .95rem;
+}
+.grade-portal-card-meta {
+  margin-top: 12px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--accent-emphasis);
+}
+.grade-portal-card.is-soon {
+  opacity: .88;
+  border-style: dashed;
+}
+.grade-portal-footer {
+  text-align: center;
+  padding: 20px 16px 28px;
+  color: var(--text2);
+  font-size: .85rem;
+}
+.grade-portal-footer a { color: var(--text2); }
+</style>
+<script>
+(function () {
+  if (!location.hash) return;
+  var target = '/fp3/' + location.hash;
+  if (location.pathname === '/' || location.pathname === '/index.html') {
+    location.replace(target);
+  }
+})();
+</script>
+</head>
+<body class="grade-portal-page site-shell-column-page">
+<main class="grade-portal-main">
+  <div class="grade-portal-hero">
+    <div class="grade-portal-mark" aria-hidden="true">
+      <span class="grade-portal-mark-top">FP</span>
+      <span class="grade-portal-mark-sub">マスター</span>
+    </div>
+    <h1>受験する級を選ぶ</h1>
+    <p class="grade-portal-lead">ファイナンシャル・プランナー試験（FP技能検定）の学習サイトです。対象の級を選んで学習を始めてください。</p>
+  </div>
+  <div class="grade-portal-cards">
+    <a class="grade-portal-card" href="/fp3/">
+      <h2>FP3級</h2>
+      <p>過去問・実践演習600問以上・一問一答・用語解説・試験ガイド。学科試験対策のメインコンテンツです。</p>
+      <div class="grade-portal-card-meta">学習を始める →</div>
+    </a>
+    <a class="grade-portal-card is-soon" href="/fp2/">
+      <h2>FP2級</h2>
+      <p>FP2級向けの過去問・演習コンテンツを準備中です。骨組みのみ公開しています。</p>
+      <div class="grade-portal-card-meta">準備中ページへ →</div>
+    </a>
+  </div>
+</main>
+<footer class="grade-portal-footer">
+  <p><a href="/fp3/privacy.html">プライバシー</a> · <a href="https://fp-master.jp/contact" target="_blank" rel="noopener noreferrer">お問い合わせ</a></p>
+  <p>学習用のコンテンツです。出題・法令・税制の正確な内容は日本FP協会の公式情報で必ず確認してください。</p>
+</footer>
+</body>
+</html>

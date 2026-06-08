@@ -24,6 +24,8 @@ from tools.site_config import (
     ga4_measurement_id,
     learning_nav_label,
     navigation_items,
+    site_href,
+    spa_hash_href,
 )
 
 FORM_URL = contact_url()
@@ -287,7 +289,7 @@ def _topnav_logo(rel_path: Path) -> str:
 def _learning_nav_href(rel_path: Path, dest: str) -> str:
     """学習ナビのリンク先（#hash は SPA トップ、それ以外は site 相対パス）。"""
     if dest.startswith("#"):
-        return "/" + dest
+        return spa_hash_href(dest)
     return footer_href(rel_path, dest)
 
 
@@ -513,7 +515,7 @@ def q_hub_links_html(rel_path: Path, *, current: str) -> str:
                 f"</li>"
             )
         else:
-            href = "/" + target.lstrip("/")
+            href = site_href(target)
             lis.append(
                 f'<li class="q-hub-tab">'
                 f'<a class="q-hub-tab-label" href="{html.escape(href)}">{html.escape(label)}</a>'
