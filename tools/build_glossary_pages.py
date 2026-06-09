@@ -67,6 +67,7 @@ PRESERVED_TERM_SUBDIRS = frozenset({"compare", "numbers", "mistakes", "priority"
 PRESERVED_TERM_HTML = frozenset({"index.html", "g-writing-sample.html", "g-diagram-sample.html"})
 
 GLOSSARY_CSV = ROOT / "data" / "glossary_terms.csv"
+FP3_TERMS_CATALOG_CSV = ROOT / "data" / "fp3_terms_catalog.csv"
 TERMS_DIR = ROOT / "terms"
 BASE_DEFAULT = clean_origin()
 
@@ -247,9 +248,9 @@ def split_semicolon(s: str) -> list[str]:
     return [x.strip() for x in re.split(r"[;；]", s or "") if x.strip()]
 
 
-TERMS_INDEX_CSS_VER = "20260524-terms-table-14px"
-TERMS_INDEX_JS_VER = "20260521-terms-snippet"
-TERMS_INDEX_SEARCH_PLACEHOLDER = "例：ストレスチェック、ラインケア、うつ病…"
+TERMS_INDEX_CSS_VER = "20260609-terms-draft-row"
+TERMS_INDEX_JS_VER = "20260609-terms-draft-row"
+TERMS_INDEX_SEARCH_PLACEHOLDER = "例：終価係数、老齢基礎年金、相続税…"
 
 # CSV enrich 時の分野テンプレ（一覧の定義抜粋には出さない）
 _GENERIC_SNIPPET_SUFFIXES = (
@@ -283,6 +284,83 @@ def sort_terms_index_entries(entries: list[dict]) -> list[dict]:
             e.get("term") or "",
         ),
     )
+
+
+def term_index_is_published(entry: dict) -> bool:
+    return bool(entry.get("published")) and bool(norm(entry.get("slug_file")))
+
+
+def load_fp3_terms_catalog() -> list[dict]:
+    """FP3級用語マスタ（一覧表示用。記事未作成の行も含む）。"""
+    if not FP3_TERMS_CATALOG_CSV.is_file():
+        return []
+    out: list[dict] = []
+    with FP3_TERMS_CATALOG_CSV.open(encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            term = norm(row.get("term") or row.get("用語"))
+            if not term:
+                continue
+            out.append(
+                {
+                    "term": term,
+                    "category": norm(row.get("category") or row.get("科目")),
+                    "short_def": norm(row.get("short_def") or row.get("定義")),
+                }
+            )
+    return out
+
+
+def build_terms_index_entries(
+    catalog: list[dict],
+    glossary_entries: list[dict],
+) -> list[dict]:
+    """カタログ全件＋記事のみの用語をマージし、一覧用エントリを返す。"""
+    by_term = {e["term"]: e for e in glossary_entries}
+    by_key: dict[str, dict] = {}
+    for e in glossary_entries:
+        by_key[lookup_key(e["term"])] = e
+
+    def resolve_article(term: str) -> dict | None:
+        if term in by_term:
+            return by_term[term]
+        return by_key.get(lookup_key(term))
+
+    index: list[dict] = []
+    seen_keys: set[str] = set()
+
+    for row in catalog:
+        term = row["term"]
+        seen_keys.add(lookup_key(term))
+        art = resolve_article(term)
+        cat = row.get("category") or (art.get("category") if art else "")
+        if art:
+            merged = dict(art)
+            merged["published"] = True
+            if row.get("short_def"):
+                merged["short_def"] = row["short_def"]
+            index.append(merged)
+        else:
+            index.append(
+                {
+                    "term": term,
+                    "category": cat,
+                    "short_def": row.get("short_def") or "",
+                    "definition": "",
+                    "tags": "",
+                    "slug_file": "",
+                    "field_hub": field_hub_slug(cat),
+                    "published": False,
+                }
+            )
+
+    for e in glossary_entries:
+        if lookup_key(e["term"]) in seen_keys:
+            continue
+        merged = dict(e)
+        merged["published"] = True
+        index.append(merged)
+
+    return index
 
 
 def _is_generic_index_snippet(text: str, term: str) -> bool:
@@ -337,20 +415,38 @@ def terms_index_snippet(entry: dict) -> str:
     return short
 
 
+def render_terms_index_term_cell(item: dict) -> str:
+    term = html.escape(item["term"])
+    if term_index_is_published(item):
+        href = html.escape(terms_index_href(item["slug_file"]))
+        return f'<div class="terms-idx-term-cell"><a href="{href}">{term}</a></div>'
+    return (
+        f'<div class="terms-idx-term-cell terms-idx-term-cell--draft">'
+        f'<span class="terms-idx-term-plain">{term}</span>'
+        f'<span class="terms-idx-soon">準備中</span></div>'
+    )
+
+
 def render_terms_index_tbody(entries: list[dict]) -> str:
     """JS 未実行時も一覧が見えるよう、全件の tbody をサーバー側で生成する（1語1行・3列）。"""
     items = sort_terms_index_entries(entries)
     rows: list[str] = []
 
     for item in items:
-        href = html.escape(terms_index_href(item["slug_file"]))
-        href_attr = f' data-entry-href="{href}"'
+        published = term_index_is_published(item)
+        row_class = "terms-idx-table-row" if published else "terms-idx-table-row is-draft"
+        if published:
+            href = html.escape(terms_index_href(item["slug_file"]))
+            href_attr = f' data-entry-href="{href}"'
+            tab_idx = ' tabindex="0"'
+        else:
+            href_attr = ""
+            tab_idx = ""
         short_def = html.escape(terms_index_snippet(item))
         rows.append(
-            "<tr class=\"terms-idx-table-row\">"
-            f'<td class="terms-idx-td-term" data-label="用語"{href_attr} tabindex="0">'
-            f'<div class="terms-idx-term-cell"><a href="{href}">{html.escape(item["term"])}</a>'
-            f"</div></td>"
+            f'<tr class="{row_class}">'
+            f'<td class="terms-idx-td-term" data-label="用語"{href_attr}{tab_idx}>'
+            f"{render_terms_index_term_cell(item)}</td>"
             f'<td class="terms-idx-td-cat" data-label="分野"{href_attr}>'
             f'{html.escape(item.get("category") or "")}</td>'
             f'<td class="terms-idx-td-snippet" data-label="定義"{href_attr}>'
@@ -363,25 +459,28 @@ def render_terms_index_tbody(entries: list[dict]) -> str:
 def terms_index_item_dict(entry: dict) -> dict:
     tags = parse_term_tags(entry.get("tags") or "")
     snippet = terms_index_snippet(entry)
+    published = term_index_is_published(entry)
     search_bits = [
         entry["term"],
         entry.get("category") or "",
         snippet,
         *tags,
     ]
+    if not published:
+        search_bits.append("準備中")
     return {
         "term": entry["term"],
         "category": entry.get("category") or "",
         "tags": tags,
         "shortDef": snippet,
-        "href": terms_index_href(entry["slug_file"]),
+        "href": terms_index_href(entry["slug_file"]) if published else "",
+        "published": published,
         "fieldHub": entry.get("field_hub") or "",
         "search": " ".join(x for x in search_bits if x),
     }
 
 
 def build_terms_list_item(entry: dict) -> str:
-    href = html.escape(terms_index_href(entry["slug_file"]))
     term = html.escape(entry["term"])
     snippet = html.escape(terms_index_snippet(entry))
     snippet_html = (
@@ -390,13 +489,23 @@ def build_terms_list_item(entry: dict) -> str:
     search_attr = html.escape(
         terms_index_item_dict(entry)["search"], quote=True
     )
-    return (
-        f'    <li class="terms-idx-item" data-search="{search_attr}">'
-        f'<a href="{href}">'
-        f'<span class="terms-idx-item-main">'
-        f'<span class="terms-idx-term">{term}</span>'
-        f"</span>{snippet_html}</a></li>"
-    )
+    if term_index_is_published(entry):
+        href = html.escape(terms_index_href(entry["slug_file"]))
+        inner = (
+            f'<a href="{href}">'
+            f'<span class="terms-idx-item-main">'
+            f'<span class="terms-idx-term">{term}</span>'
+            f"</span>{snippet_html}</a>"
+        )
+    else:
+        inner = (
+            f'<span class="terms-idx-plain" aria-disabled="true">'
+            f'<span class="terms-idx-item-main">'
+            f'<span class="terms-idx-term">{term}</span>'
+            f'<span class="terms-idx-soon">準備中</span>'
+            f"</span>{snippet_html}</span>"
+        )
+    return f'    <li class="terms-idx-item" data-search="{search_attr}">{inner}</li>'
 
 
 def split_sentences(s: str) -> list[str]:
@@ -1079,10 +1188,19 @@ def build_field_hub_html(
     desc = meta_description(
         f"{exam_name()}の{category}分野に関する用語を一覧し、各用語の解説記事へリンクします。"
     )
-    lis = [
-        f'    <li><a href="../{html.escape(e["slug_file"])}">{html.escape(e["term"])}</a></li>'
-        for e in sorted(cat_entries, key=lambda x: x["term"])
-    ]
+    lis = []
+    for e in sorted(cat_entries, key=lambda x: x["term"]):
+        if term_index_is_published(e):
+            lis.append(
+                f'    <li><a href="../{html.escape(e["slug_file"])}">{html.escape(e["term"])}</a></li>'
+            )
+        else:
+            lis.append(
+                "    <li>"
+                f'<span class="terms-idx-plain" aria-disabled="true">'
+                f'{html.escape(e["term"])} <span class="terms-idx-soon">準備中</span>'
+                f"</span></li>"
+            )
     list_html = "\n".join(lis)
     crumb_items = static_crumb_items(("用語解説一覧", "terms/index.html"), (category, None))
     page_header = site_page_header(rel_path, current="terms")
@@ -1168,6 +1286,9 @@ def build_terms_index(entries: list[dict], base_url: str) -> str:
     seo_links: list[str] = []
     for cat in cat_keys:
         for e in by_cat[cat]:
+            if not term_index_is_published(e):
+                seo_links.append(f"<li>{html.escape(e['term'])}</li>")
+                continue
             seo_links.append(
                 f'<li><a href="{html.escape(terms_index_href(e["slug_file"]))}">'
                 f"{html.escape(e['term'])}</a></li>"
@@ -1195,6 +1316,8 @@ def build_terms_index(entries: list[dict], base_url: str) -> str:
     pos = 1
     for cat in cat_keys:
         for e in by_cat[cat]:
+            if not term_index_is_published(e):
+                continue
             list_items_ld.append(
                 {
                     "@type": "ListItem",
@@ -1213,7 +1336,7 @@ def build_terms_index(entries: list[dict], base_url: str) -> str:
                 "@type": "ItemList",
                 "name": f"{exam_name()} 用語解説一覧",
                 "description": "試験で出やすい用語ごとの解説記事への索引です。",
-                "numberOfItems": n_terms,
+                "numberOfItems": len(list_items_ld),
                 "itemListElement": list_items_ld,
             },
             {
@@ -1237,9 +1360,11 @@ def build_terms_index(entries: list[dict], base_url: str) -> str:
         f"{exam_name()}の重要用語を一覧し、各用語の解説記事へリンクします。"
         "分野別に整理し、検索と絞り込みで目的の語句を探せます。"
     )
+    n_published = sum(1 for e in entries if term_index_is_published(e))
     lead = (
         f"{exam_name()}の試験で押さえたい用語を、分野別にまとめています。"
-        "各ページで意味や試験での論点を確認できます。学習の進め方は試験ガイド（articles/）をご覧ください。"
+        f"解説記事が公開済みの用語（{n_published}語）からリンクできます。"
+        "「準備中」の用語は記事作成後に順次公開します。学習の進め方は試験ガイド（articles/）をご覧ください。"
     )
     return f"""<!DOCTYPE html>
 <html lang="ja">
@@ -1443,9 +1568,15 @@ def main() -> int:
     args = ap.parse_args()
     base = args.base_url.rstrip("/")
 
-    entries = load_glossary_entries()
-    term_lookup = make_term_lookup(entries)
-    entries_by_term = {e["term"]: e for e in entries}
+    glossary_entries = load_glossary_entries()
+    catalog = load_fp3_terms_catalog()
+    index_entries = (
+        build_terms_index_entries(catalog, glossary_entries)
+        if catalog
+        else [{**e, "published": True} for e in glossary_entries]
+    )
+    term_lookup = make_term_lookup(glossary_entries)
+    entries_by_term = {e["term"]: e for e in glossary_entries}
     guides = load_linkable_guides()
 
     TERMS_DIR.mkdir(parents=True, exist_ok=True)
@@ -1456,19 +1587,25 @@ def main() -> int:
         if stale.is_dir() and stale.name not in PRESERVED_TERM_SUBDIRS:
             shutil.rmtree(stale)
 
-    for e in entries:
+    for e in glossary_entries:
         out_file = TERMS_DIR / e["slug_file"]
         rel_path = out_file.relative_to(ROOT)
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(
             build_term_html(
-                e, rel_path, base, term_lookup, entries, guides, by_term=entries_by_term
+                e,
+                rel_path,
+                base,
+                term_lookup,
+                glossary_entries,
+                guides,
+                by_term=entries_by_term,
             ),
             encoding="utf-8",
         )
 
     by_cat: dict[str, list[dict]] = {}
-    for e in entries:
+    for e in index_entries:
         by_cat.setdefault(e["category"] or "その他", []).append(e)
     hub_count = 0
     for cat in ordered_term_categories(by_cat):
@@ -1481,16 +1618,24 @@ def main() -> int:
         )
         hub_count += 1
 
-    (TERMS_DIR / "index.html").write_text(build_terms_index(entries, base), encoding="utf-8")
+    (TERMS_DIR / "index.html").write_text(
+        build_terms_index(index_entries, base), encoding="utf-8"
+    )
 
     from tools.build_term_diagram_sample_pages import build_all as build_term_diagram_samples
 
     build_term_diagram_samples(base_url=base)
 
-    write_glossary_article_slug_map(entries)
-    sync_index_glossary_slug_map(entries)
+    write_glossary_article_slug_map(glossary_entries)
+    sync_index_glossary_slug_map(glossary_entries)
 
-    print(f"Wrote {len(entries)} term pages under {TERMS_DIR}")
+    print(f"Wrote {len(glossary_entries)} term pages under {TERMS_DIR}")
+    if catalog:
+        n_pub = sum(1 for e in index_entries if term_index_is_published(e))
+        print(
+            f"Terms index: {len(index_entries)} rows "
+            f"({n_pub} published, {len(index_entries) - n_pub} draft) from fp3_terms_catalog.csv"
+        )
     print(f"Wrote {GLOSSARY_SLUG_MAP_JSON}")
     print(f"Updated {INDEX_HTML} (glos-article-slug-map-json)")
     print(f"Wrote {hub_count} field hub pages under {TERMS_DIR}/field-*/")

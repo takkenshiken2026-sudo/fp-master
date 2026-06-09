@@ -333,6 +333,37 @@ class Validator:
                 else:
                     self.warn(path, idx, issue.message)
             self._validate_diagram_id(path, row, idx)
+        self.validate_fp3_terms_catalog()
+
+    def validate_fp3_terms_catalog(self) -> None:
+        path = DATA_DIR / "fp3_terms_catalog.csv"
+        if not path.is_file():
+            self.warn(path, None, "fp3_terms_catalog.csv がありません（用語一覧マスタ）")
+            return
+        _, rows = self.read_csv(path, {"term", "category", "short_def"})
+        if len(rows) < 200:
+            self.warn(
+                path,
+                None,
+                f"fp3_terms_catalog.csv の行数が少なすぎます（{len(rows)} 行）",
+            )
+        seen: set[str] = set()
+        valid_cats = set(self.category_map.keys())
+        for idx, row in enumerate(rows, start=2):
+            term = self.require_text(path, row, idx, "term")
+            if term:
+                if term in seen:
+                    self.error(path, idx, f"term が重複しています: {term}")
+                seen.add(term)
+            cat = self.require_text(path, row, idx, "category")
+            if cat and cat not in valid_cats:
+                self.error(
+                    path,
+                    idx,
+                    f"category が site-config の分野と一致しません: {cat!r}",
+                )
+            if not self.norm(row.get("short_def")):
+                self.error(path, idx, "short_def が空です")
 
     def _validate_diagram_id(self, path: Path, row: dict[str, str], line: int) -> None:
         raw = self.norm(row.get("diagram_id"))

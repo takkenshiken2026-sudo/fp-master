@@ -118,13 +118,27 @@
     return `${TERMS_INDEX_BASE}${String(href).replace(/^\.\//, '')}`;
   }
 
+  function isPublished(item) {
+    return item.published !== false && item.href;
+  }
+
   function rowHtml(item, query) {
+    const snippet = (item.shortDef || item.definition)
+      ? highlightText(item.shortDef || item.definition, query)
+      : '';
+    if (!isPublished(item)) {
+      return `<tr class="terms-idx-table-row is-draft">
+<td class="terms-idx-td-term" data-label="用語"><div class="terms-idx-term-cell terms-idx-term-cell--draft"><span class="terms-idx-term-plain">${highlightText(item.term, query)}</span><span class="terms-idx-soon">準備中</span></div></td>
+<td class="terms-idx-td-cat" data-label="分野">${escapeHtml(item.category)}</td>
+<td class="terms-idx-td-snippet" data-label="定義">${snippet}</td>
+</tr>`;
+    }
     const href = resolveEntryHref(item.href);
     const hrefAttr = ` data-entry-href="${escapeHtml(href)}"`;
     return `<tr class="terms-idx-table-row">
 <td class="terms-idx-td-term" data-label="用語"${hrefAttr} tabindex="0"><div class="terms-idx-term-cell"><a href="${escapeHtml(href)}">${highlightText(item.term, query)}</a></div></td>
 <td class="terms-idx-td-cat" data-label="分野"${hrefAttr}>${escapeHtml(item.category)}</td>
-<td class="terms-idx-td-snippet" data-label="定義"${hrefAttr}>${(item.shortDef || item.definition) ? highlightText(item.shortDef || item.definition, query) : ''}</td>
+<td class="terms-idx-td-snippet" data-label="定義"${hrefAttr}>${snippet}</td>
 </tr>`;
   }
 
@@ -134,6 +148,9 @@
       const target = resolveEntryHref(href);
       if (target) window.location.href = target;
     };
+    flatBody.querySelectorAll('.terms-idx-table-row.is-draft [data-entry-href]').forEach((cell) => {
+      delete cell.dataset.entryHref;
+    });
     flatBody.querySelectorAll('[data-entry-href]').forEach((cell) => {
       if (cell.dataset.bound) return;
       cell.dataset.bound = '1';

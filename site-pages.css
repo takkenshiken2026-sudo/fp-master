@@ -2893,6 +2893,39 @@ html:not(.js) .terms-idx-seo-fallback .terms-idx-seo-list a {
 .terms-idx-table-row {
   cursor: pointer;
 }
+.terms-idx-table-row.is-draft {
+  cursor: default;
+}
+.terms-idx-table-row.is-draft:hover td {
+  background: inherit !important;
+}
+.terms-idx-table-row.is-draft:nth-child(even) td {
+  background: var(--table-row-alt-bg);
+}
+.terms-idx-term-cell--draft {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.terms-idx-term-plain {
+  color: var(--text2);
+  font-weight: 700;
+}
+.terms-idx-soon {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  background: #f3f3f4;
+  color: #666;
+  border: 1px solid #d8d8da;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  line-height: 1.35;
+  white-space: nowrap;
+}
 .terms-idx-table-row:hover td {
   background: color-mix(in srgb, var(--accent-soft) 28%, var(--bg2)) !important;
 }

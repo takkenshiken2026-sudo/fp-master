@@ -4506,12 +4506,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://fp-master.jp/fp3/terms/field-inheritance/index.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://fp-master.jp/fp3/terms/field-life-plan/index.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://fp-master.jp/fp3/terms/field-realestate/index.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://fp-master.jp/fp3/terms/field-risk/index.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://fp-master.jp/fp3/terms/field-tax/index.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
   </url>
