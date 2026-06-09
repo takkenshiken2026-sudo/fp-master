@@ -26,7 +26,7 @@ from tools.index_spa_patch import (  # noqa: E402
     INDEX_NOSCRIPT_MARKER_END,
     INDEX_NOSCRIPT_MARKER_START,
 )
-from tools.site_config import clean_origin, exam_name, load_config  # noqa: E402
+from tools.site_config import clean_origin, exam_name, ga4_measurement_id, load_config  # noqa: E402
 
 
 @dataclass
@@ -104,14 +104,8 @@ def _q_index(q_index: Path) -> list[Issue]:
         issues.append(Issue("q/index.html: q_hub_links_html（3モードタブ）がありません"))
     if 'aria-current="page">過去問</span>' not in text and "is-current" not in text:
         issues.append(Issue("q/index.html: 過去問タブの current 表示がありません"))
-    try:
-        from tools.site_config import site_href
-
-        practice_hub = site_href("q/practice/index.html")
-    except Exception:
-        practice_hub = "/q/practice/index.html"
     if (
-        practice_hub not in text
+        "/q/orig/index.html" not in text
         and "/q/practice/index.html" not in text
         and 'href="practice/index.html"' not in text
     ):
@@ -319,32 +313,8 @@ def _mode_index_hub_tabs(mode: str, index_path: Path) -> list[Issue]:
     issues: list[Issue] = []
     if "q-hub-links" not in text:
         issues.append(Issue(f"q/{mode}/index.html: q_hub_links_html（3モードタブ）がありません"))
-    try:
-        from tools.site_config import site_href
-
-        hub_hrefs = (
-            site_href("q/index.html"),
-            site_href("q/practice/index.html"),
-            site_href("q/ichimon/index.html"),
-        )
-    except Exception:
-        hub_hrefs = (
-            "/q/index.html",
-            "/q/practice/index.html",
-            "/q/ichimon/index.html",
-        )
-    current_rel = {
-        "past": "q/index.html",
-        "practice": "q/practice/index.html",
-        "ichimon": "q/ichimon/index.html",
-    }.get(mode, "")
-    for rel, href in zip(
-        ("q/index.html", "q/practice/index.html", "q/ichimon/index.html"),
-        hub_hrefs,
-    ):
-        if rel == current_rel:
-            continue
-        if href not in text and href.replace("/q/", "q/") not in text and href.lstrip("/") not in text:
+    for href in ("/q/index.html", "/q/practice/index.html", "/q/ichimon/index.html"):
+        if href not in text and href.replace("/q/", "") not in text:
             issues.append(Issue(f"q/{mode}/index.html: タブリンク {href} がありません"))
     return issues
 
@@ -414,16 +384,16 @@ def _html_footer_source(root: Path) -> list[Issue]:
 
 def _header_learning_nav(root: Path) -> list[Issue]:
     """静的ページの学習ナビ href / q/index の active 状態（site-chrome.md §3, §7）。"""
-    from tools.site_config import spa_hash_href
-
     spa_hash = {
-        "tnav-ichimondou": spa_hash_href("#ichimondou"),
-        "tnav-orig": spa_hash_href("#orig"),
-        "tnav-past": spa_hash_href("#past"),
-        "tnav-dash": spa_hash_href("#dash"),
-        "tnav-review": spa_hash_href("#review"),
+        "tnav-ichimondou": "/#ichimondou",
+        "tnav-orig": "/#orig",
+        "tnav-past": "/#past",
+        "tnav-dash": "/#dash",
+        "tnav-review": "/#review",
     }
-    article_sample = root / "articles" / "index.html"
+    article_sample = root / "articles" / "field-law-basics" / "index.html"
+    if not article_sample.is_file():
+        article_sample = root / "articles" / "exam-overview" / "index.html"
     samples: list[tuple[str, Path]] = [
         ("articles sample", article_sample),
         ("terms/index.html", root / "terms" / "index.html"),
@@ -556,28 +526,25 @@ def _viewport_and_static_css(root: Path) -> list[Issue]:
         elif 'property="og:title"' not in text:
             issues.append(Issue("index.html: og:title がありません（SNSカード用 SEO head 未適用）"))
         else:
-            from tools.index_seo_head import index_canonical_url
-
             head = text.split("</head>", 1)[0]
             origin = clean_origin().rstrip("/")
-            expected_canon = index_canonical_url().rstrip("/")
             og_url_m = re.search(r'property="og:url"\s+content="([^"]+)"', head)
-            if og_url_m and og_url_m.group(1).rstrip("/") != expected_canon:
+            if og_url_m and og_url_m.group(1).rstrip("/") != origin:
                 issues.append(
                     Issue(
-                        f"index.html: og:url が正規URLと不一致です"
-                        f"（現在: {og_url_m.group(1)!r}、期待: {index_canonical_url()!r}）"
+                        f"index.html: og:url が siteOrigin と不一致です"
+                        f"（現在: {og_url_m.group(1)!r}、期待: {origin + '/'}）"
                         " — tools/apply_site_config.py を実行してください"
                     )
                 )
             canon_m = re.search(r'id="canonical-link"\s+href="([^"]+)"', head)
             if not canon_m:
                 canon_m = re.search(r'rel="canonical"\s+href="([^"]+)"', head)
-            if canon_m and canon_m.group(1).rstrip("/") != expected_canon:
+            if canon_m and canon_m.group(1).rstrip("/") != origin:
                 issues.append(
                     Issue(
-                        f"index.html: canonical が正規URLと不一致です"
-                        f"（現在: {canon_m.group(1)!r}、期待: {index_canonical_url()!r}）"
+                        f"index.html: canonical が siteOrigin と不一致です"
+                        f"（現在: {canon_m.group(1)!r}、期待: {origin + '/'}）"
                         " — tools/apply_site_config.py を実行してください"
                     )
                 )
@@ -646,6 +613,71 @@ def _viewport_and_static_css(root: Path) -> list[Issue]:
                     "（テンプレ index.html を同期してください）"
                 )
             )
+    return issues
+
+
+_GA4_INLINE_RE = re.compile(r'window\.__GA4_MEASUREMENT_ID__="([^"]*)"')
+_GA4_DEFAULT_MID_RE = re.compile(r'var DEFAULT_MID = "([^"]*)";')
+_GA4_SKIP_PREFIXES = (
+    "terms/compare/",
+    "terms/numbers/",
+    "terms/mistakes/",
+    "terms/priority/",
+    "terms/samples/",
+    "public_site/",
+)
+
+
+def _ga4_page_issues(root: Path, rel: str, *, require_page_view: bool = False) -> list[Issue]:
+    """公開 HTML の GA4 スニペット整合性（リダイレクト専用 URL は除外）。"""
+    if any(rel.startswith(p) for p in _GA4_SKIP_PREFIXES):
+        return []
+    path = root / rel
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    issues: list[Issue] = []
+    expected = ga4_measurement_id()
+    if "site-analytics.js" not in text:
+        issues.append(Issue(f"{rel}: site-analytics.js がありません（GA4 未設置）"))
+        return issues
+    m = _GA4_INLINE_RE.search(text)
+    if expected:
+        if not m or m.group(1) != expected:
+            got = m.group(1) if m else "(なし)"
+            issues.append(Issue(f"{rel}: GA4 測定ID不一致（期待 {expected!r}、実際 {got!r}）"))
+    if require_page_view and "ga4PageView" not in text:
+        issues.append(Issue(f"{rel}: ga4PageView 呼び出しがありません（SPA 計測漏れ）"))
+    return issues
+
+
+def _ga4_tracking(root: Path) -> list[Issue]:
+    """docs/integration-checklist — GA4 測定IDとスニペットの横断検証。"""
+    issues: list[Issue] = []
+    expected = ga4_measurement_id()
+
+    sa = root / "site-analytics.js"
+    if not sa.is_file():
+        issues.append(Issue("site-analytics.js がありません"))
+    elif expected:
+        dm = _GA4_DEFAULT_MID_RE.search(sa.read_text(encoding="utf-8"))
+        if not dm or dm.group(1) != expected:
+            got = dm.group(1) if dm else "(なし)"
+            issues.append(
+                Issue(f"site-analytics.js: DEFAULT_MID 不一致（期待 {expected!r}、実際 {got!r}）")
+            )
+
+    issues.extend(_ga4_page_issues(root, "index.html", require_page_view=True))
+    for rel in ("about.html", "privacy.html", "related-sites.html", "articles/index.html"):
+        issues.extend(_ga4_page_issues(root, rel))
+
+    samples: list[str] = []
+    for pattern in ("articles/*/index.html", "terms/g-*.html", "q/practice/*/index.html"):
+        for path in sorted(root.glob(pattern))[:1]:
+            samples.append(str(path.relative_to(root)))
+    for rel in samples:
+        issues.extend(_ga4_page_issues(root, rel))
+
     return issues
 
 
@@ -721,6 +753,7 @@ def main() -> int:
     issues.extend(_header_learning_nav(root))
     issues.extend(_responsive_css_source(root))
     issues.extend(_viewport_and_static_css(root))
+    issues.extend(_ga4_tracking(root))
 
     if not issues:
         print("validate_site_integration: OK")

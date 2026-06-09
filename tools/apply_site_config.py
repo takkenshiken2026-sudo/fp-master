@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.site_config import (
-    base_path,
     brand_logo_lines,
     brand_logo_size_class,
     brand_mark,
@@ -29,19 +28,11 @@ from tools.site_config import (
     learning_nav_label,
     official_organization,
     primary_external_link,
-    site_href,
-    spa_hash_href,
     sync_config_files,
     fields,
 )
-from tools.html_footer import (
-    breadcrumb_html,
-    site_page_footer,
-    site_page_header,
-    site_shell_footer,
-)
+from tools.html_footer import site_page_footer, site_page_header, site_shell_footer
 from tools.brand_assets import inject_brand_head
-from tools.breadcrumb_seo import spa_breadcrumb_prefix_li, static_crumb_items
 from tools.index_seo_head import (
     INDEX_SEO_MARKER_END,
     INDEX_SEO_MARKER_START,
@@ -74,68 +65,25 @@ STATIC_PAGE_CURRENTS = {
     ROOT / "articles" / "index.html": "articles",
 }
 
-STATIC_PAGE_CRUMB_LABELS: dict[Path, str] = {
-    ROOT / "about.html": "このサイトについて",
-    ROOT / "privacy.html": "プライバシー・利用条件",
-    ROOT / "related-sites.html": "関連リンク",
-}
 
-_SPA_BREADCRUMB_OL_RE = re.compile(
-    r"(<ol class=\"breadcrumb-list\">\s*)"
-    r"(?:\s*<li class=\"breadcrumb-item(?!\s+breadcrumb-current)[^\"]*\"[^>]*>.*?</li>\s*)*"
-    r"(<li class=\"breadcrumb-item breadcrumb-current[^>]*>.*?</li>\s*</ol>)",
-    re.DOTALL,
+_SPA_BREADCRUMB_TOP_RE = re.compile(
+    r'(<li class="breadcrumb-item"><a href="/" onclick="event\.preventDefault\(\);gotoPage\(\'quiz-start\'\)" title=")[^"]*(">)[^<]*(</a></li>)',
 )
+_GA4_INLINE_RE = re.compile(r'window\.__GA4_MEASUREMENT_ID__="[^"]*";')
+_GA4_DEFAULT_MID_RE = re.compile(r'var DEFAULT_MID = "[^"]*";')
 
 
-def update_spa_breadcrumbs(text: str) -> str:
-    """SPA パンくず先頭を portal + 級ブランド階層に揃える（冪等・重複しない）。"""
-    prefix = spa_breadcrumb_prefix_li()
-
-    def repl(match: re.Match[str]) -> str:
-        return f"{match.group(1)}{prefix}\n          {match.group(2)}"
-
-    return _SPA_BREADCRUMB_OL_RE.sub(repl, text)
-
-
-def update_static_page_breadcrumbs(text: str, path: Path) -> str:
-    """手書き静的ページのパンくずを portal + 級ブランド階層に揃える。"""
-    label = STATIC_PAGE_CRUMB_LABELS.get(path)
-    if not label:
-        return text
-    rel_path = path.relative_to(ROOT)
-    new_crumb = breadcrumb_html(rel_path, static_crumb_items((label, None)))
-    return re.sub(
-        r'<nav class="site-page-header-crumb" aria-label="パンくず">.*?</nav>',
-        new_crumb,
-        text,
-        count=1,
-        flags=re.S,
-    )
-
-
-def patch_spa_absolute_paths(text: str) -> str:
-    """basePath 配下の SPA 用にルート絶対リンク（/#hash, /）を書き換える。"""
-    if not base_path():
-        return text
-    text = text.replace('href="/fp3#/#', 'href="/fp3#')
-    spa_top = site_href("index.html")
-
-    def _hash_repl(match: re.Match[str]) -> str:
-        return f'href="{html.escape(spa_hash_href(match.group(1)))}"'
-
-    text = re.sub(r'href="/(#[^"]*)"', _hash_repl, text)
-    text = re.sub(
-        r'(<a[^>]*?)href="/"(\s+onclick="event\.preventDefault\(\);gotoPage)',
-        rf'\1href="{html.escape(spa_top)}"\2',
-        text,
-    )
-    text = re.sub(
-        r'(<li class="breadcrumb-item"><a )href="/"(\s+onclick="event\.preventDefault\(\);gotoPage)',
-        rf'\1href="{html.escape(spa_top)}"\2',
-        text,
-    )
+def apply_ga4_measurement_ids(text: str) -> str:
+    """site-config の ga4MeasurementId を index / site-analytics へ常に反映する。"""
+    mid = ga4_measurement_id()
+    text = _GA4_INLINE_RE.sub(f'window.__GA4_MEASUREMENT_ID__="{mid}";', text)
+    text = _GA4_DEFAULT_MID_RE.sub(f'var DEFAULT_MID = "{mid}";', text)
     return text
+
+
+def fix_spa_breadcrumb_top(text: str) -> str:
+    """SPA 内パンくず1段目はサイト名ではなく「トップ」に統一する。"""
+    return _SPA_BREADCRUMB_TOP_RE.sub(r"\1トップ\2トップ\3", text)
 
 
 def replace_all(text: str) -> str:
@@ -146,14 +94,10 @@ def replace_all(text: str) -> str:
     replacements = [
         ("© 2026 Sampleマスター学習支援・YOUR-DOMAIN.example", copyright_text()),
         ("Sampleマスター", brand_name()),
-        ("マン管マスター", brand_name()),
-        ("マンション管理士試験", exam_name()),
         ("◯◯試験（プレースホルダー）", exam_name()),
         ("YOUR-DOMAIN.example", host),
         ("https://YOUR-DOMAIN.example", origin),
         ("https://example.com/contact", contact_url()),
-        ("window.__GA4_MEASUREMENT_ID__=\"\"", f'window.__GA4_MEASUREMENT_ID__="{ga4_measurement_id()}"'),
-        ('var DEFAULT_MID = "";', f'var DEFAULT_MID = "{ga4_measurement_id()}";'),
         ("一般社団法人 試験実施団体", official_organization()),
         ("試験実施団体（試験・登録の公式）", official.get("label", official_organization())),
         ("https://example.com/", official.get("url", "https://example.com/")),
@@ -170,6 +114,7 @@ def replace_all(text: str) -> str:
         replacements.append(("◯◯試験", exam_name()))
     for src, dst in replacements:
         text = text.replace(src, dst)
+    text = apply_ga4_measurement_ids(text)
 
     marker = '<script src="./site-config.js"></script>'
     if "site-config.js" not in text and "site-analytics.js" in text:
@@ -319,13 +264,6 @@ def _ensure_topnav_logo_stack(text: str) -> str:
 
 def update_index_brand_mark(text: str) -> str:
     mark = _index_logo_mark_html()
-    aria = html.escape(f"{brand_name()}、{exam_name()}対策のトップへ")
-    text = re.sub(
-        r'(<a class="topnav-logo"[^>]*\s)aria-label="[^"]*"',
-        rf'\1aria-label="{aria}"',
-        text,
-        count=1,
-    )
 
     text = _TOPNAV_LOGO_MARK_RE.sub(mark, text, count=1)
     text = _ensure_topnav_logo_stack(text)
@@ -473,8 +411,6 @@ def main() -> int:
         if path == ROOT / "index.html":
             new = migrate_legacy_takken_leaks(new)
         new = replace_static_chrome(new, path)
-        if path in STATIC_PAGE_CRUMB_LABELS:
-            new = update_static_page_breadcrumbs(new, path)
         rel = path.relative_to(ROOT)
         if path.suffix == ".html":
             new = inject_brand_head(new, rel, site_root=ROOT)
@@ -484,8 +420,7 @@ def main() -> int:
             new = inject_index_noscript(new)
             new = inject_index_fields_fallback(new)
             new = update_index_spa_seo_js(new)
-            new = update_spa_breadcrumbs(new)
-            new = patch_spa_absolute_paths(new)
+            new = fix_spa_breadcrumb_top(new)
             new = ensure_index_theme(new)
             new = update_index_shell_footer(new)
             new = update_index_brand_mark(new)
