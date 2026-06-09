@@ -34,7 +34,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.q_explanation import build_explanation_html
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog
 from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items
 from tools.html_footer import (
@@ -686,12 +685,6 @@ def build_question_html(
     title = page_title_seo(page)
     desc = page_meta_description(page)
     context_line = page_context_line(page)
-    from tools.fp_table_parser import stem_display_to_html
-
-    lead = norm(page.get("stem_plain"))
-    lead_html = (
-        f'<div class="q-page-lead">{stem_display_to_html(lead)}</div>' if lead else ""
-    )
     canonical = public_url(base_url, page["rel_path"])
     root_idx = rel_to_root(rel_path)
     css_href = rel_css(rel_path)
@@ -718,7 +711,6 @@ def build_question_html(
         badges.append('<span class="q-badge q-badge-warn">出題無効</span>')
     badge_html = ("<p class=\"q-badges\">" + " ".join(badges) + "</p>") if badges else ""
 
-    exp_html = build_explanation_html(page, row)
     similar_html = build_similar_questions_html(
         page,
         rel_path,
@@ -796,7 +788,6 @@ def build_question_html(
   <p class="q-meta-line">{html.escape(context_line)}</p>
   {badge_html}
   <h1 class="q-h1">{html.escape(heading)}</h1>
-  {lead_html}
   <section class="q-block" aria-labelledby="q-stem-h">
     <h2 id="q-stem-h" class="q-h2">問題</h2>
     <div class="q-stem">{page["stem_html"]}</div>
@@ -811,10 +802,6 @@ def build_question_html(
   <section class="q-block q-answer" aria-labelledby="q-ans-h">
     <h2 id="q-ans-h" class="q-h2">正答</h2>
     {ans_block}
-  </section>
-  <section class="q-block" aria-labelledby="q-exp-h">
-    <h2 id="q-exp-h" class="q-h2">解説</h2>
-    {exp_html}
   </section>
   {similar_html}
   {related_html}

@@ -27,7 +27,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.q_explanation import build_explanation_html, build_ichimon_explanation_html  # noqa: E402
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog  # noqa: E402
 from tools.build_past_question_pages import (  # noqa: E402
     HEAD_FONTS,
@@ -369,21 +368,11 @@ def build_practice_question_html(
     )
     study_modes_note = study_modes_note_html()
     canonical = public_url(base_url, page["rel_path"])
-    lead_html = f'<p class="q-page-lead">{html.escape(stem)}</p>' if stem else ""
     opts_html = "".join(
         f'<li class="q-opt"><span class="q-opt-num">（{i}）</span> {html.escape(o)}</li>'
         for i, o in enumerate(page["opts"], start=1)
     )
     ans_block = f'<p>正答は <strong>（{page["correct"]}）</strong> です。</p>'
-    exp_html = build_explanation_html(
-        {
-            **page,
-            "year": 0,
-            "is_invalidated": False,
-            "is_exempt": False,
-        },
-        row,
-    )
     materials_html = build_materials_html(row)
     similar_html = build_similar_questions_html(
         page,
@@ -454,7 +443,6 @@ def build_practice_question_html(
   {q_hub_links_html(rel_path, current="practice")}
   <p class="q-meta-line">実践演習 · {html.escape(page["category"])}</p>
   <h1 class="q-h1">{html.escape(heading)}</h1>
-  {lead_html}
   <section class="q-block" aria-labelledby="q-stem-h">
     <h2 id="q-stem-h" class="q-h2">問題</h2>
     <div class="q-stem">{page["stem_html"]}</div>
@@ -467,10 +455,6 @@ def build_practice_question_html(
   <section class="q-block q-answer" aria-labelledby="q-ans-h">
     <h2 id="q-ans-h" class="q-h2">正答</h2>
     {ans_block}
-  </section>
-  <section class="q-block" aria-labelledby="q-exp-h">
-    <h2 id="q-exp-h" class="q-h2">解説</h2>
-    {exp_html}
   </section>
   {similar_html}
   {related_html}
@@ -563,7 +547,6 @@ def build_ichimon_question_html(
         static_crumb_items(("一問一答一覧", "q/ichimon/index.html"), (heading, None)),
     )
     site_footer = site_page_footer(rel_path, current="ichimon")
-    exp_html = build_ichimon_explanation_html(page, row)
 
     return f"""<!DOCTYPE html>
 <html lang="ja">
@@ -605,10 +588,6 @@ def build_ichimon_question_html(
     <h2 id="q-ans-h" class="q-h2">正答</h2>
     <p class="q-ichimon-answer">答えは <strong class="q-marubatsu">{html.escape(ans)}</strong> です。</p>
     <p>{ans_note}</p>
-  </section>
-  <section class="q-block" aria-labelledby="q-exp-h">
-    <h2 id="q-exp-h" class="q-h2">解説</h2>
-    {exp_html}
   </section>
   {similar_html}
   {related_html}
