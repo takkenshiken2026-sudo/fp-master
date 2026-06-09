@@ -7,7 +7,7 @@ window.SITE_CONFIG = {
   "gradePortalHref": "/",
   "siteOrigin": "https://fp-master.jp",
   "contactUrl": "https://fp-master.jp/contact",
-  "ga4MeasurementId": "",
+  "ga4MeasurementId": "G-SD8XK5LH5R",
   "theme": {
     "accent": "#0d5c4a",
     "accentText": "#ffffff",
