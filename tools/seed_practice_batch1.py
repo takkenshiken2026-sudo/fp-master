@@ -16,6 +16,7 @@ COLUMNS = [
     "category",
     "tags",
     "source_ref",
+    "diagram_id",
     "stem",
     "preamble",
     "statement_a",

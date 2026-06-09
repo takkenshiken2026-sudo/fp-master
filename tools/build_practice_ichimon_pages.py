@@ -57,6 +57,7 @@ from tools.html_footer import (  # noqa: E402
     q_hub_links_html,
     q_index_filters_details_html,
     q_index_stats_line,
+    q_index_subject_row_html,
     q_index_tools_close_html,
     q_index_tools_open_html,
     shell_body_class,
@@ -73,6 +74,7 @@ from tools.q_page_seo import (
     question_meta_description,
     study_modes_note_html,
 )
+from tools.past_question_subject import subject_display, subject_from_row  # noqa: E402
 from tools.site_config import brand_name, category_order, clean_origin, exam_name
 from tools.seo_editorial_chrome import seo_brand_asset_tags
 
@@ -94,7 +96,7 @@ INDEX_CONFIG: dict[str, dict] = {
         "searchInputLabel": "実践演習検索",
         "searchPlaceholder": "例：第1問、分野名、問題文…",
         "emptyTitle": "条件に一致する実践演習がありません",
-        "emptyHint": "検索語を短くするか、分野・学習状況を「すべて」に戻してお試しください。",
+        "emptyHint": "検索語を短くするか、科目・分野・学習状況を「すべて」に戻してお試しください。",
         "appLinkTemplate": "../index.html#orig",
         "appLinkLabel": "アプリで解く",
         "rowLabelField": "qno",
@@ -185,9 +187,11 @@ def practice_page_dict(row: dict, line_no: int) -> dict:
         raise ValueError(f"practice line {line_no}: 正答なし no={qno}")
     cat = norm(row.get("category"))
     stem_plain = norm(row.get("stem"))
+    subject = subject_from_row(row, qno=qno)
     return {
         "qno": qno,
         "category": cat,
+        "subject": subject,
         "type": norm(row.get("type")) or "single",
         "stem_html": build_stem_html(row),
         "stem_plain": stem_plain,
@@ -708,9 +712,14 @@ def build_mode_index(
         canonical_rel = "q/practice/index.html"
         index_items = [practice_index_item_dict(pg) for pg in pages]
         group_by = "category"
-        filter_hint = "分野・学習状況"
+        filter_hint = "科目・分野・学習状況"
         show_category_row = False
         year_row_label = "分野へ"
+        gakka_count = sum(1 for pg in pages if pg.get("subject") == "gakka")
+        jitsugi_count = sum(1 for pg in pages if pg.get("subject") == "jitsugi")
+        subject_row_html = q_index_subject_row_html(
+            gakka_count=gakka_count, jitsugi_count=jitsugi_count
+        )
     else:
         current = "ichimon"
         from tools.q_page_seo import index_h1, index_page_title
@@ -725,6 +734,7 @@ def build_mode_index(
         filter_hint = "分野・学習状況"
         show_category_row = False
         year_row_label = "分野へ"
+        subject_row_html = ""
 
     by_category: dict[str, int] = {}
     for pg in pages:
@@ -809,6 +819,7 @@ def build_mode_index(
         search_placeholder=search_placeholder,
         hit_text=f"{len(pages)} / {len(pages)} 問",
     )}
+      {subject_row_html if mode == "practice" else ""}
       {q_index_filters_details_html(
           year_row_label=year_row_label if mode == "practice" else group_label,
           year_jump_html=group_jump_html,
@@ -868,7 +879,8 @@ def build_practice_index_table_row(page: dict) -> str:
         '<tr class="q-year-table-row" tabindex="0"'
         f' data-app-id="{page["app_id"]}"'
         f' data-href="{html.escape(page["href_rel"], quote=True)}"'
-        f' data-category="{html.escape(page["category"], quote=True)}">'
+        f' data-category="{html.escape(page["category"], quote=True)}"'
+        f' data-subject="{html.escape(page.get("subject") or "", quote=True)}">'
         f'<td class="q-year-table-no" data-label="問"><a href="{href}">{html.escape(label)}</a></td>'
         f'<td class="q-year-table-cat" data-label="分野">{html.escape(page["category"])}</td>'
         f'<td class="q-year-table-desc" data-label="問題文">{preview_cell}</td>'
@@ -908,18 +920,22 @@ def practice_index_item_dict(page: dict) -> dict:
     preview = stem_preview(page.get("stem_plain") or "")
     tags = page.get("tags") or []
     qno = page["qno"]
+    subject = page.get("subject") or ""
     search_bits = [
         f"第{qno}問",
         page["category"],
         preview,
         *tags,
     ]
+    if subject:
+        search_bits.append(subject_display(subject))
     return {
         "appId": PRACTICE_ID_BASE + qno,
         "year": 0,
         "qno": qno,
         "label": f"第{qno}問",
         "category": page["category"],
+        "subject": subject,
         "href": page["href_rel"],
         "preview": preview,
         "tags": tags,

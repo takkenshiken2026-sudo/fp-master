@@ -150,6 +150,7 @@ def practice_row_to_obj(row: dict, line_no: int) -> dict | None:
         "year": PRACTICE_POOL_YEAR,
         "num": qno,
         "field": field,
+        "subject": subject_from_row(row, qno=qno),
         "text": text,
         "opts": opts,
         "ans": 0 if cor is None else cor,
