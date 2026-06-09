@@ -486,28 +486,25 @@ def _ichimon_answer_is_true(page: dict) -> bool:
     return bool(page.get("correct_answer"))
 
 
+_ICHIMON_ANSWER_PREFIX_RE = re.compile(
+    r"^正解は\s*[○×]\s*です[。.]?\s*",
+    re.IGNORECASE,
+)
+
+
+def strip_ichimon_answer_prefix(text: str) -> str:
+    """CSV 解説先頭の「正解は○です。」等を除去（正答欄と重複しないように）。"""
+    return _ICHIMON_ANSWER_PREFIX_RE.sub("", norm(text) or "").strip()
+
+
 def split_legacy_ichimon_explanation(
     exp: str, *, is_true: bool, statement: str
 ) -> tuple[str, str]:
-    """1 段落の explanation から要約と正解理由のたたき台を作る。"""
-    body = norm(exp) or "（解説は未入力です。）"
-    if is_true:
-        summary = (
-            "この記述は正しい内容です。"
-            "○ が正答になります。"
-        )
-    else:
-        summary = (
-            "この記述は誤りです。"
-            "× が正答になります。"
-        )
-    if len(body) <= 120:
-        return summary, body
-    first = re.split(r"[。.]\s*", body, maxsplit=1)[0]
-    if first and len(first) >= 20:
-        summary = first + ("。" if not first.endswith("。") else "")
-    lead = f"設問文「{_snippet(statement, 48)}」について、"
-    return summary, lead + body
+    """1 段落の explanation から正解理由本文を取り出す（要約は正答欄に任せる）。"""
+    _ = is_true
+    _ = statement
+    body = strip_ichimon_answer_prefix(exp) or norm(exp) or "（解説は未入力です。）"
+    return "", body
 
 
 def infer_ichimon_opposite_note(page: dict, row: dict) -> str:
@@ -580,6 +577,9 @@ def build_ichimon_explanation_html(page: dict, row: dict) -> str:
         summary = summary or leg_summary
         correct_body = correct_body or leg_body
 
+    summary = strip_ichimon_answer_prefix(summary) if summary else ""
+    correct_body = strip_ichimon_answer_prefix(correct_body) if correct_body else ""
+
     if not opposite:
         opposite = infer_ichimon_opposite_note(page, row)
 
@@ -593,13 +593,6 @@ def build_ichimon_explanation_html(page: dict, row: dict) -> str:
     )
     if correct_body:
         parts.append(f"<p>{text_to_html(correct_body)}</p>")
-    truth = "正しい" if is_true else "誤っている"
-    parts.append(
-        f'<p class="q-exp-correct-opt">'
-        f"設問文は<strong>{truth}</strong>記述のため、答えは "
-        f'<strong class="q-marubatsu">{html.escape(ans)}</strong> です。'
-        f"</p>"
-    )
     if statement:
         parts.append(
             f'<blockquote class="q-exp-quote">{text_to_html(statement)}</blockquote>'

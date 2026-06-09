@@ -514,11 +514,6 @@ def build_ichimon_question_html(
     study_modes_note = study_modes_note_html()
     canonical = public_url(base_url, page["rel_path"])
     ans = marubatsu_label(page["correct_answer"])
-    ans_note = (
-        "この記述は<strong>正しい</strong>ので、答えは ○ です。"
-        if page["correct_answer"]
-        else "この記述は<strong>誤り</strong>なので、答えは × です。"
-    )
     source_line = (
         f'<p class="q-meta-line">{html.escape(page["source"])}</p>'
         if page.get("source")
@@ -602,7 +597,6 @@ def build_ichimon_question_html(
   <section class="q-block q-answer" aria-labelledby="q-ans-h">
     <h2 id="q-ans-h" class="q-h2">正答</h2>
     <p class="q-ichimon-answer">答えは <strong class="q-marubatsu">{html.escape(ans)}</strong> です。</p>
-    <p>{ans_note}</p>
   </section>
   <section class="q-block" aria-labelledby="q-exp-h">
     <h2 id="q-exp-h" class="q-h2">解説</h2>
