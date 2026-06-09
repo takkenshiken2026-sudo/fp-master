@@ -393,13 +393,27 @@ def build_study_hint(page: dict, row: dict) -> str:
     return hint
 
 
+_CHOICE_ANSWER_PREFIX_RE = re.compile(r"^正解は\s*\d+\s*です[。.]?\s*", re.IGNORECASE)
+_ANSWER_ONLY_SUMMARY_RE = re.compile(
+    r"^正(?:答|解)は\s*[（(]?\d+[）)]?\s*です[。.]?\s*$"
+)
+
+
+def strip_choice_answer_prefix(text: str) -> str:
+    """CSV 解説先頭の「正解は1です。」等を除去（正答欄と重複しないように）。"""
+    return _CHOICE_ANSWER_PREFIX_RE.sub("", norm(text) or "").strip()
+
+
+def is_answer_only_summary(text: str) -> bool:
+    t = norm(text)
+    if not t:
+        return True
+    return bool(_ANSWER_ONLY_SUMMARY_RE.match(t))
+
+
 def split_legacy_explanation(exp: str) -> tuple[str, str]:
-    m = re.match(r"^正解は\s*(\d+)\s*です[。.]?\s*(.*)$", exp, re.DOTALL)
-    if m:
-        body = norm(m.group(2)) or exp
-        summary = f"正答は（{m.group(1)}）です。"
-        return summary, body
-    return "", exp
+    body = strip_choice_answer_prefix(exp) or norm(exp) or "（解説は未入力です。）"
+    return "", body
 
 
 def build_choice_commentary(page: dict, row: dict) -> list[tuple[int, str, str]]:
@@ -425,15 +439,17 @@ def build_explanation_html(page: dict, row: dict) -> str:
 
     summary = norm(row.get("explanation_summary"))
     correct_body = norm(row.get("explanation_correct"))
-    point = norm(row.get("explanation_point"))
 
-    if not summary and not correct_body and not point:
+    if not summary and not correct_body:
         leg_summary, leg_body = split_legacy_explanation(base)
         summary = summary or leg_summary
         correct_body = correct_body or leg_body
 
+    summary = strip_choice_answer_prefix(summary) if summary else ""
+    correct_body = strip_choice_answer_prefix(correct_body) if correct_body else ""
+
     parts: list[str] = ['<div class="q-exp">']
-    if summary:
+    if summary and not is_answer_only_summary(summary):
         parts.append(f'<p class="q-exp-lead">{text_to_html(summary)}</p>')
 
     correct = page.get("correct")
@@ -469,14 +485,6 @@ def build_explanation_html(page: dict, row: dict) -> str:
                 '<h3 id="q-exp-wrong-h" class="q-exp-h3">他の選択肢</h3>'
                 f'<ul class="q-exp-choice-list">{lis}</ul></section>'
             )
-
-    hint = build_study_hint(page, row)
-    if hint:
-        parts.append(
-            '<section class="q-exp-section" aria-labelledby="q-exp-tip-h">'
-            '<h3 id="q-exp-tip-h" class="q-exp-h3">学習のヒント</h3>'
-            f"<p>{text_to_html(hint)}</p></section>"
-        )
 
     parts.append("</div>")
     return "\n    ".join(parts)
@@ -561,16 +569,14 @@ def build_ichimon_explanation_html(page: dict, row: dict) -> str:
     """一問一答 — 過去問と同型（要約・正解の理由・もう一方の記号・学習のヒント）。"""
     statement = norm(page.get("statement") or row.get("question"))
     is_true = _ichimon_answer_is_true(page)
-    ans = "○" if is_true else "×"
     wrong = "×" if is_true else "○"
 
     summary = norm(row.get("explanation_summary"))
     correct_body = norm(row.get("explanation_correct"))
     opposite = norm(row.get("explanation_opposite"))
-    point = norm(row.get("explanation_point"))
     base = norm(row.get("explanation")) or "（解説は未入力です。）"
 
-    if not summary and not correct_body and not point:
+    if not summary and not correct_body:
         leg_summary, leg_body = split_legacy_ichimon_explanation(
             base, is_true=is_true, statement=statement
         )
@@ -584,7 +590,7 @@ def build_ichimon_explanation_html(page: dict, row: dict) -> str:
         opposite = infer_ichimon_opposite_note(page, row)
 
     parts: list[str] = ['<div class="q-exp">']
-    if summary:
+    if summary and not is_answer_only_summary(summary):
         parts.append(f'<p class="q-exp-lead">{text_to_html(summary)}</p>')
 
     parts.append(
@@ -605,14 +611,6 @@ def build_ichimon_explanation_html(page: dict, row: dict) -> str:
         f"{html.escape(wrong)} を選びやすい考え方</h3>"
         f"<p>{text_to_html(opposite)}</p></section>"
     )
-
-    hint = build_study_hint(page, row)
-    if hint:
-        parts.append(
-            '<section class="q-exp-section" aria-labelledby="q-exp-tip-h">'
-            '<h3 id="q-exp-tip-h" class="q-exp-h3">学習のヒント</h3>'
-            f"<p>{text_to_html(hint)}</p></section>"
-        )
 
     parts.append("</div>")
     return "\n    ".join(parts)
