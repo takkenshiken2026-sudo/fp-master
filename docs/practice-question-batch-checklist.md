@@ -74,6 +74,41 @@ python3 tools/build_all.py
 
 ---
 
+## F. 実技バッチ（第61バッチ以降）
+
+実技は **図表と数値の整合** がボトルネックです。学科バッチより小さく刻み、専用検証を必ず回してください。
+
+### 着手前
+
+- [ ] 1バッチは **最大5問**（図表ありは **3問まで**）。ミスが出たら次は **3問** に減らす
+- [ ] 出典 `source_ref` は `YYYY-jitsugi-NN` 形式で、未使用の種を優先
+- [ ] `tags` は `FP3級;実技;実践演習;三答択;source:…-vN`（**学科** を入れない）
+- [ ] 図表ありは **diagram_id を必ず指定**（過去問と同じ ID で可。数値を変えるなら図表 JSON も要更新）
+- [ ] 数値を変える場合は **手計算または式で正答・誤答肢を再計算**（過去問の正答をそのまま流用しない）
+
+### 1行あたり
+
+- [ ] `diagram_id` がある行は、静的ページに `q-materials` が出る（`build_practice_ichimon_pages.py` 後）
+- [ ] 正答番号と `explanation` の「正解はN」が一致
+- [ ] 誤答肢メモは各 **72文字以上**
+
+### バッチ後（必須コマンド）
+
+```bash
+python3 tools/validate_practice_questions.py
+python3 tools/validate_practice_jitsugi.py
+python3 tools/build_practice_ichimon_pages.py
+python3 tools/csv_to_exam_site_past_js.py
+# または
+python3 tools/build_all.py
+```
+
+- [ ] 図表付き **全問** を静的ページで表示確認（表の数値と問題文が矛盾しないか）
+- [ ] アプリ（`#orig`）で実技フィルタをオンにし、追加分を **1問解いて** 資料表示を確認
+- [ ] サンプル **3問** を人が全文読んで計算・制度の整合を確認した
+
+---
+
 ## 関連ファイル
 
 | ファイル | 役割 |

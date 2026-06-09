@@ -34,6 +34,7 @@ from tools.build_past_question_pages import (  # noqa: E402
     Q_INDEX_CSS_VER,
     ROBOTS_INDEX_FOLLOW,
     q_index_filter_chip_btn,
+    build_materials_html,
     build_stem_html,
     glossary_links_for_tags,
     guide_links_for_page,
@@ -383,6 +384,7 @@ def build_practice_question_html(
         },
         row,
     )
+    materials_html = build_materials_html(row)
     similar_html = build_similar_questions_html(
         page,
         rel_path,
@@ -456,6 +458,7 @@ def build_practice_question_html(
   <section class="q-block" aria-labelledby="q-stem-h">
     <h2 id="q-stem-h" class="q-h2">問題</h2>
     <div class="q-stem">{page["stem_html"]}</div>
+    {materials_html}
   </section>
   <section class="q-block" aria-labelledby="q-opts-h">
     <h2 id="q-opts-h" class="q-h2">選択肢</h2>
