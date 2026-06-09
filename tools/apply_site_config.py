@@ -34,9 +34,14 @@ from tools.site_config import (
     sync_config_files,
     fields,
 )
-from tools.html_footer import site_page_footer, site_page_header, site_shell_footer
+from tools.html_footer import (
+    breadcrumb_html,
+    site_page_footer,
+    site_page_header,
+    site_shell_footer,
+)
 from tools.brand_assets import inject_brand_head
-from tools.breadcrumb_seo import spa_breadcrumb_prefix_li
+from tools.breadcrumb_seo import spa_breadcrumb_prefix_li, static_crumb_items
 from tools.index_seo_head import (
     INDEX_SEO_MARKER_END,
     INDEX_SEO_MARKER_START,
@@ -69,16 +74,44 @@ STATIC_PAGE_CURRENTS = {
     ROOT / "articles" / "index.html": "articles",
 }
 
+STATIC_PAGE_CRUMB_LABELS: dict[Path, str] = {
+    ROOT / "about.html": "このサイトについて",
+    ROOT / "privacy.html": "プライバシー・利用条件",
+    ROOT / "related-sites.html": "関連リンク",
+}
 
-_SPA_BREADCRUMB_HOME_RE = re.compile(
-    r'<li class="breadcrumb-item"><a href="[^"]*"[^>]*onclick="event\.preventDefault\(\);gotoPage\(\'quiz-start\'\)"[^>]*>[^<]*</a></li>',
+_SPA_BREADCRUMB_OL_RE = re.compile(
+    r"(<ol class=\"breadcrumb-list\">\s*)"
+    r"(?:\s*<li class=\"breadcrumb-item(?!\s+breadcrumb-current)[^\"]*\"[^>]*>.*?</li>\s*)*"
+    r"(<li class=\"breadcrumb-item breadcrumb-current[^>]*>.*?</li>\s*</ol>)",
+    re.DOTALL,
 )
 
 
 def update_spa_breadcrumbs(text: str) -> str:
-    """SPA パンくず先頭を portal + 級ブランド階層に揃える（SEO・内部リンク）。"""
+    """SPA パンくず先頭を portal + 級ブランド階層に揃える（冪等・重複しない）。"""
     prefix = spa_breadcrumb_prefix_li()
-    return _SPA_BREADCRUMB_HOME_RE.sub(prefix, text)
+
+    def repl(match: re.Match[str]) -> str:
+        return f"{match.group(1)}{prefix}\n          {match.group(2)}"
+
+    return _SPA_BREADCRUMB_OL_RE.sub(repl, text)
+
+
+def update_static_page_breadcrumbs(text: str, path: Path) -> str:
+    """手書き静的ページのパンくずを portal + 級ブランド階層に揃える。"""
+    label = STATIC_PAGE_CRUMB_LABELS.get(path)
+    if not label:
+        return text
+    rel_path = path.relative_to(ROOT)
+    new_crumb = breadcrumb_html(rel_path, static_crumb_items((label, None)))
+    return re.sub(
+        r'<nav class="site-page-header-crumb" aria-label="パンくず">.*?</nav>',
+        new_crumb,
+        text,
+        count=1,
+        flags=re.S,
+    )
 
 
 def patch_spa_absolute_paths(text: str) -> str:
@@ -115,7 +148,6 @@ def replace_all(text: str) -> str:
         ("Sampleマスター", brand_name()),
         ("マン管マスター", brand_name()),
         ("マンション管理士試験", exam_name()),
-        ("FPマスター", brand_name()),
         ("◯◯試験（プレースホルダー）", exam_name()),
         ("YOUR-DOMAIN.example", host),
         ("https://YOUR-DOMAIN.example", origin),
@@ -441,6 +473,8 @@ def main() -> int:
         if path == ROOT / "index.html":
             new = migrate_legacy_takken_leaks(new)
         new = replace_static_chrome(new, path)
+        if path in STATIC_PAGE_CRUMB_LABELS:
+            new = update_static_page_breadcrumbs(new, path)
         rel = path.relative_to(ROOT)
         if path.suffix == ".html":
             new = inject_brand_head(new, rel, site_root=ROOT)
