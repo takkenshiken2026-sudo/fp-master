@@ -133,8 +133,8 @@ def infer_wrong_choice_note(
         )
         if correct and correct_text:
             parts.append(
-                f"本問の正答は（{correct}）「{_snippet(correct_text, 56)}」です。"
-                "この記述は、学習効果を著しく損ねる・明らかに誤った方針であり、"
+                f"（{correct}）「{_snippet(correct_text, 56)}」は、"
+                "学習効果を著しく損ねる・明らかに誤った方針であり、"
                 "他の肢より「最も不適切」と言えます。"
             )
         parts.append(
@@ -165,8 +165,8 @@ def infer_wrong_choice_note(
             )
     else:
         parts.append(
-            f"この肢「{_snippet(opt, 48)}」は、設問の求め方（正しいもの／誤っているもの／"
-            "最も適切でないもの）と照らすと正答になりません。"
+            f"「{_snippet(opt, 48)}」は、制度・数値・手続の観点で"
+            f"{category or '本分野'}の正答肢としては成立しません。"
         )
 
     rules: list[tuple[str, str]] = [
@@ -229,16 +229,9 @@ def infer_wrong_choice_note(
             "主語・客体・数字・期限・「毎年／常に／不要」などの限定語をチェックしてください。"
         )
 
-    if correct_body and len(parts) < 2:
-        hint = _snippet(correct_body, 100)
-        parts.append(
-            f"正解の要点: {hint} "
-            "この観点と両立しない部分がこの肢にないか、用語解説で定義を確認しながら見直してください。"
-        )
-
     if len(parts) < 2:
         parts.append(
-            f"正答（{correct}）との差分を一行メモに残し、同分野の過去問・実践演習で解き直すと定着しやすくなります。"
+            "用語解説で関連制度を確認し、同分野の過去問・実践演習で解き直すと定着しやすくなります。"
         )
 
     return "\n\n".join(parts)
@@ -416,6 +409,32 @@ def split_legacy_explanation(exp: str) -> tuple[str, str]:
     return "", body
 
 
+_WRONG_CHOICE_OPENING_RE = re.compile(
+    r"^この肢「[^」]*」は、設問の求め方（正しいもの／誤っているもの／最も適切でないもの）と照らすと正答になりません。[。\s]*",
+)
+_WRONG_CHOICE_KEY_POINT_RE = re.compile(r"^正解の要点:\s*")
+_WRONG_CHOICE_FOOTER_RE = re.compile(
+    r"\s*この観点と両立しない部分がこの肢にないか、用語解説で定義を確認しながら見直してください。[。\s]*$"
+)
+
+
+def polish_wrong_choice_note(note: str, *, choice_text: str, category: str) -> str:
+    """他の選択肢の解説から正答欄・正解の理由と重複する定型文を除去する。"""
+    n = norm(note)
+    if not n:
+        return n
+    n = _WRONG_CHOICE_OPENING_RE.sub("", n)
+    n = _WRONG_CHOICE_KEY_POINT_RE.sub("", n)
+    n = strip_choice_answer_prefix(n)
+    n = _WRONG_CHOICE_FOOTER_RE.sub("", n)
+    n = re.sub(r"\s{2,}", " ", n).strip()
+    if not n:
+        opt = norm(choice_text)
+        cat = category or "本分野"
+        return f"「{_snippet(opt, 48)}」は、{cat}の観点で本問の正答肢ではありません。"
+    return n
+
+
 def build_choice_commentary(page: dict, row: dict) -> list[tuple[int, str, str]]:
     parsed = parse_explanation_choices(norm(row.get("explanation_choices")))
     correct = page.get("correct")
@@ -427,6 +446,11 @@ def build_choice_commentary(page: dict, row: dict) -> list[tuple[int, str, str]]
             continue
         note = resolve_wrong_choice_note(
             page, i, opt, row, csv_note=parsed.get(i) or ""
+        )
+        note = polish_wrong_choice_note(
+            note,
+            choice_text=opt,
+            category=norm(page.get("category") or ""),
         )
         items.append((i, opt, note))
     return items
