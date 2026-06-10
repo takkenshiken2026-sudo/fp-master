@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://fp-master.jp/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://fp-master.jp/about.html</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
@@ -508,11 +513,6 @@
   <url>
     <loc>https://fp-master.jp/articles/tools-wrong-answer-review/index.html</loc>
     <lastmod>2026-06-09</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://fp-master.jp/index.html</loc>
-    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
