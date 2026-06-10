@@ -9,7 +9,6 @@ import json
 import re
 
 from tools.brand_assets import theme_ink
-from tools.breadcrumb_seo import index_home_breadcrumb_json_ld
 from tools.site_config import base_path, brand_name, clean_origin, exam_name, fields, public_url
 
 INDEX_SEO_MARKER_START = "<!--INDEX_SEO_HEAD-->"
@@ -29,11 +28,19 @@ def index_site_label() -> str:
 
 
 def index_canonical_url() -> str:
+    """SPA ホームの canonical / og:url（basePath 対応）。"""
+    url = public_url("")
+    return url if url.endswith("/") else f"{url}/"
+
+
+def index_spa_hash_url(hash_frag: str) -> str:
+    """JSON-LD 等用の SPA ハッシュ URL（例: https://example.com/fp3#past）。"""
+    frag = hash_frag if hash_frag.startswith("#") else f"#{hash_frag}"
     origin = clean_origin()
     bp = base_path()
     if bp:
-        return f"{origin}{bp}/"
-    return f"{origin}/"
+        return f"{origin}{bp}{frag}"
+    return f"{origin}/{frag.lstrip('#')}"
 
 
 def index_description() -> str:
@@ -64,8 +71,8 @@ def index_keywords() -> str:
 
 
 def index_json_ld_graph() -> list[dict]:
-    origin = clean_origin()
     home_url = index_canonical_url()
+    home_id = home_url.rstrip("/")
     alt = f"{exam_name()}対策サイト"
     platform_desc = (
         f"{exam_name()}の過去問・実践演習・一問一答・用語解説を"
@@ -74,7 +81,7 @@ def index_json_ld_graph() -> list[dict]:
     return [
         {
             "@type": "WebSite",
-            "@id": f"{home_url}#website",
+            "@id": f"{home_id}/#website",
             "url": home_url,
             "name": brand_name(),
             "alternateName": alt,
@@ -83,7 +90,7 @@ def index_json_ld_graph() -> list[dict]:
         },
         {
             "@type": "EducationalApplication",
-            "@id": f"{home_url}#app",
+            "@id": f"{home_id}/#app",
             "name": brand_name(),
             "alternateName": alt,
             "description": platform_desc,
@@ -103,13 +110,21 @@ def index_json_ld_graph() -> list[dict]:
                 },
             ],
         },
-        index_home_breadcrumb_json_ld(),
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "トップ", "item": home_url},
+                {"@type": "ListItem", "position": 2, "name": "過去問", "item": index_spa_hash_url("#past")},
+                {"@type": "ListItem", "position": 3, "name": "実践演習", "item": index_spa_hash_url("#orig")},
+                {"@type": "ListItem", "position": 4, "name": "用語解説", "item": public_url("terms/")},
+            ],
+        },
     ]
 
 
 def index_seo_head_inner() -> str:
     """SEO block only (og:image は brand_assets の BRAND_ASSET_HEAD が担当)。"""
-    origin = clean_origin()
+    home_url = index_canonical_url()
     og_title = index_og_title()
     home_title = index_home_title()
     desc_short = index_description()
@@ -131,11 +146,11 @@ def index_seo_head_inner() -> str:
 <meta name="keywords" content="{html.escape(keywords)}">
 <meta name="robots" content="index, follow">
 <meta name="application-name" content="{html.escape(site_label)}">
-<link rel="canonical" href="{html.escape(index_canonical_url())}" id="canonical-link">
+<link rel="canonical" href="{html.escape(home_url)}" id="canonical-link">
 
 <!-- Open Graph (SNS・Slack等でのリッチ表示) -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="{html.escape(index_canonical_url())}">
+<meta property="og:url" content="{html.escape(home_url)}">
 <meta property="og:title" content="{html.escape(og_title)}">
 <meta property="og:description" content="{html.escape(desc_short)}">
 <meta property="og:locale" content="ja_JP">
@@ -182,6 +197,28 @@ _ORPHAN_DUP_SEO_AFTER_MARKER = re.compile(
     re.I,
 )
 
+_INDEX_SEO_POLLUTED_REGION = re.compile(
+    rf"{re.escape(INDEX_SEO_MARKER_START)}[\s\S]*?"
+    rf"{re.escape(INDEX_SEO_MARKER_END)}\s*"
+    r"(?:<!-- Open Graph \(SNS・Slack等でのリッチ表示\) -->[\s\S]*?<!--/INDEX_SEO_HEAD-->\s*)*"
+    r"(?:\(SNS・Slack等でのリッチ表示\) -->[\s\S]*?<!--/INDEX_SEO_HEAD-->\s*)*"
+    r'(?=<meta name="format-detection"|<link rel="preconnect")',
+    re.I,
+)
+
+_ORPHAN_SEO_TAIL_RE = re.compile(
+    r"(?:(?:<!-- Open Graph )?\(SNS・Slack等でのリッチ表示\) -->[\s\S]*?<!--/INDEX_SEO_HEAD-->\s*)+",
+    re.I,
+)
+
+_ORPHAN_META_AFTER_SEO_RE = re.compile(
+    r"<meta name=\"keywords\"[^>]+>\s*"
+    r"<meta name=\"robots\"[^>]+>\s*"
+    r"<meta name=\"application-name\"[^>]+>\s*"
+    r"<link rel=\"canonical\"[^>]+>\s*",
+    re.I,
+)
+
 
 def _strip_legacy_index_seo(text: str) -> str:
     text = _ORPHAN_TWITTER_AFTER_IMAGE.sub(r"\1\n", text, count=1)
@@ -200,63 +237,64 @@ def _strip_duplicate_seo_after_marker(text: str) -> str:
     tail_start = end + len(INDEX_SEO_MARKER_END)
     tail = text[tail_start:]
     m = _ORPHAN_DUP_SEO_AFTER_MARKER.match(tail.lstrip())
-    if not m:
-        return text
-    consumed = len(tail) - len(tail.lstrip()) + m.end()
-    return text[:tail_start] + tail[consumed:]
-
-
-def _strip_all_orphan_seo_after_first_marker(text: str) -> str:
-    """最初の INDEX_SEO 終端マーカー以降に蓄積した重複 SEO を一括除去。"""
-    end = text.find(INDEX_SEO_MARKER_END)
-    if end < 0:
-        return text
-    tail_start = end + len(INDEX_SEO_MARKER_END)
-    tail = text[tail_start:]
-    anchor = re.search(r'<meta name="format-detection"', tail)
-    if anchor:
-        junk = tail[: anchor.start()]
-        if (
-            INDEX_SEO_MARKER_END in junk
-            or "<title>" in junk
-            or 'name="application-name"' in junk
-            or 'property="og:title"' in junk
-        ):
-            return text[:tail_start] + tail[anchor.start() :]
-    while True:
-        prev = text
-        text = _strip_duplicate_seo_after_marker(text)
-        if text == prev:
-            break
+    if m:
+        consumed = len(tail) - len(tail.lstrip()) + m.end()
+        return text[:tail_start] + tail[consumed:]
+    m2 = _ORPHAN_META_AFTER_SEO_RE.match(tail.lstrip())
+    if m2:
+        consumed = len(tail) - len(tail.lstrip()) + m2.end()
+        return text[:tail_start] + tail[consumed:]
     return text
 
 
 def inject_index_seo_head(text: str) -> str:
     """Replace or insert site-config driven SEO head for SPA index.html."""
     block_inner = index_seo_head_inner()
-    block = f"{INDEX_SEO_MARKER_START}\n{block_inner}\n{INDEX_SEO_MARKER_END}"
-    if INDEX_SEO_MARKER_START in text and INDEX_SEO_MARKER_END in text:
-        text = _INDEX_SEO_BLOCK.sub(block, text, count=1)
+    block = f"{INDEX_SEO_MARKER_START}\n{block_inner}\n{INDEX_SEO_MARKER_END}\n"
+    polluted = _INDEX_SEO_POLLUTED_REGION.search(text)
+    if polluted:
+        return text[: polluted.start()] + block + text[polluted.end() :]
+    while INDEX_SEO_MARKER_START in text and INDEX_SEO_MARKER_END in text:
+        text = _INDEX_SEO_BLOCK.sub("", text, count=1)
+    text = _ORPHAN_SEO_TAIL_RE.sub("", text)
+    text = _strip_legacy_index_seo(text)
+    if "<!--SITE_VERIFICATION_META_INJECT-->" in text:
+        text = text.replace("<!--SITE_VERIFICATION_META_INJECT-->", block, 1)
+    elif _ORPHAN_TWITTER_AFTER_IMAGE.search(text):
+        text = _ORPHAN_TWITTER_AFTER_IMAGE.sub(r"\1\n" + block, text, count=1)
+    elif "<!--BRAND_ASSET_HEAD-->" in text:
+        text = re.sub(
+            r"(<!--BRAND_ASSET_HEAD-->[\s\S]*?<link rel=\"apple-touch-icon\"[^>]+>)",
+            r"\1\n" + block,
+            text,
+            count=1,
+        )
     else:
-        text = _strip_legacy_index_seo(text)
-        if "<!--SITE_VERIFICATION_META_INJECT-->" in text:
-            text = text.replace("<!--SITE_VERIFICATION_META_INJECT-->", block, 1)
-        elif _ORPHAN_TWITTER_AFTER_IMAGE.search(text):
-            text = _ORPHAN_TWITTER_AFTER_IMAGE.sub(r"\1\n" + block, text, count=1)
-        elif "<!--BRAND_ASSET_HEAD-->" in text:
-            text = re.sub(
-                r"(<!--BRAND_ASSET_HEAD-->[\s\S]*?<link rel=\"apple-touch-icon\"[^>]+>)",
-                r"\1\n" + block,
-                text,
-                count=1,
-            )
-        else:
-            text = re.sub(r'(<meta charset="UTF-8">)', r"\1\n" + block, text, count=1)
-    return _strip_all_orphan_seo_after_first_marker(text)
+        text = re.sub(r'(<meta charset="UTF-8">)', r"\1\n" + block, text, count=1)
+    while True:
+        cleaned = _strip_duplicate_seo_after_marker(text)
+        if cleaned == text:
+            break
+        text = cleaned
+    return text
+
+
+_OTHER_SITE_HOSTS = (
+    "chintaikanrishi-master.jp",
+    "mankan-master.jp",
+    "kangyou-master.jp",
+    "eisei1shu-master.jp",
+    "eisei2shu-master.jp",
+    "mentalhealth-master.jp",
+    "kikenbutsu-master.jp",
+    "unkan-master.jp",
+    "boiler-master.jp",
+    "takken-master.jp",
+)
 
 
 def migrate_legacy_takken_leaks(text: str) -> str:
-    """宅建 fork 残骸を site-config のブランド・ドメインへ置換（宅建サイトは除外）。"""
+    """他サイト fork 残骸を site-config のブランド・ドメインへ置換（宅建サイトは除外）。"""
     origin = clean_origin()
     if "takken-master.jp" in origin:
         return text
@@ -270,28 +308,19 @@ def migrate_legacy_takken_leaks(text: str) -> str:
         ("マン管マスター", bn),
         ("マンション管理士試験対策サイト", f"{en}対策サイト"),
         ("マンション管理士試験", en),
+        ("運管マスター", bn),
+        ("運行管理者試験対策サイト", f"{en}対策サイト"),
+        ("運行管理者試験", en),
         ("FPマスター", bn),
     ]
     for src, dst in replacements:
         text = text.replace(src, dst)
-    # 他サイト fork からコピーされたドメインを siteOrigin へ
-    origin = clean_origin()
     host = origin.replace("https://", "").replace("http://", "").strip("/")
     if host:
-        for leak in (
-            "chintaikanrishi-master.jp",
-            "mankan-master.jp",
-            "kangyou-master.jp",
-            "eisei1shu-master.jp",
-            "eisei2shu-master.jp",
-            "mentalhealth-master.jp",
-            "kikenbutsu-master.jp",
-            "unkan-master.jp",
-            "boiler-master.jp",
-            "takken-master.jp",
-        ):
+        for leak in _OTHER_SITE_HOSTS:
             if leak != host:
                 text = text.replace(f"https://{leak}", origin)
+                text = text.replace(leak, host)
     return text
 
 
