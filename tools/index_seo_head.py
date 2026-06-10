@@ -9,7 +9,15 @@ import json
 import re
 
 from tools.brand_assets import theme_ink
-from tools.site_config import base_path, brand_name, clean_origin, exam_name, fields, public_url
+from tools.site_config import (
+    base_path,
+    brand_name,
+    clean_origin,
+    exam_name,
+    fields,
+    google_site_verification,
+    public_url,
+)
 
 INDEX_SEO_MARKER_START = "<!--INDEX_SEO_HEAD-->"
 INDEX_SEO_MARKER_END = "<!--/INDEX_SEO_HEAD-->"
@@ -137,8 +145,13 @@ def index_seo_head_inner() -> str:
         ensure_ascii=False,
         indent=2,
     )
-    return f"""<!--SITE_VERIFICATION_META_INJECT-->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    gsc_token = google_site_verification()
+    gsc_meta = (
+        f'<meta name="google-site-verification" content="{html.escape(gsc_token)}">\n'
+        if gsc_token
+        else "<!--SITE_VERIFICATION_META_INJECT-->\n"
+    )
+    return f"""{gsc_meta}<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>{html.escape(home_title)}</title>
 
 <!-- 基本SEO -->
@@ -290,31 +303,32 @@ _OTHER_SITE_HOSTS = (
     "unkan-master.jp",
     "boiler-master.jp",
     "takken-master.jp",
+    "fp-master.jp",
 )
 
 
 def migrate_legacy_takken_leaks(text: str) -> str:
-    """他サイト fork 残骸を site-config のブランド・ドメインへ置換（宅建サイトは除外）。"""
+    """他サイト fork 残骸を site-config のブランド・ドメインへ置換。"""
     origin = clean_origin()
-    if "takken-master.jp" in origin:
-        return text
-    bn = brand_name()
-    en = exam_name()
-    replacements = [
-        ("https://takken-master.jp", origin),
-        ("宅建マスター", bn),
-        ("宅地建物取引士試験対策サイト", f"{en}対策サイト"),
-        ("宅地建物取引士試験", en),
-        ("マン管マスター", bn),
-        ("マンション管理士試験対策サイト", f"{en}対策サイト"),
-        ("マンション管理士試験", en),
-        ("運管マスター", bn),
-        ("運行管理者試験対策サイト", f"{en}対策サイト"),
-        ("運行管理者試験", en),
-        ("FPマスター", bn),
-    ]
-    for src, dst in replacements:
-        text = text.replace(src, dst)
+    is_takken = "takken-master.jp" in origin
+    if not is_takken:
+        bn = brand_name()
+        en = exam_name()
+        replacements = [
+            ("https://takken-master.jp", origin),
+            ("宅建マスター", bn),
+            ("宅地建物取引士試験対策サイト", f"{en}対策サイト"),
+            ("宅地建物取引士試験", en),
+            ("マン管マスター", bn),
+            ("マンション管理士試験対策サイト", f"{en}対策サイト"),
+            ("マンション管理士試験", en),
+            ("運管マスター", bn),
+            ("運行管理者試験対策サイト", f"{en}対策サイト"),
+            ("運行管理者試験", en),
+            ("FPマスター", bn),
+        ]
+        for src, dst in replacements:
+            text = text.replace(src, dst)
     host = origin.replace("https://", "").replace("http://", "").strip("/")
     if host:
         for leak in _OTHER_SITE_HOSTS:

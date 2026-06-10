@@ -43,6 +43,49 @@ def clean_origin() -> str:
     return str(CONFIG.get("siteOrigin") or "").rstrip("/")
 
 
+def base_path() -> str:
+    """サイト公開パスのプレフィックス（例: /fp3）。未設定時は空。"""
+    raw = str(CONFIG.get("basePath") or "").strip().rstrip("/")
+    if not raw:
+        return ""
+    return raw if raw.startswith("/") else f"/{raw}"
+
+
+def exam_grade() -> str:
+    return str(CONFIG.get("examGrade") or "").strip()
+
+
+def site_href(site_rel: str) -> str:
+    """ドメインルートからの絶対パス（例: /fp3/q/index.html）。"""
+    rel = site_rel.lstrip("/")
+    bp = base_path()
+    if not rel:
+        return bp or "/"
+    return f"{bp}/{rel}" if bp else f"/{rel}"
+
+
+def spa_hash_href(hash_part: str) -> str:
+    """SPA 学習ナビ用（例: /fp3#past）。"""
+    h = hash_part.strip()
+    if h.startswith("/#"):
+        h = h[1:]
+    elif h.startswith("/"):
+        h = h.lstrip("/")
+    if h and not h.startswith("#"):
+        h = f"#{h}"
+    bp = base_path()
+    return f"{bp}{h}" if bp else f"/{h}"
+
+
+def google_site_verification() -> str:
+    """Google Search Console の HTML タグ確認用トークン（未設定なら空）。"""
+    return str(CONFIG.get("googleSiteVerification") or "").strip()
+
+
+def grade_portal_href() -> str:
+    return str(CONFIG.get("gradePortalHref") or "/").strip() or "/"
+
+
 def brand_name() -> str:
     return str(CONFIG.get("brandName") or "Sampleマスター")
 
@@ -96,28 +139,8 @@ def is_template_site() -> bool:
     return "プレースホルダ" in exam or exam.startswith("◯◯")
 
 
-def excluded_past_exam_years() -> set[str]:
-    """静的過去問から除外する exam_year（site-config.json の excludePastExamYears）。"""
-    raw = CONFIG.get("excludePastExamYears") or CONFIG.get("excludedPastExamYears") or []
-    if isinstance(raw, str):
-        return {raw.strip()} if raw.strip() else set()
-    return {str(x).strip() for x in raw if str(x).strip()}
-
-
 def contact_url() -> str:
     return str(CONFIG.get("contactUrl") or "#")
-
-
-def base_path() -> str:
-    """SPA のサブパス（例: /fp3）。未設定なら空。"""
-    raw = str(CONFIG.get("basePath") or "").strip().rstrip("/")
-    if not raw:
-        return ""
-    return raw if raw.startswith("/") else f"/{raw}"
-
-
-def exam_grade() -> str:
-    return str(CONFIG.get("examGrade") or "").strip()
 
 
 def ga4_measurement_id() -> str:
@@ -422,6 +445,9 @@ def write_site_config_js() -> None:
         "brandName": brand_name(),
         "brandMark": brand_mark(),
         "examName": exam_name(),
+        "examGrade": exam_grade(),
+        "basePath": base_path(),
+        "gradePortalHref": grade_portal_href(),
         "siteOrigin": clean_origin(),
         "contactUrl": contact_url(),
         "ga4MeasurementId": ga4_measurement_id(),
