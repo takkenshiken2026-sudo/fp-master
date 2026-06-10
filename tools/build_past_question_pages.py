@@ -56,7 +56,7 @@ from tools.html_footer import (
 )
 from tools.past_question_subject import subject_display, subject_from_row
 from tools.seo_editorial_chrome import seo_brand_asset_tags
-from tools.site_config import brand_name, clean_origin, exam_name
+from tools.site_config import brand_name, clean_origin, exam_name, public_url as site_public_url
 
 DATA_CSV = ROOT / "data" / "past_questions.csv"
 Q_ROOT = ROOT / "q"
@@ -393,7 +393,9 @@ def rel_theme_css(rel_file: Path) -> str:
 
 
 def public_url(base: str, rel_path: str) -> str:
-    return f"{base.rstrip('/')}/{rel_path.lstrip('/')}"
+    """siteOrigin + basePath を含む公開 URL（sitemap と整合）。"""
+    del base
+    return site_public_url(rel_path)
 
 
 def rel_href(rel_file: Path, target: str) -> str:
