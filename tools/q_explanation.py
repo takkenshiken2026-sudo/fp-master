@@ -81,6 +81,98 @@ def _snippet(text: str, max_len: int = 36) -> str:
     return t[: max_len - 1] + "…"
 
 
+_FW_DIGIT_TRANS = str.maketrans("０１２３４５６７８９", "0123456789")
+
+
+def _normalize_for_compare(text: str) -> str:
+    return re.sub(r"\s+", "", norm(text))
+
+
+def _parse_kana_slots(text: str) -> dict[str, str]:
+    slots: dict[str, str] = {}
+    for m in re.finditer(r"（([ア-ウ])）\s*([^（]+?)(?=(?:（[ア-ウ]）)|$)", norm(text)):
+        slots[m.group(1)] = norm(m.group(2))
+    return slots
+
+
+def _slot_values_equal(a: str, b: str) -> bool:
+    return _normalize_for_compare(a) == _normalize_for_compare(b)
+
+
+def _combo_diff_note(wrong: str, correct: str, explanation: str) -> str:
+    """（ア）（イ）（ウ）形式の組合せ肢について、ずれている空欄だけを説明する。"""
+    w_slots = _parse_kana_slots(wrong)
+    c_slots = _parse_kana_slots(correct)
+    if len(w_slots) < 2 or len(c_slots) < 2:
+        return ""
+    diffs: list[tuple[str, str, str]] = []
+    for k in ("ア", "イ", "ウ", "エ", "オ"):
+        if k not in w_slots and k not in c_slots:
+            continue
+        wv = w_slots.get(k, "")
+        cv = c_slots.get(k, "")
+        if wv and cv and not _slot_values_equal(wv, cv):
+            diffs.append((k, wv, cv))
+    if not diffs:
+        return ""
+    lines: list[str] = []
+    for k, wv, cv in diffs:
+        line = f"（{k}）が「{wv}」となっていますが、正しくは「{cv}」です"
+        if k == "ア" and "再調達原価" in cv and "原価法" in explanation:
+            line += "（原価法は再調達原価を基に試算します）"
+        elif k == "イ" and "取引事例比較法" in cv and "取引事例" in explanation:
+            line += "（取引事例の比較がこの行の評価手法です）"
+        elif k == "ウ" and "現在価値" in cv and "現在価値" in explanation:
+            line += "（収益還元法では純収益を現在価値に割り引きます）"
+        lines.append(line)
+    return "。".join(lines) + "。"
+
+
+def _extract_digits(text: str) -> str:
+    raw = re.sub(r"[^\d０-９]", "", norm(text)).translate(_FW_DIGIT_TRANS)
+    return raw if raw.isdigit() else ""
+
+
+def _numeric_diff_note(wrong: str, correct: str, explanation: str) -> str:
+    """数値だけが違う選択肢向けの短い解説。"""
+    w, c = _extract_digits(wrong), _extract_digits(correct)
+    if not w or not c or w == c:
+        return ""
+    w_label, c_label = norm(wrong), norm(correct)
+    if re.search(rf"最長\s*{re.escape(c)}年|{re.escape(c)}年間", explanation):
+        return (
+            f"任意継続被保険者の加入期間は最長{c_label}です。"
+            f"「{w_label}」は設問の正答期間と一致しません。"
+        )
+    if re.search(rf"{re.escape(c_label)}", explanation) or re.search(
+        rf"{re.escape(c)}", explanation
+    ):
+        return f"正答は「{c_label}」です。「{w_label}」は解説の数値と異なります。"
+    return f"正答は「{c_label}」です。「{w_label}」との数値の違いを確認してください。"
+
+
+def _text_overlap_diff_note(wrong: str, correct: str, explanation: str) -> str:
+    """長文肢で正答肢との差分キーワードを拾う。"""
+    if len(norm(wrong)) < 20 or len(norm(correct)) < 20:
+        return ""
+    w_set = set(re.findall(r"[\u4e00-\u9fff]{2,}", _normalize_for_compare(wrong)))
+    c_set = set(re.findall(r"[\u4e00-\u9fff]{2,}", _normalize_for_compare(correct)))
+    only_wrong = [t for t in sorted(w_set - c_set) if len(t) >= 2][:3]
+    only_correct = [t for t in sorted(c_set - w_set) if len(t) >= 2][:3]
+    if not only_wrong and not only_correct:
+        return ""
+    parts: list[str] = []
+    if only_wrong:
+        parts.append(f"この肢特有の論点は「{'・'.join(only_wrong)}」です")
+    if only_correct:
+        parts.append(f"正答側では「{'・'.join(only_correct)}」が要点です")
+    if explanation and len(explanation) >= 24:
+        hint = _snippet(explanation, 72)
+        if hint not in "".join(parts):
+            parts.append(hint)
+    return "。".join(parts) + "。"
+
+
 _MIN_CHOICE_NOTE_LEN = 72
 
 
@@ -111,7 +203,7 @@ def infer_wrong_choice_note(
     choice_text: str,
     row: dict,
 ) -> str:
-    """CSV に explanation_choices が無いとき、選択肢文から読み手向けの解説を組み立てる。"""
+    """CSV に explanation_choices が無いとき、正答との差分を中心に短い解説を組み立てる。"""
     stem = norm(page.get("stem_plain") or page.get("stem") or "")
     mode = question_ask_mode(stem)
     opt = norm(choice_text)
@@ -121,120 +213,49 @@ def infer_wrong_choice_note(
     opts = page.get("opts") or []
     if cor_idx is not None and 1 <= cor_idx <= len(opts):
         correct_text = opts[cor_idx - 1]
-    correct_body = norm(row.get("explanation_correct")) or norm(row.get("explanation")) or ""
+    correct_body = strip_choice_answer_prefix(
+        norm(row.get("explanation_correct")) or norm(row.get("explanation")) or ""
+    )
     category = norm(page.get("category") or "")
 
-    parts: list[str] = []
+    if correct_text and opt:
+        for builder in (
+            lambda: _combo_diff_note(opt, correct_text, correct_body),
+            lambda: _numeric_diff_note(opt, correct_text, correct_body),
+            lambda: _text_overlap_diff_note(opt, correct_text, correct_body),
+        ):
+            note = builder()
+            if note:
+                return note
 
     if mode == "least_appropriate" and _choice_sounds_positive(opt):
-        parts.append(
-            f"「{opt}」は、単体では適切な学習法・正しい対応に当たります。"
-            "したがって「最も適切でないもの」として選ぶ正答にはなりません。"
-        )
+        parts = [
+            "単体では適切な学習法・対応に当たるため、"
+            "「最も適切でないもの」の正答にはなりません。",
+        ]
         if correct and correct_text:
             parts.append(
-                f"（{correct}）「{_snippet(correct_text, 56)}」は、"
-                "学習効果を著しく損ねる・明らかに誤った方針であり、"
-                "他の肢より「最も不適切」と言えます。"
+                f"本問の正答（{correct}）は「{_snippet(correct_text, 48)}」で、"
+                "他の肢より明らかに不適切です。"
             )
-        parts.append(
-            "よくある誤解は、「正しい学習法か」で各肢を判断してしまい、"
-            "（4）のような明らかに有害な記述を見落とすことです。"
-            "設問文の「最も適切でない」を先に線引きし、四肢を比較して選んでください。"
-        )
-    elif mode == "least_appropriate":
-        parts.append(
-            f"「{opt}」は、一見もっともらしく見える場合がありますが、"
-            f"正答（{correct}）「{_snippet(correct_text, 56)}」と比べると、"
-            "学習・制度・実務の観点で「最も問題がある」記述ではありません。"
-        )
-        parts.append(
-            "「最も適切でない」形式では、正しそうな肢が複数あることがあります。"
-            "各肢の主語・客体・数字・期限・手続の順序が設問条件と合うかを確認し、"
-            "最も不適切な一つだけを選びます。"
-        )
-    elif mode == "most_correct":
-        parts.append(
-            f"この肢は「{opt}」と述べていますが、"
-            f"{category or '本分野'}の基準では正しい記述ではありません。"
-        )
-        if correct and correct_text:
-            parts.append(
-                f"正答（{correct}）「{_snippet(correct_text, 56)}」は、"
-                "制度・手続・学習法のいずれかの観点で適切な内容です。"
-            )
-    else:
-        parts.append(
-            f"「{_snippet(opt, 48)}」は、制度・数値・手続の観点で"
-            f"{category or '本分野'}の正答肢としては成立しません。"
+        return " ".join(parts)
+
+    if mode == "least_appropriate":
+        return (
+            "一見もっともらしい記述ですが、本問で「最も適切でない」とされるのは"
+            f"正答（{correct}）です。四肢を比較して選び直してください。"
         )
 
-    rules: list[tuple[str, str]] = [
-        (
-            r"口コミ|SNS|ブログ|噂",
-            "受験制度・出題範囲・合格基準の正誤は、実施団体の公式発表が基準です。"
-            "口コミは参考程度にとどめ、日程・範囲・申込方法は必ず公式サイトや受験案内で確認してください。",
-        ),
-        (
-            r"毎年|常に|固定|変わらない|前年と同じ",
-            "試験日程・出題範囲・申込方法は改定されることがあります。"
-            "「一度確認すれば十分」と決めつけると、変更の見落としや学習範囲のズレにつながります。",
-        ),
-        (
-            r"生成済み|直接編集|手編集|JSだけ",
-            "公開用データは CSV とビルドスクリプトを正本にすると、再生成・検証・本番同期が一貫します。"
-            "生成物だけを手修正すると、次回ビルドで上書きされたり、テンプレと本番の差分が残りやすくなります。",
-        ),
-        (
-            r"列名は自由|列名.*変え",
-            "CSV 列名はツールの検証・変換と対応しています。"
-            "任意の列名に変えると、ビルドやリンク検証が失敗し、静的ページとアプリ用データの整合が崩れます。",
-        ),
-        (
-            r"ドメイン.*不要|設定は不要",
-            "canonical・サイトマップ・OGP には正しいドメイン（siteOrigin）が必要です。"
-            "プレースホルダーのままでは検索エンジンと SNS プレビューで URL が誤って扱われます。",
-        ),
-        (
-            r"削除される|送信される|連携できない",
-            "本テンプレートでは、学習履歴はブラウザ内保存を基本とし、復習・ブックマーク・用語解説へつなげる設計です。"
-            "この肢の断定は、実際の仕様（ローカル保存・関連ページ）と一致しません。",
-        ),
-        (
-            r"図表|比較.*役立たない",
-            "関連制度の違いや数値・期限は、表や比較で整理すると混同が減ります。"
-            "特に設備・税務・手続き分野では、一覧表を自作して見直すと得点しやすくなります。",
-        ),
-        (
-            r"記録しない|参照しない",
-            "苦手分野や混同しやすい用語を記録しておくと、復習の優先順位がつけられます。"
-            "用語の定義を飛ばすと、設問の前提（誰が・何を・どこまで）を取り違えやすくなります。",
-        ),
-        (
-            r"二度と見直さない|見直さない",
-            "誤答した問題を放置すると、同じパターンのミスが本番まで残ります。"
-            "復習リストや間隔を空けた解き直しで、弱点を可視化することが重要です。",
-        ),
-    ]
-    for pattern, msg in rules:
-        if re.search(pattern, opt):
-            if not any(re.search(pattern, p) for p in parts):
-                parts.append(msg)
-            break
-
-    if mode == "most_correct" and correct_text and len(parts) < 3:
-        parts.append(
-            f"正答の論点と照らすと、この肢は"
-            f"「{_snippet(opt, 40)}」という断定のどこかが設問の前提と矛盾します。"
-            "主語・客体・数字・期限・「毎年／常に／不要」などの限定語をチェックしてください。"
+    if mode == "most_correct":
+        return (
+            f"{category or '本分野'}の論点では正答（{correct}）と内容が一致しません。"
+            "正解の理由と表・数値の対応を照らしてください。"
         )
 
-    if len(parts) < 2:
-        parts.append(
-            "用語解説で関連制度を確認し、同分野の過去問・実践演習で解き直すと定着しやすくなります。"
-        )
-
-    return "\n\n".join(parts)
+    return (
+        f"正答（{correct}）とは異なる内容です。"
+        f"{category or '本分野'}の要点を正解の理由と照らして確認してください。"
+    )
 
 
 def resolve_wrong_choice_note(
@@ -416,6 +437,14 @@ _WRONG_CHOICE_KEY_POINT_RE = re.compile(r"^正解の要点:\s*")
 _WRONG_CHOICE_FOOTER_RE = re.compile(
     r"\s*この観点と両立しない部分がこの肢にないか、用語解説で定義を確認しながら見直してください。[。\s]*$"
 )
+_FP_WRONG_NOTE_BOILER_RE = re.compile(
+    r"この肢は「[^」]*」と述べていますが、[^。]+。?"
+    r"|正答（\d+）「[^」]*」は、制度・手続・学習法[^。]+。?"
+    r"|正答の論点と照らすと、この肢は[^。]+。?"
+    r"|主語・客体・数字・期限[^。]+。?"
+    r"|制度・数値・手続の観点で[^。]+正答肢としては成立しません[^。]*。?"
+    r"|用語解説で関連制度を確認し、同分野の過去問・実践演習で解き直すと定着しやすくなります[。.]?"
+)
 
 
 def polish_wrong_choice_note(note: str, *, choice_text: str, category: str) -> str:
@@ -427,12 +456,104 @@ def polish_wrong_choice_note(note: str, *, choice_text: str, category: str) -> s
     n = _WRONG_CHOICE_KEY_POINT_RE.sub("", n)
     n = strip_choice_answer_prefix(n)
     n = _WRONG_CHOICE_FOOTER_RE.sub("", n)
+    n = _FP_WRONG_NOTE_BOILER_RE.sub("", n)
     n = re.sub(r"\s{2,}", " ", n).strip()
     if not n:
         opt = norm(choice_text)
         cat = category or "本分野"
-        return f"「{_snippet(opt, 48)}」は、{cat}の観点で本問の正答肢ではありません。"
+        return f"{cat}の論点では本問の正答肢ではありません（「{_snippet(opt, 32)}」）。"
     return n
+
+
+def _wrong_note_dedupe_key(note: str) -> str:
+    n = re.sub(r"「[^」]{20,}」", "「…」", norm(note))
+    n = re.sub(r"（\d+）", "", n)
+    return _normalize_for_compare(n)
+
+
+def _is_generic_wrong_note(note: str) -> bool:
+    n = norm(note)
+    if not n or len(n) < 40:
+        return True
+    generic_markers = (
+        r"この肢は「",
+        r"正しい記述ではありません",
+        r"制度・手続・学習法のいずれか",
+        r"正答の論点と照らすと",
+        r"正答肢としては成立しません",
+        r"制度・数値・手続の観点で",
+        r"用語解説で関連制度を確認し",
+        r"論点では正答（\d+）と内容が一致しません",
+        r"正解の理由と表・数値の対応を照らしてください",
+    )
+    return any(re.search(p, n) for p in generic_markers)
+
+
+def _consolidated_wrong_choices_note(
+    page: dict,
+    row: dict,
+    wrong_nums: list[int],
+    wrong_opts: list[str] | None = None,
+) -> str:
+    correct = page.get("correct")
+    label = "、".join(str(n) for n in wrong_nums)
+    correct_body = strip_choice_answer_prefix(
+        norm(row.get("explanation_correct")) or norm(row.get("explanation")) or ""
+    )
+    cor_idx = _correct_choice_index(correct)
+    opts = page.get("opts") or []
+    correct_text = opts[cor_idx - 1] if cor_idx and 1 <= cor_idx <= len(opts) else ""
+    if wrong_opts and correct_text and all(_extract_digits(o) for o in wrong_opts):
+        wrong_labels = "・".join(f"「{norm(o)}」" for o in wrong_opts)
+        numeric = _numeric_diff_note(wrong_opts[0], correct_text, correct_body)
+        if numeric:
+            return numeric.replace(
+                f"「{norm(wrong_opts[0])}」",
+                wrong_labels,
+                1,
+            )
+    hint = _snippet(correct_body, 80)
+    if hint:
+        return f"（{label}）はいずれも正答（{correct}）とは異なります。{hint}"
+    return (
+        f"（{label}）はいずれも正答（{correct}）とは異なります。"
+        "正解の理由と各肢の差分を照らして確認してください。"
+    )
+
+
+def collapse_wrong_choice_items(
+    page: dict, row: dict, items: list[tuple[int, str, str]]
+) -> list[tuple[str, str, str]]:
+    """同一の汎用解説をまとめ、テンプレの連打を防ぐ。"""
+    if not items:
+        return []
+    groups: list[dict] = []
+    index: dict[str, int] = {}
+    for num, opt, note in items:
+        key = _wrong_note_dedupe_key(note)
+        if key not in index:
+            index[key] = len(groups)
+            groups.append({"nums": [num], "opts": [opt], "note": note})
+        else:
+            g = groups[index[key]]
+            g["nums"].append(num)
+            g["opts"].append(opt)
+    collapsed: list[tuple[str, str, str]] = []
+    for group in groups:
+        nums = sorted(group["nums"])
+        label = "、".join(str(n) for n in nums)
+        note = group["note"]
+        if len(nums) > 1 and _is_generic_wrong_note(note):
+            note = _consolidated_wrong_choices_note(
+                page, row, nums, wrong_opts=group["opts"]
+            )
+            opt_head = ""
+        elif len(nums) == 1:
+            opt_head = group["opts"][0]
+        else:
+            opt_head = "／".join(_snippet(o, 28) for o in group["opts"])
+        collapsed.append((label, note, opt_head))
+    return collapsed
 
 
 def build_choice_commentary(page: dict, row: dict) -> list[tuple[int, str, str]]:
@@ -494,15 +615,22 @@ def build_explanation_html(page: dict, row: dict) -> str:
             )
         parts.append("</section>")
 
-        wrong_items = build_choice_commentary(page, row)
+        wrong_items = collapse_wrong_choice_items(
+            page, row, build_choice_commentary(page, row)
+        )
         if wrong_items:
             lis = "".join(
                 f'<li class="q-exp-choice-item">'
                 f'<p class="q-exp-choice-head">'
-                f'<span class="q-exp-choice-num">（{n}）</span> '
-                f'<span class="q-exp-choice-text">{html.escape(opt)}</span></p>'
+                f'<span class="q-exp-choice-num">（{nums}）</span>'
+                + (
+                    f' <span class="q-exp-choice-text">{html.escape(opt_head)}</span>'
+                    if opt_head
+                    else ""
+                )
+                + "</p>"
                 f'<p class="q-exp-choice-note">{text_to_html(note)}</p></li>'
-                for n, opt, note in wrong_items
+                for nums, note, opt_head in wrong_items
             )
             parts.append(
                 '<section class="q-exp-section" aria-labelledby="q-exp-wrong-h">'
