@@ -17,7 +17,7 @@ from tools.seo_utils import (  # noqa: E402
     is_noindex_html,
     is_sitemap_excluded_rel,
 )
-from tools.site_config import base_path, clean_origin  # noqa: E402
+from tools.site_config import clean_origin  # noqa: E402
 from tools.sitemap_utils import SitemapEntry, iso_date, iso_from_mtime, write_sitemap  # noqa: E402
 
 GUIDE_CSV = ROOT / "data" / "guide_articles.csv"
@@ -196,30 +196,11 @@ def collect_entries(base: str) -> list[SitemapEntry]:
 def main() -> int:
     import argparse
 
-    from tools.sitemap_utils import SitemapEntry
-
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", default=clean_origin())
     args = ap.parse_args()
-    origin = args.base_url.rstrip("/")
-    bp = base_path()
-    fp3_base = f"{origin}{bp}" if bp else origin
-    entries = collect_entries(fp3_base)
-
-    portal = ROOT / "grade-portal.html"
-    if portal.is_file():
-        portal_mod = iso_from_mtime(portal)
-        entries.insert(
-            0,
-            SitemapEntry(loc=f"{origin}/", lastmod=portal_mod),
-        )
-
-    fp2_index = ROOT / "fp2" / "index.html"
-    if fp2_index.is_file():
-        entries.append(
-            SitemapEntry(loc=f"{origin}/fp2/", lastmod=iso_from_mtime(fp2_index))
-        )
-
+    base = args.base_url.rstrip("/")
+    entries = collect_entries(base)
     out = ROOT / "sitemap.xml"
     write_sitemap(entries, out)
     with_lastmod = sum(1 for e in entries if e.lastmod)

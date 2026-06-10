@@ -35,14 +35,13 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.q_explanation import build_explanation_html
+from tools.q_content_quality import is_demo_past_question_row
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog
-from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items
 from tools.html_footer import (
     ROBOTS_INDEX_FOLLOW,
     breadcrumb_html,
     q_hub_links_html,
     q_index_filters_details_html,
-    q_index_subject_row_html,
     q_index_stats_line,
     q_index_tools_close_html,
     q_index_tools_open_html,
@@ -54,9 +53,14 @@ from tools.html_footer import (
     static_footer_block,
     static_site_header,
 )
-from tools.past_question_subject import subject_display, subject_from_row
 from tools.seo_editorial_chrome import seo_brand_asset_tags
-from tools.site_config import brand_name, clean_origin, exam_name, public_url as site_public_url
+from tools.site_config import (
+    brand_name,
+    clean_origin,
+    exam_name,
+    excluded_past_exam_years,
+    public_url as site_public_url,
+)
 
 DATA_CSV = ROOT / "data" / "past_questions.csv"
 Q_ROOT = ROOT / "q"
@@ -91,64 +95,17 @@ def parse_correct(raw: str, *, max_choice: int = 5) -> int | str | None:
     return cor
 
 
-def build_materials_html(row: dict) -> str:
-    from tools.fp_table_parser import preamble_is_materials
-
-    diagram_id = norm(row.get("diagram_id"))
-    if diagram_id:
-        from tools.question_diagram import diagram_body_html
-
-        rendered = diagram_body_html(diagram_id)
-        if rendered:
-            return rendered
-    preamble = norm(row.get("preamble"))
-    if not preamble or not preamble_is_materials(preamble):
-        return ""
-    br = "<br>\n"
-    return f'<div class="q-materials"><p>{html.escape(preamble).replace(chr(10), br)}</p></div>'
-
-
-def resolve_stem_text(row: dict) -> str:
-    from tools.fp_table_parser import (
-        format_stem_display_text,
-        split_question_and_materials,
-        strip_embedded_materials_from_stem,
-    )
-
-    stem = norm(row.get("stem"))
-    if not stem:
-        return ""
-    diagram_id = norm(row.get("diagram_id"))
-    if diagram_id:
-        stem = strip_embedded_materials_from_stem(stem)
-        preamble = norm(row.get("preamble"))
-        if preamble:
-            raw = stem
-            if "どれか" not in raw:
-                raw = raw + preamble
-            stem_only, _ = split_question_and_materials(raw)
-            stem = stem_only or stem
-    return format_stem_display_text(stem)
-
-
 def build_stem_html(row: dict) -> str:
-    from tools.fp_table_parser import (
-        format_stem_display_text,
-        preamble_is_materials,
-        stem_display_to_html,
-    )
+    from tools.q_stem_format import format_past_stem_html
 
     parts: list[str] = []
-    stem = resolve_stem_text(row)
+    stem = norm(row.get("stem"))
     preamble = norm(row.get("preamble"))
-    diagram_id = norm(row.get("diagram_id"))
     br = "<br>\n"
     if stem:
-        parts.append(stem_display_to_html(stem))
-    if preamble and not diagram_id and not preamble_is_materials(preamble):
-        parts.append(
-            f"<p>{html.escape(format_stem_display_text(preamble)).replace(chr(10), br)}</p>"
-        )
+        parts.append(format_past_stem_html(stem))
+    if preamble:
+        parts.append(f"<p>{html.escape(preamble).replace(chr(10), br)}</p>")
     stmts: list[tuple[str, str]] = []
     for lab, key in LABELS:
         t = norm(row.get(key))
@@ -179,6 +136,12 @@ def stem_preview(text: str, limit: int = 52) -> str:
     return one[: limit - 1] + "…"
 
 
+def past_year_label(page: dict) -> str:
+    from tools.q_page_seo import past_year_display
+
+    return past_year_display(page["year"], page.get("wareki", ""))
+
+
 def page_heading(page: dict) -> str:
     from tools.q_page_seo import question_h1
 
@@ -187,11 +150,12 @@ def page_heading(page: dict) -> str:
         year=page["year"],
         qno=page["qno"],
         category=page["category"],
+        year_label=past_year_label(page),
     )
 
 
 def page_context_line(page: dict) -> str:
-    return f"{page['year']}年 · {page['category']}"
+    return f"{past_year_label(page)} · {page['category']}"
 
 
 def page_title_seo(page: dict) -> str:
@@ -202,6 +166,7 @@ def page_title_seo(page: dict) -> str:
         year=page["year"],
         qno=page["qno"],
         category=page["category"],
+        year_label=past_year_label(page),
     )
 
 
@@ -211,10 +176,14 @@ def page_meta_description(page: dict) -> str:
     return question_meta_description(
         "past",
         headline=question_meta_headline(
-            "past", year=page["year"], qno=page["qno"]
+            "past",
+            year=page["year"],
+            qno=page["qno"],
+            year_label=past_year_label(page),
         ),
         category=page["category"],
         body=norm(page.get("stem_plain")),
+        answer_tail=str(page["correct"]) if page.get("correct") is not None else "",
     )
 
 
@@ -318,15 +287,11 @@ def index_item_dict(page: dict) -> dict:
         preview,
         *tags,
     ]
-    subject = page.get("subject") or ""
-    if subject:
-        search_bits.append(subject_display(subject))
     return {
         "appId": page["app_id"],
         "year": page["year"],
         "qno": page["qno"],
         "category": page["category"],
-        "subject": subject,
         "wareki": page.get("wareki", ""),
         "href": page["href_rel"],
         "preview": preview,
@@ -359,8 +324,7 @@ def build_index_table_row(page: dict) -> str:
         '<tr class="q-year-table-row" tabindex="0"'
         f' data-app-id="{page["app_id"]}"'
         f' data-href="{html.escape(page["href_rel"], quote=True)}"'
-        f' data-category="{html.escape(page["category"], quote=True)}"'
-        f' data-subject="{html.escape(page.get("subject") or "", quote=True)}">'
+        f' data-category="{html.escape(page["category"], quote=True)}">'
         f'<td class="q-year-table-no" data-label="問"><a href="{href}">{html.escape(label)}</a></td>'
         f'<td class="q-year-table-cat" data-label="分野">{html.escape(page["category"])}</td>'
         f'<td class="q-year-table-desc" data-label="問題文">{preview_cell}</td>'
@@ -393,7 +357,6 @@ def rel_theme_css(rel_file: Path) -> str:
 
 
 def public_url(base: str, rel_path: str) -> str:
-    """siteOrigin + basePath を含む公開 URL（sitemap と整合）。"""
     del base
     return site_public_url(rel_path)
 
@@ -417,21 +380,23 @@ def normalize_glossary_href(href: str) -> str:
 
 
 GUIDE_LINK_FALLBACK_SLUGS = (
-    "tools-free-past-question-sites",
-    "tools-ichimon-vs-past",
-    "faq-study-hours",
-    "attr-zero-knowledge-start",
+    "past-question-strategy",
+    "study-plan",
+    "exam-overview",
+    "glossary-how-to",
 )
 
 
 def load_guide_articles() -> list[dict[str, str]]:
-    from tools.build_glossary_pages import load_linkable_guides
+    from tools.build_glossary_pages import load_guide_slugs
 
-    return load_linkable_guides()
+    return load_guide_slugs()
 
 
 def guide_links_for_page(category: str, guides: list[dict[str, str]], *, limit: int = 2) -> list[tuple[str, str]]:
     """(href_rel_from_site_root, label) — rel_href で結合する。"""
+    from tools.internal_links import resolve_published_guide_slug
+
     if not guides:
         return []
     picked: list[tuple[str, str]] = []
@@ -450,12 +415,14 @@ def guide_links_for_page(category: str, guides: list[dict[str, str]], *, limit: 
     for slug in GUIDE_LINK_FALLBACK_SLUGS:
         if len(picked) >= limit:
             break
-        g = by_slug.get(slug)
-        if g and slug not in seen:
-            seen.add(slug)
-            picked.append((f"articles/{slug}/index.html", g["title"]))
-    if not picked:
-        picked.append(("articles/index.html", "試験ガイド一覧"))
+        resolved = resolve_published_guide_slug(slug, by_slug)
+        if not resolved or resolved in seen:
+            continue
+        g = by_slug.get(resolved)
+        if not g:
+            continue
+        seen.add(resolved)
+        picked.append((f"articles/{resolved}/index.html", g["title"]))
     return picked
 
 
@@ -617,8 +584,8 @@ def split_semicolon(s: str) -> list[str]:
 
 
 def load_rows() -> list[dict]:
-    with DATA_CSV.open(encoding="utf-8-sig", newline="") as f:
-        return list(csv.DictReader(f))
+    text = DATA_CSV.read_text(encoding="utf-8-sig")
+    return list(csv.DictReader(text.splitlines()))
 
 
 def page_dict(row: dict, line_no: int) -> dict:
@@ -648,7 +615,7 @@ def page_dict(row: dict, line_no: int) -> dict:
     wareki = norm(row.get("exam_wareki"))
     cat = norm(row.get("category"))
     typ = norm(row.get("type")) or "single"
-    stem_plain = resolve_stem_text(row)
+    stem_plain = norm(row.get("stem"))
     exp = norm(row.get("explanation")) or "（解説は未入力です。）"
     return {
         "year": year,
@@ -657,7 +624,6 @@ def page_dict(row: dict, line_no: int) -> dict:
         "category": cat,
         "type": typ,
         "stem_html": build_stem_html(row),
-        "materials_html": build_materials_html(row),
         "stem_plain": stem_plain,
         "opts": opts,
         "correct": cor,
@@ -668,7 +634,6 @@ def page_dict(row: dict, line_no: int) -> dict:
         "id": f"past-{year}-{qno:02d}",
         "app_id": year * 100 + qno,
         "tags": parse_tags(norm(row.get("tags"))),
-        "subject": subject_from_row(row, qno=qno),
         "rel_path": f"q/past/y{year}/q{qno:02d}/index.html",
     }
 
@@ -688,6 +653,9 @@ def build_question_html(
     title = page_title_seo(page)
     desc = page_meta_description(page)
     context_line = page_context_line(page)
+    lead = norm(page.get("stem_plain"))
+    # 問題セクション（q-stem）と同一のため q-page-lead は出さない
+    lead_html = ""
     canonical = public_url(base_url, page["rel_path"])
     root_idx = rel_to_root(rel_path)
     css_href = rel_css(rel_path)
@@ -740,10 +708,11 @@ def build_question_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": crumb_json_ld(
-                    static_crumb_items(("過去問一覧", "q/index.html"), (heading, None)),
-                    last_item_url=canonical,
-                ),
+                "itemListElement": [
+                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
+                    {"@type": "ListItem", "position": 2, "name": "過去問一覧", "item": public_url(base_url, "q/index.html")},
+                    {"@type": "ListItem", "position": 3, "name": heading, "item": canonical},
+                ],
             },
         ],
     }
@@ -754,7 +723,7 @@ def build_question_html(
     )
     site_breadcrumb = breadcrumb_html(
         rel_path,
-        static_crumb_items(("過去問一覧", "q/index.html"), (heading, None)),
+        [("トップ", "index.html"), ("過去問一覧", "q/index.html"), (heading, None)],
     )
     site_footer = site_page_footer(rel_path, current="q")
     from tools.q_page_seo import study_modes_note_html
@@ -792,10 +761,10 @@ def build_question_html(
   <p class="q-meta-line">{html.escape(context_line)}</p>
   {badge_html}
   <h1 class="q-h1">{html.escape(heading)}</h1>
+  {lead_html}
   <section class="q-block" aria-labelledby="q-stem-h">
     <h2 id="q-stem-h" class="q-h2">問題</h2>
     <div class="q-stem">{page["stem_html"]}</div>
-    {page.get("materials_html") or ""}
   </section>
   <section class="q-block" aria-labelledby="q-opts-h">
     <h2 id="q-opts-h" class="q-h2">選択肢</h2>
@@ -842,50 +811,23 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
     sorted_years = sorted(by_year.keys(), reverse=True)
     open_years = set(sorted_years[:2])
 
-    subject_order = (("gakka", "学科"), ("jitsugi", "実技"))
-    gakka_count = sum(1 for pg in index_pages if pg.get("subject") == "gakka")
-    jitsugi_count = sum(1 for pg in index_pages if pg.get("subject") == "jitsugi")
-
-    def subject_sections(year: int, year_pages: list[dict]) -> str:
-        by_subject: dict[str, list[dict]] = {}
-        for pg in year_pages:
-            by_subject.setdefault(pg.get("subject") or "gakka", []).append(pg)
-        parts: list[str] = []
-        for sid, label in subject_order:
-            subset = by_subject.get(sid, [])
-            if not subset:
-                continue
-            rows_html = "".join(build_index_table_row(pg) for pg in subset)
-            tags = subset[0].get("tags") or []
-            sub_note = "（三答択）" if sid == "gakka" and "三答択" in tags else ""
-            subheading = f"{label}{sub_note}"
-            parts.append(
-                f'<section class="q-index-subject-block" id="year-{year}-{sid}" data-subject="{sid}">'
-                f'<h3 class="q-index-subject-heading">{html.escape(subheading)}</h3>'
-                f'<div class="q-year-table-wrap">'
-                f'<table class="q-year-table" aria-label="{html.escape(subheading)}">'
-                "<thead><tr>"
-                '<th scope="col">問</th><th scope="col">分野</th>'
-                '<th scope="col">問題文（抜粋）</th>'
-                "</tr></thead>"
-                f"<tbody>{rows_html}</tbody>"
-                "</table></div></section>"
-            )
-        return "".join(parts)
-
     year_blocks = []
     year_jump_links = []
     for y in sorted_years:
-        year_pages = by_year[y]
-        sample = year_pages[0]
+        rows_html = "".join(build_index_table_row(pg) for pg in by_year[y])
+        sample = by_year[y][0]
         year_label = norm(sample.get("year_label") or "")
-        heading = year_label or (f"{y}年" if y <= 9999 else sample["wareki"])
+        heading = year_label or (
+            sample["wareki"]
+            if y > 9999
+            else f"{y}年（{sample['wareki']}）"
+        )
         jump_label = year_label or (f"{y}年" if y <= 9999 else sample["wareki"])
         expanded = "true" if y in open_years else "false"
         collapsed = "" if y in open_years else " is-collapsed"
         year_jump_links.append(
             f'<a class="q-index-filter-opt q-index-year-link" href="#year-{y}" data-year="{y}">'
-            f'{html.escape(jump_label)}<span class="q-index-filter-count">（{len(year_pages)}）</span></a>'
+            f'{html.escape(jump_label)}<span class="q-index-filter-count">（{len(by_year[y])}）</span></a>'
         )
         year_blocks.append(
             f'<section class="q-index-year-block{collapsed}" id="year-{y}">'
@@ -895,11 +837,16 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
             f'aria-controls="year-body-{y}"><span class="q-index-year-chevron" aria-hidden="true"></span></button>'
             f'<h2 id="year-{y}-heading">{html.escape(heading)}</h2>'
             f"</div>"
-            f'<span class="q-index-year-count" data-total="{len(year_pages)}">{len(year_pages)}問</span>'
+            f'<span class="q-index-year-count" data-total="{len(by_year[y])}">{len(by_year[y])}問</span>'
             f"</div>"
-            f'<div class="q-index-year-body" id="year-body-{y}">'
-            f"{subject_sections(y, year_pages)}"
-            f"</div></section>"
+            f'<div class="q-year-table-wrap" id="year-body-{y}">'
+            f'<table class="q-year-table" aria-labelledby="year-{y}-heading">'
+            "<thead><tr>"
+            '<th scope="col">問</th><th scope="col">分野</th>'
+            '<th scope="col">問題文（抜粋）</th>'
+            "</tr></thead>"
+            f"<tbody>{rows_html}</tbody>"
+            "</table></div></section>"
         )
     year_blocks_html = (
         "".join(year_blocks).replace("<motion ", "<div ").replace("</motion>", "</div>")
@@ -934,7 +881,7 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
         rel_path,
         current="q",
     )
-    q_index_breadcrumb = breadcrumb_html(rel_path, static_crumb_items(("過去問一覧", None)))
+    q_index_breadcrumb = breadcrumb_html(rel_path, [("トップ", "index.html"), ("過去問一覧", None)])
     q_index_footer = site_page_footer(rel_path, current="q")
 
     from tools.q_page_seo import (
@@ -991,18 +938,16 @@ def build_q_index(pages: list[dict], base_url: str) -> str:
         search_placeholder=search_placeholder,
         hit_text=f"{len(pages)} / {len(pages)} 問",
     )}
-      {q_index_subject_row_html(gakka_count=gakka_count, jitsugi_count=jitsugi_count)}
       {q_index_filters_details_html(
           year_row_label="年度",
           year_jump_html=year_jump_html,
           category_chips_html=category_chips_html,
           status_chips_html=status_chips_html,
-          filters_hint="年度・分野・学習状況",
       )}
     {q_index_tools_close_html()}
     <div class="q-index-empty-panel hide" id="q-index-empty" role="status">
       <p class="q-index-empty-title">条件に一致する過去問がありません</p>
-      <p class="q-index-empty-hint">検索語を短くするか、科目・分野・学習状況を「すべて」に戻してお試しください。</p>
+      <p class="q-index-empty-hint">検索語を短くするか、分野・学習状況を「すべて」に戻してお試しください。</p>
       <button type="button" class="q-index-reset" id="q-index-empty-reset">条件をクリア</button>
     </div>
     <div class="q-index-layout">
@@ -1045,7 +990,16 @@ def main() -> int:
     base = args.base_url.rstrip("/")
 
     rows = load_rows()
-    pages = [page_dict(r, i) for i, r in enumerate(rows, start=2)]
+    skip_years = excluded_past_exam_years()
+    valid_rows: list[tuple[int, dict]] = []
+    for i, row in enumerate(rows, start=2):
+        if norm(row.get("is_invalidated", "")).upper() == "TRUE":
+            continue
+        if is_demo_past_question_row(row, excluded_exam_years=skip_years):
+            continue
+        valid_rows.append((i, row))
+    pages = [page_dict(r, i) for i, r in valid_rows]
+    rows = [r for _, r in valid_rows]
     glossary_lookup = load_glossary_lookup()
     guides = load_guide_articles()
     question_catalog = load_question_catalog(ROOT)

@@ -316,19 +316,58 @@ def assign_sentences(exp: str, texts: dict[int, str]) -> dict[int, list[str]]:
 
 
 def assign_letter_combo(exp: str, texts: dict[int, str]) -> dict[int, list[str]]:
-    """選択肢が A,B 形式のとき、解説中の A（…）・B（…）を各肢へ割り当てる。"""
+    """選択肢が A,B / ア,イ 形式のとき、解説中の A（…）・ア（…）を各肢へ割り当てる。"""
     buckets: dict[int, list[str]] = {i: [] for i in texts}
     for sent in split_sentences(exp):
-        letters_in_sent = re.findall(r"[A-E][（(]", sent)
+        letters_in_sent = re.findall(r"[A-Eア-オ][（(]", sent)
         if not letters_in_sent:
             continue
         letters = {ch[0] for ch in letters_in_sent}
         for n, txt in texts.items():
-            tokens = re.split(r"[,，、\s]+", txt)
-            if letters & set(tokens):
+            tokens = re.split(r"[,，、\sと]+", txt)
+            kana_in_opt = set(re.findall(r"[ア-オ]", txt))
+            if letters & set(tokens) or letters & kana_in_opt:
                 if sent not in buckets[n]:
                     buckets[n].append(sent)
     return buckets
+
+
+def extract_kana_letter_clauses(exp: str) -> dict[str, str]:
+    """ア（効力なし）… のようにカナラベル付き解説を抽出。"""
+    out: dict[str, str] = {}
+    for m in re.finditer(
+        r"([ア-オ])（([^）]{1,32})）\s*([^。]+。?)",
+        norm(exp),
+    ):
+        letter = m.group(1)
+        if letter not in out:
+            out[letter] = f"{m.group(2)}　{m.group(3).strip()}"
+    return out
+
+
+def kana_combo_choice_note(
+    n: int, opt: str, exp: str, correct: int, correct_opt: str
+) -> str:
+    """区分所有法など「アとイ」型の組合せ肢向け解説。"""
+    letters = re.findall(r"[ア-オ]", opt)
+    if len(letters) < 2:
+        return ""
+    clauses = extract_kana_letter_clauses(exp)
+    if not clauses:
+        return ""
+    bits = [f"{L}：{clauses[L][:110]}" for L in letters if L in clauses]
+    summary = ""
+    if "これらを踏まえると" in exp:
+        summary = exp.split("これらを踏まえると", 1)[1].strip()[:140]
+    body = " ".join(bits)
+    note = (
+        f"（{n}）「{opt}」は正答（{correct}）「{correct_opt}」と異なる組合せです。"
+    )
+    if body:
+        note += f" {body}"
+    if summary:
+        note += f" {summary}"
+    return note.strip()
 
 
 def is_true_only_marker(note: str) -> bool:
@@ -366,6 +405,11 @@ def finalize_wrong_note(
     stem: str,
 ) -> str:
     note = norm(note)
+    if len(note) >= MIN_WRONG_NOTE_LEN and re.search(
+        r"効力|組合せ|区分所有|解説では|⇒|→|第\d+条",
+        note,
+    ):
+        return note
     opt_short = opt[:80] + ("…" if len(opt) > 80 else "")
     correct_short = correct_opt[:80] + ("…" if len(correct_opt) > 80 else "")
 
@@ -489,12 +533,27 @@ def infer_contrast_note(
                     "「発生しない」と断定していますが、解説では過失相殺等を踏まえ賠償がゼロとは限らない趣旨です。"
                 )
 
-    if re.search(r"心療内科", opt) and "精神科" in exp and "心身症" in exp:
+    if re.search(r"うつ病", opt) and re.search(r"身体疾患|内科を受診", opt):
+        reasons.append(
+            "うつ病は精神疾患であり、心身症の側面もあるため心療内科・精神科で診られることがあります。"
+            "身体疾患だけで内科受診に限定する整理は本問の趣旨と異なります。"
+        )
+    elif re.search(r"入院治療のみ|外来診療は心療内科", opt):
+        reasons.append(
+            "精神科も外来診療を行い、入院のみを担当するわけではありません。"
+        )
+    elif re.search(r"まったく異なる|治療が受けられない", opt):
+        reasons.append(
+            "両科の対象は重なりがあり完全に別ではありません。解説どおり境界は曖昧です。"
+        )
+    elif re.search(r"心療内科", opt) and "精神科" in exp and "心身症" in exp:
         reasons.append(
             "心療内科と精神科の診療範囲の区別が解説と異なります。精神科は精神疾患全般、"
             "心療内科は心身症が中心という整理が本問のポイントです。"
         )
-    if re.search(r"精神科", opt) and "心療内科" in exp and "心身症" in exp and "すべて" in opt:
+    elif re.search(r"精神科", opt) and "心療内科" in exp and "心身症" in exp and re.search(
+        r"すべて|のみ|だけ", opt
+    ):
         reasons.append("診療科の対象範囲の言い過ぎ・取り違えがある可能性があります。")
 
     for sent in split_sentences(exp):
@@ -508,7 +567,9 @@ def infer_contrast_note(
             for tok in ("ない", "しない", "のみ", "誤", "対象外", "不要", "含まれない")
         ) and any(tok in sent for tok in ("及ぶ", "ある", "必要", "実施", "有効", "適切")):
             if len(sent) <= 100:
-                reasons.append(f"解説では「{sent}」とある一方、（{n}）の記述はそれと矛盾します。")
+                reasons.append(
+                    "正答の解説と、主体・手続・効果のいずれかが一致していません。"
+                )
                 break
 
     if not reasons:
@@ -517,9 +578,33 @@ def infer_contrast_note(
         )
 
     lead = " ".join(reasons[:2])
-    return (
-        f"{lead} 解説の要点：{exp[:140]}{'…' if len(exp) > 140 else ''} "
-        f"正答（{correct}）との違いを確認し直してください。"
+    return lead.strip()
+
+
+def make_explanation_summary(correct_body: str, exp: str, correct: int) -> str:
+    """リード文は1文・短く。正解理由全文のコピーを避ける。"""
+    base = norm(correct_body) or norm(exp)
+    if not base:
+        return f"正答（{correct}）を確認してください。"
+    sents = [s for s in split_sentences(base) if len(s) >= 10]
+    core = sents[0] if sents else base[:90]
+    core = re.sub(r"^正解は\d+です[。、]?\s*", "", core)
+    if len(core) > 96:
+        core = core[:93] + "…"
+    return core or f"正答（{correct}）を確認してください。"
+
+
+def explanation_choices_is_boilerplate(value: str) -> bool:
+    v = norm(value)
+    if not v:
+        return False
+    return bool(
+        re.search(
+            r"解説の要点[：「]|解説の要点は「|が示す論点と一致しません|"
+            r"との違いを、?解説の要点|との違いを確認し直してください|"
+            r"解説では「[^」]{8,}」とある一方、（\d+）の記述はそれと矛盾",
+            v,
+        )
     )
 
 
@@ -539,7 +624,7 @@ def synthesize_wrong_note(
     lead = correct_sents[0] if correct_sents else extract_correct_body(exp, correct)
     if lead:
         return polish_note(
-            f"本問の正答は（{correct}）です。{lead} したがって（{n}）の記述は正答ではありません。",
+            f"（{n}）の記述は正答ではありません。{lead[:80]}{'…' if len(lead) > 80 else ''}",
             n,
             opt,
             correct,
@@ -609,7 +694,11 @@ def build_row_fields(row: dict) -> tuple[str, str, str]:
     correct_opt = texts.get(correct, "")
     for n in wrong_nums:
         parts: list[str] = []
-        if re.match(r"^[A-E]", texts[n].strip()):
+        if re.search(r"[ア-オ]", texts[n]):
+            combo = kana_combo_choice_note(n, texts[n], exp, correct, correct_opt)
+            if combo:
+                parts.append(combo)
+        elif re.match(r"^[A-E]", texts[n].strip()):
             combo = combo_choice_note(n, texts[n], exp, correct, correct_opt)
             if combo:
                 parts.append(combo)
@@ -664,6 +753,27 @@ def build_row_fields(row: dict) -> tuple[str, str, str]:
             wrong_map[n], n, texts[n], correct, category
         )
 
+    if len(wrong_nums) >= 2:
+        notes = [wrong_map[n] for n in wrong_nums]
+        if len(set(notes)) == 1:
+            for n in wrong_nums:
+                m = re.search(rf"\({n}\)\s*([^。]+。?)", exp)
+                if m:
+                    wrong_map[n] = polish_note(
+                        m.group(1).strip(), n, texts[n], correct, category
+                    )
+                else:
+                    wrong_map[n] = infer_contrast_note(
+                        n, texts[n], correct, correct_opt, exp, stem
+                    )
+            notes = [wrong_map[n] for n in wrong_nums]
+            if len(set(notes)) == 1:
+                for n in wrong_nums:
+                    opt_short = texts[n][:72] + ("…" if len(texts[n]) > 72 else "")
+                    wrong_map[n] = (
+                        f"{wrong_map[n]} 選択肢（{n}）「{opt_short}」の記述内容を確認してください。"
+                    )
+
     correct_body = norm(row.get("explanation_correct"))
     if not correct_body:
         parts = []
@@ -682,9 +792,14 @@ def build_row_fields(row: dict) -> tuple[str, str, str]:
     correct_body = re.sub(r"\s{2,}", " ", correct_body).strip()
 
     summary = norm(row.get("explanation_summary"))
-    if not summary or summary == exp[:200]:
-        lead = extract_correct_body(exp, correct) or exp[:180]
-        summary = lead[:220]
+    new_summary = make_explanation_summary(correct_body, exp, correct)
+    if (
+        not summary
+        or summary == exp[:200]
+        or summary == correct_body
+        or len(summary) > 120
+    ):
+        summary = new_summary
 
     choices_field = ";".join(f"{n}:{wrong_map[n]}" for n in sorted(wrong_map))
     point = norm(row.get("explanation_point")) or CATEGORY_STUDY_HINTS.get(category, "")
@@ -695,6 +810,16 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", type=Path, default=DEFAULT_CSV)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--only-empty",
+        action="store_true",
+        help="explanation_choices が既に入っている行は上書きしない",
+    )
+    ap.add_argument(
+        "--refresh-boilerplate",
+        action="store_true",
+        help="解説テンプレ（解説の要点 等）が入った explanation_choices を再生成する",
+    )
     args = ap.parse_args()
     path = args.csv.resolve()
     if not path.is_file():
@@ -717,7 +842,16 @@ def main() -> int:
             fieldnames.append(col)
 
     short = 0
+    skipped = 0
     for row in rows:
+        existing = norm(row.get("explanation_choices"))
+        if args.only_empty and existing:
+            if not (
+                args.refresh_boilerplate
+                and explanation_choices_is_boilerplate(existing)
+            ):
+                skipped += 1
+                continue
         choices_field, correct_body, summary, point = build_row_fields(row)
         if choices_field:
             note_lens = [
@@ -738,6 +872,8 @@ def main() -> int:
 
     filled = sum(1 for r in rows if norm(r.get("explanation_choices")))
     print(f"rows={len(rows)} explanation_choices filled={filled}")
+    if skipped:
+        print(f"skipped (only-empty): {skipped}")
     if short:
         print(f"warning: {short} rows with short average wrong-note length")
 

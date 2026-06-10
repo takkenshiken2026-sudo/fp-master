@@ -121,9 +121,6 @@ class PublicContentValidator:
                 continue
             if re.fullmatch(r"[A-D]{3,4}", snippet):
                 continue
-            # FP 等の試験資料で使う空欄記号（×××・△△△ など）
-            if ch in "×△□" and re.fullmatch(rf"{re.escape(ch)}+", snippet):
-                continue
             start = max(0, match.start() - 12)
             end = min(len(plain), match.end() + 12)
             context = plain[start:end].replace("\n", " ")

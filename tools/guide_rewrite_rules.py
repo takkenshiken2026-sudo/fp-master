@@ -93,20 +93,23 @@ def rewrite_forbidden_hits(text: str) -> list[str]:
     return [p for p in REWRITE_FORBIDDEN_PHRASES if p in t]
 
 
-def slug_leaks_in_text(text: str, slug: str) -> list[str]:
-    """本文中の slug 名露出（内部記法）。"""
+def slug_leaks_in_text(text: str, slug: str, *, slug_set: set[str] | None = None) -> list[str]:
+    """本文中の slug 名露出（内部記法）。slug_set があれば既知 slug のみ検出。"""
     t = norm(text)
-    if not t or not slug:
+    if not t:
         return []
+    if slug_set:
+        from tools.guide_slug_prose import slug_leaks_against_pool
+
+        return slug_leaks_against_pool(t, slug, slug_set)
     hits: list[str] = []
-    if slug in t:
+    if slug and slug in t:
         hits.append(slug)
     for m in SLUG_IN_BODY_RE.finditer(t):
         token = m.group(0)
         if token in SLUG_IN_BODY_ALLOW:
             continue
         if "-" in token and len(token) >= 8 and token != slug:
-            # 他 slug 参照（related 混入）
             if re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)+", token):
                 hits.append(token)
     return hits

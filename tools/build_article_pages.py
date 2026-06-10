@@ -16,7 +16,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items
 from tools.html_footer import (  # noqa: E402
     ROBOTS_INDEX_FOLLOW,
     breadcrumb_html,
@@ -59,10 +58,7 @@ def apply_vars(value: str) -> str:
     text = norm(value)
     return (
         text.replace("Sampleマスター", brand_name())
-        .replace("FPマスター", brand_name())
-        .replace("マン管マスター", brand_name())
         .replace("◯◯試験（プレースホルダー）", exam_name())
-        .replace("マンション管理士試験", exam_name())
         .replace("◯◯試験", exam_name())
     )
 
@@ -155,13 +151,42 @@ def sanitize_guide_text(text: str, slug: str = "") -> str:
 
 
 from tools.affiliate_links import affiliate_article_is_buildable  # noqa: E402
-from tools.editorial_quality import is_published_guide  # noqa: E402
+from tools.guide_field_prose import field_prefix_labels, resolve_reader_slug_prose  # noqa: E402
+from tools.guide_slug_prose import url_label_map_from_sources  # noqa: E402
+from tools.guide_slug_prose import resolve_slug_references  # noqa: E402
 from tools.seo_body_markup import seo_section_body_html  # noqa: E402
 
 
-def guide_article_is_buildable(row: dict[str, str]) -> bool:
-    """公開可能な試験ガイドのみ HTML を生成する（draft は一覧のみ）。"""
-    return is_published_guide(row) and affiliate_article_is_buildable(row)
+def slug_title_map(by_slug: dict[str, dict[str, str]]) -> dict[str, str]:
+    return {s: apply_vars(row.get("title", "")) for s, row in by_slug.items() if s}
+
+
+def article_url_labels(article: dict[str, str]) -> dict[str, str]:
+    return url_label_map_from_sources(parse_source_links(article.get("primary_sources", "")))
+
+
+def resolve_reader_prose(
+    text: str,
+    *,
+    slug_titles: dict[str, str],
+    current_slug: str,
+    link_internal: bool = False,
+    prefix_labels: dict[str, str] | None = None,
+    url_labels: dict[str, str] | None = None,
+    link_external_urls: bool = True,
+) -> str:
+    if not text:
+        return text
+    labels = prefix_labels if prefix_labels is not None else field_prefix_labels(ROOT)
+    return resolve_reader_slug_prose(
+        text,
+        slug_titles=slug_titles or {},
+        current_slug=current_slug,
+        link_internal=link_internal,
+        prefix_labels=labels,
+        url_labels=url_labels,
+        link_external_urls=link_external_urls,
+    )
 
 
 def paragraphs(text: str) -> str:
@@ -173,9 +198,21 @@ def list_or_paragraph(
     *,
     term_hrefs: dict[str, str] | None = None,
     linked_terms: set[str] | None = None,
+    slug_titles: dict[str, str] | None = None,
+    current_slug: str = "",
+    url_labels: dict[str, str] | None = None,
 ) -> str:
+    body = text
+    if slug_titles and current_slug:
+        body = resolve_reader_prose(
+            body,
+            slug_titles=slug_titles,
+            current_slug=current_slug,
+            link_internal=True,
+            url_labels=url_labels,
+        )
     return seo_section_body_html(
-        text,
+        body,
         transform=apply_vars,
         term_hrefs=term_hrefs,
         linked_terms=linked_terms,
@@ -212,8 +249,21 @@ def section_html(
     *,
     term_hrefs: dict[str, str] | None = None,
     linked_terms: set[str] | None = None,
+    slug_titles: dict[str, str] | None = None,
+    url_labels: dict[str, str] | None = None,
 ) -> str:
-    heading = apply_vars(article.get(f"section_{idx}_heading", ""))
+    slug = norm(article.get("slug"))
+    heading_raw = apply_vars(article.get(f"section_{idx}_heading", ""))
+    heading = heading_raw
+    if slug_titles and heading_raw:
+        heading = resolve_reader_prose(
+            heading_raw,
+            slug_titles=slug_titles,
+            current_slug=slug,
+            link_internal=False,
+            url_labels=url_labels,
+            link_external_urls=False,
+        )
     body = resolve_guide_section_body(article, article.get(f"section_{idx}_body", ""))
     if not heading or not norm(body):
         return ""
@@ -221,7 +271,7 @@ def section_html(
     return (
         f'<section class="seo-article-section" aria-labelledby="{sid}">'
         f'<h2 id="{sid}"><span class="section-heading-num">{display_num}</span>{html.escape(heading)}</h2>'
-        f"{list_or_paragraph(body, term_hrefs=term_hrefs, linked_terms=linked_terms)}</section>"
+        f"{list_or_paragraph(body, term_hrefs=term_hrefs, linked_terms=linked_terms, slug_titles=slug_titles, current_slug=slug, url_labels=url_labels)}</section>"
     )
 
 
@@ -230,6 +280,8 @@ def sections_html(
     *,
     term_hrefs: dict[str, str] | None = None,
     linked_terms: set[str] | None = None,
+    slug_titles: dict[str, str] | None = None,
+    url_labels: dict[str, str] | None = None,
 ) -> str:
     sections: list[str] = []
     display_num = 1
@@ -240,6 +292,8 @@ def sections_html(
             display_num,
             term_hrefs=term_hrefs,
             linked_terms=linked_terms,
+            slug_titles=slug_titles,
+            url_labels=url_labels,
         )
         if html_text:
             sections.append(html_text)
@@ -263,23 +317,67 @@ def key_points_items(article: dict[str, str]) -> list[str]:
     return from_headings[:3]
 
 
-def key_points_box_html(article: dict[str, str]) -> str:
+def key_points_box_html(
+    article: dict[str, str],
+    *,
+    slug_titles: dict[str, str] | None = None,
+    url_labels: dict[str, str] | None = None,
+) -> str:
     from tools.knowledge_hub_seo import seo_key_points_box_html
 
+    slug = norm(article.get("slug"))
     items = key_points_items(article)
+    if slug_titles:
+        items = [
+            resolve_reader_prose(
+                item,
+                slug_titles=slug_titles,
+                current_slug=slug,
+                link_internal=False,
+                url_labels=url_labels,
+                link_external_urls=False,
+            )
+            for item in items
+        ]
     intro = apply_vars(article.get("user_intent", ""))
+    if slug_titles and intro:
+        intro = resolve_reader_prose(
+            intro,
+            slug_titles=slug_titles,
+            current_slug=slug,
+            link_internal=False,
+            url_labels=url_labels,
+            link_external_urls=False,
+        )
     return seo_key_points_box_html(items, intro=intro)
 
 
-def toc_html(article: dict[str, str], has_faq: bool) -> str:
+def toc_html(
+    article: dict[str, str],
+    has_faq: bool,
+    *,
+    slug_titles: dict[str, str] | None = None,
+    url_labels: dict[str, str] | None = None,
+) -> str:
+    slug = norm(article.get("slug"))
     items: list[tuple[str, str]] = []
     if key_points_items(article) or norm(apply_vars(article.get("user_intent", ""))):
         items.append(("key-points-title", "この記事の要点"))
     items.append(("quality-panel-title", "この記事の信頼性について"))
     for idx in range(1, 9):
-        heading = apply_vars(article.get(f"section_{idx}_heading", ""))
+        heading_raw = apply_vars(article.get(f"section_{idx}_heading", ""))
         body = norm(article.get(f"section_{idx}_body", ""))
-        if heading and body:
+        if heading_raw and body:
+            heading = heading_raw
+            if slug_titles:
+                heading = resolve_reader_prose(
+                    heading_raw,
+                    slug_titles=slug_titles,
+                    current_slug=slug,
+                    link_internal=False,
+                    url_labels=url_labels,
+                    link_external_urls=False,
+                )
             items.append((f"article-sec-{idx}", heading))
     if has_faq:
         items.append(("article-sec-faq", "よくある質問"))
@@ -295,12 +393,33 @@ def toc_html(article: dict[str, str], has_faq: bool) -> str:
     )
 
 
-def faq_items(article: dict[str, str]) -> list[dict[str, str]]:
+def faq_items(
+    article: dict[str, str],
+    *,
+    slug_titles: dict[str, str] | None = None,
+    url_labels: dict[str, str] | None = None,
+) -> list[dict[str, str]]:
     items: list[dict[str, str]] = []
     slug = norm(article.get("slug"))
     for idx in range(1, 4):
         q = apply_vars(article.get(f"faq_{idx}_question", ""))
         a = sanitize_guide_text(apply_vars(article.get(f"faq_{idx}_answer", "")), slug)
+        if slug_titles:
+            q = resolve_reader_prose(
+                q,
+                slug_titles=slug_titles,
+                current_slug=slug,
+                link_internal=False,
+                url_labels=url_labels,
+                link_external_urls=False,
+            )
+            a = resolve_reader_prose(
+                a,
+                slug_titles=slug_titles,
+                current_slug=slug,
+                link_internal=True,
+                url_labels=url_labels,
+            )
         if q and a:
             items.append({"question": q, "answer": a})
     return items
@@ -377,12 +496,7 @@ def parse_related_links(
             )
             if len(links) >= 2:
                 break
-        for slug in (
-            "tools-free-past-question-sites",
-            "tools-ichimon-vs-past",
-            "faq-study-hours",
-            "attr-zero-knowledge-start",
-        ):
+        for slug in ("exam-overview", "study-plan", "past-question-strategy", "glossary-how-to"):
             if len(links) >= 2:
                 break
             if slug in by_slug and slug not in seen and slug != current_slug:
@@ -481,20 +595,62 @@ def build_article_html(
 ) -> str:
     slug = article["slug"]
     rel_path = Path("articles") / slug / "index.html"
+    slug_titles = slug_title_map(by_slug)
+    field_labels = field_prefix_labels(ROOT)
+    url_labels = article_url_labels(article)
     title = apply_vars(article["title"])
+    title = resolve_reader_prose(
+        title,
+        slug_titles=slug_titles,
+        current_slug=slug,
+        link_internal=False,
+        prefix_labels=field_labels,
+        url_labels=url_labels,
+        link_external_urls=False,
+    )
     lead_text = sanitize_guide_text(apply_vars(article.get("lead", "")), slug)
-    desc = meta_description(apply_vars(article.get("meta_description") or "") or lead_text or title)
+    lead_text = resolve_reader_prose(
+        lead_text,
+        slug_titles=slug_titles,
+        current_slug=slug,
+        link_internal=True,
+        prefix_labels=field_labels,
+        url_labels=url_labels,
+    )
+    if lead_text and "[" in lead_text:
+        from tools.inline_markup import render_inline_markup  # noqa: E402
+
+        lead_html = render_inline_markup(lead_text)
+    else:
+        lead_html = html.escape(lead_text)
+    meta_raw = apply_vars(article.get("meta_description") or "") or lead_text or title
+    meta_raw = resolve_reader_prose(
+        meta_raw,
+        slug_titles=slug_titles,
+        current_slug=slug,
+        link_internal=False,
+        prefix_labels=field_labels,
+        url_labels=url_labels,
+        link_external_urls=False,
+    )
+    desc = meta_description(meta_raw)
     canonical = public_url(f"articles/{slug}/")
     updated = content_date_from_row(article)
     genre = apply_vars(article.get("genre", "試験ガイド"))
     tags = split_semicolon(apply_vars(article.get("tags", "")))
     display_tags = public_display_tags(tags)
     linked_terms: set[str] = set()
-    sections = sections_html(article, term_hrefs=term_hrefs, linked_terms=linked_terms)
-    faqs = faq_items(article)
+    sections = sections_html(
+        article,
+        term_hrefs=term_hrefs,
+        linked_terms=linked_terms,
+        slug_titles=slug_titles,
+        url_labels=url_labels,
+    )
+    faqs = faq_items(article, slug_titles=slug_titles, url_labels=url_labels)
     faq_section = faq_html(faqs, section_num=article_body_section_count(article) + 1) if faqs else ""
-    toc = toc_html(article, bool(faqs))
-    key_points_box = key_points_box_html(article)
+    toc = toc_html(article, bool(faqs), slug_titles=slug_titles, url_labels=url_labels)
+    key_points_box = key_points_box_html(article, slug_titles=slug_titles, url_labels=url_labels)
     from tools.build_glossary_pages import field_hub_slug  # noqa: E402
     from tools.internal_links import (  # noqa: E402
         guide_knowledge_hub_link_items,
@@ -569,7 +725,7 @@ def build_article_html(
         "本人に割り当てられた試験会場は受験票の表記が正本です。</p></blockquote></section>"
     )
     info_table = article_info_table(article)
-    crumb_items = static_crumb_items(("試験ガイド", "articles/index.html"), (title, None))
+    crumb_items = [("トップ", "index.html"), ("試験ガイド", "articles/index.html"), (title, None)]
     article_schema = {
         "@type": "Article",
         "@id": canonical + "#article",
@@ -595,17 +751,30 @@ def build_article_html(
             {"@type": "WebPage", "@id": canonical + "#webpage", "url": canonical, "name": title, "description": desc, "inLanguage": "ja-JP"},
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": crumb_json_ld(crumb_items, last_item_url=canonical),
+                "itemListElement": [
+                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url("index.html")},
+                    {"@type": "ListItem", "position": 2, "name": "試験ガイド", "item": public_url("articles/index.html")},
+                    {"@type": "ListItem", "position": 3, "name": title, "item": canonical},
+                ],
             },
         ],
     }
     if faqs:
+        from tools.guide_slug_prose import plain_text_from_reader_prose  # noqa: E402
+
         json_ld["@graph"].append(
             {
                 "@type": "FAQPage",
                 "@id": canonical + "#faq",
                 "mainEntity": [
-                    {"@type": "Question", "name": item["question"], "acceptedAnswer": {"@type": "Answer", "text": item["answer"]}}
+                    {
+                        "@type": "Question",
+                        "name": plain_text_from_reader_prose(item["question"]),
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": plain_text_from_reader_prose(item["answer"]),
+                        },
+                    }
                     for item in faqs
                 ],
             }
@@ -642,7 +811,7 @@ def build_article_html(
       {meta_updated_html(updated)}
     </div>
     <h1 class="article-title">{html.escape(title)}</h1>
-    <p class="article-lead">{html.escape(lead_text)}</p>
+    <p class="article-lead">{lead_html}</p>
     {key_points_box}
     {toc}
     {quality_panel}
@@ -671,56 +840,12 @@ def sort_articles_for_index(articles: list[dict[str, str]]) -> list[dict[str, st
     )
 
 
-def article_index_card_html(article: dict[str, str], *, published: bool) -> str:
-    title_text = apply_vars(article["title"])
-    desc_text = meta_description(apply_vars(article.get("meta_description") or article.get("lead") or title_text), 130)
-    genre = apply_vars(article.get("genre", "試験ガイド"))
-    style = guide_genre_style_by_label().get(genre, "meta")
-    all_tags = split_semicolon(apply_vars(article.get("tags", "")))
-    display_tags = public_display_tags(all_tags)
-    tags = " / ".join(display_tags)
-    search_text = " ".join([title_text, desc_text, genre, tags, apply_vars(article.get("lead", ""))])
-    draft_class = "" if published else " is-draft"
-    if published:
-        inner = (
-            f'<a class="article-index-card-link" href="{html.escape(article["slug"])}/">'
-            f'<span class="article-index-card-genre">{html.escape(genre)}</span>'
-            f"<h2>{html.escape(title_text)}</h2>"
-            f"<p>{html.escape(desc_text)}</p>"
-            + (f'<div class="article-index-card-tags">{html.escape(tags)}</div>' if tags else "")
-            + "</a>"
-        )
-    else:
-        inner = (
-            '<div class="article-index-card-link is-disabled" aria-disabled="true">'
-            f'<span class="article-index-card-genre">{html.escape(genre)}</span>'
-            '<span class="article-index-card-soon">準備中</span>'
-            f"<h2>{html.escape(title_text)}</h2>"
-            f"<p>{html.escape(desc_text)}</p>"
-            + (f'<div class="article-index-card-tags">{html.escape(tags)}</div>' if tags else "")
-            + "</div>"
-        )
-    return (
-        '<article class="article-index-card'
-        + draft_class
-        + '" '
-        f'data-genre="{html.escape(genre, quote=True)}" '
-        f'data-genre-style="{html.escape(style, quote=True)}" '
-        f'data-search="{html.escape(search_text, quote=True)}" '
-        f'data-published="{"1" if published else "0"}">'
-        + inner
-        + "</article>"
-    )
-
-
-def build_index_html(catalog: list[dict[str, str]], published_articles: list[dict[str, str]]) -> str:
+def build_index_html(articles: list[dict[str, str]]) -> str:
     rel_path = Path("articles/index.html")
-    catalog = sort_articles_for_index(catalog)
-    published_articles = sort_articles_for_index(published_articles)
-    published_slugs = {norm(a.get("slug")) for a in published_articles if norm(a.get("slug"))}
+    articles = sort_articles_for_index(articles)
     genre_styles = guide_genre_style_by_label()
     by_genre: dict[str, list[dict[str, str]]] = {}
-    for article in catalog:
+    for article in articles:
         by_genre.setdefault(apply_vars(article.get("genre", "試験ガイド")), []).append(article)
     genre_counts = {genre: len(group) for genre, group in by_genre.items()}
     genre_chips = ['<button type="button" class="article-index-chip on" data-genre="all">すべて</button>']
@@ -735,12 +860,28 @@ def build_index_html(catalog: list[dict[str, str]], published_articles: list[dic
             f'data-genre-style="{html.escape(style, quote=True)}">'
             f"{html.escape(genre)}<span>{count}</span></button>"
         )
-    article_cards = [
-        article_index_card_html(article, published=norm(article.get("slug")) in published_slugs)
-        for article in catalog
-    ]
-    published_count = len(published_articles)
-    total_count = len(catalog)
+    article_cards: list[str] = []
+    for article in articles:
+        title_text = apply_vars(article["title"])
+        desc_text = meta_description(apply_vars(article.get("meta_description") or article.get("lead") or title_text), 130)
+        genre = apply_vars(article.get("genre", "試験ガイド"))
+        style = genre_styles.get(genre, "meta")
+        all_tags = split_semicolon(apply_vars(article.get("tags", "")))
+        display_tags = public_display_tags(all_tags)
+        tags = " / ".join(display_tags)
+        search_text = " ".join([title_text, desc_text, genre, tags, apply_vars(article.get("lead", ""))])
+        article_cards.append(
+            '<article class="article-index-card" '
+            f'data-genre="{html.escape(genre, quote=True)}" '
+            f'data-genre-style="{html.escape(style, quote=True)}" '
+            f'data-search="{html.escape(search_text, quote=True)}">'
+            f'<a class="article-index-card-link" href="{html.escape(article["slug"])}/">'
+            f'<span class="article-index-card-genre">{html.escape(genre)}</span>'
+            f"<h2>{html.escape(title_text)}</h2>"
+            f"<p>{html.escape(desc_text)}</p>"
+            + (f'<div class="article-index-card-tags">{html.escape(tags)}</div>' if tags else "")
+            + "</a></article>"
+        )
     article_index_script = """<script>
 (() => {
   const q = document.getElementById('article-index-q');
@@ -760,12 +901,7 @@ def build_index_html(catalog: list[dict[str, str]], published_articles: list[dic
       card.classList.toggle('hide', !ok);
       if (ok) shown++;
     });
-    if (hit) {
-      const pub = cards.filter((c) => c.dataset.published === '1').length;
-      hit.textContent = shown === cards.length
-        ? `公開 ${pub} / 全 ${cards.length} 記事`
-        : `表示 ${shown} / 全 ${cards.length} 記事（公開 ${pub}）`;
-    }
+    if (hit) hit.textContent = `${shown} / ${cards.length} 記事`;
     if (empty) empty.classList.toggle('hide', shown !== 0);
   }
   q?.addEventListener('input', apply);
@@ -785,25 +921,10 @@ def build_index_html(catalog: list[dict[str, str]], published_articles: list[dic
     desc = f"{exam_name()}の受験フェーズ別ガイド（制度・学習計画・演習・直前・再受験）一覧です。用語の定義は用語解説（知識ハブ）をご覧ください。"
     item_list = [
         {"@type": "ListItem", "position": i, "name": apply_vars(a["title"]), "item": public_url(f"articles/{a['slug']}/")}
-        for i, a in enumerate(published_articles, start=1)
+        for i, a in enumerate(articles, start=1)
     ]
-    articles_idx_crumbs = static_crumb_items(("試験ガイド", None))
     ld_json = json.dumps(
-        {
-            "@context": "https://schema.org",
-            "@graph": [
-                {
-                    "@type": "ItemList",
-                    "name": f"{exam_name()} 試験ガイド",
-                    "numberOfItems": published_count,
-                    "itemListElement": item_list,
-                },
-                {
-                    "@type": "BreadcrumbList",
-                    "itemListElement": crumb_json_ld(articles_idx_crumbs, last_item_url=canonical),
-                },
-            ],
-        },
+        {"@context": "https://schema.org", "@type": "ItemList", "name": f"{exam_name()} 試験ガイド", "numberOfItems": len(articles), "itemListElement": item_list},
         ensure_ascii=False,
         indent=2,
     )
@@ -833,16 +954,16 @@ def build_index_html(catalog: list[dict[str, str]], published_articles: list[dic
 {site_page_wrap_open()}
 {site_page_header(rel_path, current="articles")}
 <main class="site-page-main">
-  {breadcrumb_html(rel_path, articles_idx_crumbs)}
+  {breadcrumb_html(rel_path, [("トップ", "index.html"), ("試験ガイド", None)])}
   <h1>試験ガイド</h1>
   <p class="site-page-lead">{html.escape(exam_name())}の制度理解から学習計画・演習・直前対策まで、受験フェーズ別の<strong>進め方</strong>をまとめています。用語の意味・比較・数値は<a href="../terms/index.html">用語解説（知識ハブ）</a>、問題演習は<a href="../q/index.html">過去問一覧</a>からどうぞ。</p>
   <section class="article-index-panel" aria-labelledby="article-index-heading">
     <div class="article-index-head">
       <div>
         <h2 id="article-index-heading">記事一覧</h2>
-        <p>全{total_count}記事（公開 {published_count}）。キーワード検索とジャンルで絞り込めます。準備中の記事はタイトルのみ表示し、本文公開まで開けません。</p>
+        <p>全{len(articles)}記事。キーワード検索とジャンルで絞り込めます。</p>
       </div>
-      <span id="article-index-hit" class="article-index-hit">公開 {published_count} / 全 {total_count} 記事</span>
+      <span id="article-index-hit" class="article-index-hit">{len(articles)} / {len(articles)} 記事</span>
     </div>
     <div class="article-index-tools">
       <label class="article-index-search" for="article-index-q">
@@ -885,8 +1006,8 @@ def clean_generated_dirs() -> None:
 
 def main() -> int:
     articles = load_articles()
-    buildable = [article for article in articles if guide_article_is_buildable(article)]
-    skipped = len(articles) - len(buildable)
+    buildable = [article for article in articles if affiliate_article_is_buildable(article)]
+    skipped_affiliate = len(articles) - len(buildable)
     by_slug = {norm(a.get("slug")): a for a in buildable if norm(a.get("slug"))}
     term_hrefs: dict[str, str] | None = None
     glossary_categories: list[str] = []
@@ -920,10 +1041,10 @@ def main() -> int:
             ),
             encoding="utf-8",
         )
-    (ARTICLES_DIR / "index.html").write_text(build_index_html(articles, buildable), encoding="utf-8")
+    (ARTICLES_DIR / "index.html").write_text(build_index_html(buildable), encoding="utf-8")
     msg = f"Wrote {len(buildable)} guide articles under {ARTICLES_DIR}"
-    if skipped:
-        msg += f" (catalog {len(articles)} rows; skipped {skipped} draft/unpublished or affiliate without ASP links)"
+    if skipped_affiliate:
+        msg += f" (skipped {skipped_affiliate} affiliate without ASP links)"
     print(msg)
     print(f"Wrote {ARTICLES_DIR / 'index.html'}")
     return 0

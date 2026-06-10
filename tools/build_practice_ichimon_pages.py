@@ -28,13 +28,18 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.q_explanation import build_explanation_html, build_ichimon_explanation_html  # noqa: E402
+from tools.q_content_quality import (  # noqa: E402
+    build_ichimon_primary_ids,
+    ichimon_robots_meta,
+    is_demo_practice_question_row,
+    set_ichimon_primary_ids,
+)
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog  # noqa: E402
 from tools.build_past_question_pages import (  # noqa: E402
     HEAD_FONTS,
     Q_INDEX_CSS_VER,
     ROBOTS_INDEX_FOLLOW,
     q_index_filter_chip_btn,
-    build_materials_html,
     build_stem_html,
     glossary_links_for_tags,
     guide_links_for_page,
@@ -52,13 +57,11 @@ from tools.build_past_question_pages import (  # noqa: E402
     stem_preview,
     text_to_html,
 )
-from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items  # noqa: E402
 from tools.html_footer import (  # noqa: E402
     breadcrumb_html,
     q_hub_links_html,
     q_index_filters_details_html,
     q_index_stats_line,
-    q_index_subject_row_html,
     q_index_tools_close_html,
     q_index_tools_open_html,
     shell_body_class,
@@ -75,7 +78,6 @@ from tools.q_page_seo import (
     question_meta_description,
     study_modes_note_html,
 )
-from tools.past_question_subject import subject_display, subject_from_row  # noqa: E402
 from tools.site_config import brand_name, category_order, clean_origin, exam_name
 from tools.seo_editorial_chrome import seo_brand_asset_tags
 
@@ -97,7 +99,7 @@ INDEX_CONFIG: dict[str, dict] = {
         "searchInputLabel": "実践演習検索",
         "searchPlaceholder": "例：第1問、分野名、問題文…",
         "emptyTitle": "条件に一致する実践演習がありません",
-        "emptyHint": "検索語を短くするか、科目・分野・学習状況を「すべて」に戻してお試しください。",
+        "emptyHint": "検索語を短くするか、分野・学習状況を「すべて」に戻してお試しください。",
         "appLinkTemplate": "../index.html#orig",
         "appLinkLabel": "アプリで解く",
         "rowLabelField": "qno",
@@ -188,11 +190,9 @@ def practice_page_dict(row: dict, line_no: int) -> dict:
         raise ValueError(f"practice line {line_no}: 正答なし no={qno}")
     cat = norm(row.get("category"))
     stem_plain = norm(row.get("stem"))
-    subject = subject_from_row(row, qno=qno)
     return {
         "qno": qno,
         "category": cat,
-        "subject": subject,
         "type": norm(row.get("type")) or "single",
         "stem_html": build_stem_html(row),
         "stem_plain": stem_plain,
@@ -366,9 +366,11 @@ def build_practice_question_html(
         headline=question_meta_headline("practice", qno=page["qno"]),
         category=page["category"],
         body=stem,
+        answer_tail=str(page["correct"]) if page.get("correct") is not None else "",
     )
     study_modes_note = study_modes_note_html()
     canonical = public_url(base_url, page["rel_path"])
+    lead_html = ""
     opts_html = "".join(
         f'<li class="q-opt"><span class="q-opt-num">（{i}）</span> {html.escape(o)}</li>'
         for i, o in enumerate(page["opts"], start=1)
@@ -383,7 +385,6 @@ def build_practice_question_html(
         },
         row,
     )
-    materials_html = build_materials_html(row)
     similar_html = build_similar_questions_html(
         page,
         rel_path,
@@ -408,17 +409,22 @@ def build_practice_question_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": crumb_json_ld(
-                    static_crumb_items(("実践演習一覧", "q/practice/index.html"), (heading, None)),
-                    last_item_url=canonical,
-                ),
+                "itemListElement": [
+                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
+                    {"@type": "ListItem", "position": 2, "name": "実践演習一覧", "item": public_url(base_url, "q/practice/index.html")},
+                    {"@type": "ListItem", "position": 3, "name": heading, "item": canonical},
+                ],
             },
         ],
     }
     site_header = site_page_header(rel_path, current="practice")
     site_breadcrumb = breadcrumb_html(
         rel_path,
-        static_crumb_items(("実践演習一覧", "q/practice/index.html"), (heading, None)),
+        [
+            ("トップ", "index.html"),
+            ("実践演習一覧", "q/practice/index.html"),
+            (heading, None),
+        ],
     )
     site_footer = site_page_footer(rel_path, current="practice")
 
@@ -453,10 +459,10 @@ def build_practice_question_html(
   {q_hub_links_html(rel_path, current="practice")}
   <p class="q-meta-line">実践演習 · {html.escape(page["category"])}</p>
   <h1 class="q-h1">{html.escape(heading)}</h1>
+  {lead_html}
   <section class="q-block" aria-labelledby="q-stem-h">
     <h2 id="q-stem-h" class="q-h2">問題</h2>
     <div class="q-stem">{page["stem_html"]}</div>
-    {materials_html}
   </section>
   <section class="q-block" aria-labelledby="q-opts-h">
     <h2 id="q-opts-h" class="q-h2">選択肢</h2>
@@ -493,6 +499,7 @@ def build_ichimon_question_html(
     question_catalog: list[dict],
 ) -> str:
     from tools.q_page_seo import (
+        ichimon_meta_snippet,
         question_h1,
         question_meta_headline,
         question_page_title,
@@ -505,15 +512,16 @@ def build_ichimon_question_html(
         "ichimon", question_id=page["id"], category=page["category"]
     )
     stmt = page.get("statement") or ""
+    ans = marubatsu_label(page["correct_answer"])
     desc = question_meta_description(
         "ichimon",
         headline=question_meta_headline("ichimon", question_id=page["id"]),
         category=page["category"],
-        body=stmt,
+        body=ichimon_meta_snippet(stmt),
+        answer_tail=ans,
     )
     study_modes_note = study_modes_note_html()
     canonical = public_url(base_url, page["rel_path"])
-    ans = marubatsu_label(page["correct_answer"])
     source_line = (
         f'<p class="q-meta-line">{html.escape(page["source"])}</p>'
         if page.get("source")
@@ -543,20 +551,26 @@ def build_ichimon_question_html(
             },
             {
                 "@type": "BreadcrumbList",
-                "itemListElement": crumb_json_ld(
-                    static_crumb_items(("一問一答一覧", "q/ichimon/index.html"), (heading, None)),
-                    last_item_url=canonical,
-                ),
+                "itemListElement": [
+                    {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
+                    {"@type": "ListItem", "position": 2, "name": "一問一答一覧", "item": public_url(base_url, "q/ichimon/index.html")},
+                    {"@type": "ListItem", "position": 3, "name": heading, "item": canonical},
+                ],
             },
         ],
     }
     site_header = site_page_header(rel_path, current="ichimon")
     site_breadcrumb = breadcrumb_html(
         rel_path,
-        static_crumb_items(("一問一答一覧", "q/ichimon/index.html"), (heading, None)),
+        [
+            ("トップ", "index.html"),
+            ("一問一答一覧", "q/ichimon/index.html"),
+            (heading, None),
+        ],
     )
     site_footer = site_page_footer(rel_path, current="ichimon")
     exp_html = build_ichimon_explanation_html(page, row)
+    robots_meta = ichimon_robots_meta(page["id"])
 
     return f"""<!DOCTYPE html>
 <html lang="ja">
@@ -566,7 +580,7 @@ def build_ichimon_question_html(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{html.escape(title)}</title>
 <meta name="description" content="{html.escape(desc)}">
-{ROBOTS_INDEX_FOLLOW}
+{robots_meta}
 <link rel="canonical" href="{html.escape(canonical)}">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{html.escape(title)}">
@@ -707,14 +721,9 @@ def build_mode_index(
         canonical_rel = "q/practice/index.html"
         index_items = [practice_index_item_dict(pg) for pg in pages]
         group_by = "category"
-        filter_hint = "科目・分野・学習状況"
+        filter_hint = "分野・学習状況"
         show_category_row = False
         year_row_label = "分野へ"
-        gakka_count = sum(1 for pg in pages if pg.get("subject") == "gakka")
-        jitsugi_count = sum(1 for pg in pages if pg.get("subject") == "jitsugi")
-        subject_row_html = q_index_subject_row_html(
-            gakka_count=gakka_count, jitsugi_count=jitsugi_count
-        )
     else:
         current = "ichimon"
         from tools.q_page_seo import index_h1, index_page_title
@@ -729,7 +738,6 @@ def build_mode_index(
         filter_hint = "分野・学習状況"
         show_category_row = False
         year_row_label = "分野へ"
-        subject_row_html = ""
 
     by_category: dict[str, int] = {}
     for pg in pages:
@@ -773,7 +781,9 @@ def build_mode_index(
     group_label = cfg["groupLabel"]
 
     header = site_page_header(rel_path, current=current)
-    breadcrumb = breadcrumb_html(rel_path, static_crumb_items((f"{h1}一覧", None)))
+    breadcrumb = breadcrumb_html(
+        rel_path, [("トップ", "index.html"), (f"{h1}一覧", None)]
+    )
     footer = site_page_footer(rel_path, current=current)
     list_aria = f"{group_label}別{h1}"
 
@@ -814,7 +824,6 @@ def build_mode_index(
         search_placeholder=search_placeholder,
         hit_text=f"{len(pages)} / {len(pages)} 問",
     )}
-      {subject_row_html if mode == "practice" else ""}
       {q_index_filters_details_html(
           year_row_label=year_row_label if mode == "practice" else group_label,
           year_jump_html=group_jump_html,
@@ -874,8 +883,7 @@ def build_practice_index_table_row(page: dict) -> str:
         '<tr class="q-year-table-row" tabindex="0"'
         f' data-app-id="{page["app_id"]}"'
         f' data-href="{html.escape(page["href_rel"], quote=True)}"'
-        f' data-category="{html.escape(page["category"], quote=True)}"'
-        f' data-subject="{html.escape(page.get("subject") or "", quote=True)}">'
+        f' data-category="{html.escape(page["category"], quote=True)}">'
         f'<td class="q-year-table-no" data-label="問"><a href="{href}">{html.escape(label)}</a></td>'
         f'<td class="q-year-table-cat" data-label="分野">{html.escape(page["category"])}</td>'
         f'<td class="q-year-table-desc" data-label="問題文">{preview_cell}</td>'
@@ -915,22 +923,18 @@ def practice_index_item_dict(page: dict) -> dict:
     preview = stem_preview(page.get("stem_plain") or "")
     tags = page.get("tags") or []
     qno = page["qno"]
-    subject = page.get("subject") or ""
     search_bits = [
         f"第{qno}問",
         page["category"],
         preview,
         *tags,
     ]
-    if subject:
-        search_bits.append(subject_display(subject))
     return {
         "appId": PRACTICE_ID_BASE + qno,
         "year": 0,
         "qno": qno,
         "label": f"第{qno}問",
         "category": page["category"],
-        "subject": subject,
         "href": page["href_rel"],
         "preview": preview,
         "tags": tags,
@@ -999,6 +1003,8 @@ def main() -> int:
     for i, row in enumerate(practice_rows, start=2):
         if norm(row.get("is_invalidated", "")).upper() == "TRUE":
             continue
+        if is_demo_practice_question_row(row):
+            continue
         practice_pages.append(practice_page_dict(row, i))
         practice_rows_valid.append(row)
     _patch_index_rows_for_practice(practice_pages)
@@ -1035,6 +1041,7 @@ def main() -> int:
         )
 
     ichimon_rows = load_ichimon_rows()
+    set_ichimon_primary_ids(build_ichimon_primary_ids(ichimon_rows))
     ichimon_pairs: list[tuple[dict, dict]] = []
     for i, row in enumerate(ichimon_rows, start=2):
         ichimon_pairs.append((ichimon_page_dict(row, i), row))

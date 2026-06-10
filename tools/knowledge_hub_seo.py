@@ -29,7 +29,6 @@ from tools.glossary_past_questions import (  # noqa: E402
     find_past_questions_for_term,
     past_questions_section_html,
 )
-from tools.breadcrumb_seo import crumb_json_ld, static_crumb_items  # noqa: E402
 from tools.html_footer import breadcrumb_html  # noqa: E402
 from tools.seo_utils import json_ld_date_modified  # noqa: E402
 from tools.site_config import (  # noqa: E402
@@ -92,7 +91,14 @@ def seo_key_points_box_html(
     intro_text = intro.strip()
     if not cleaned and not intro_text:
         return ""
-    intro_html = f"<p>{html.escape(intro_text)}</p>" if intro_text else ""
+    intro_html = ""
+    if intro_text:
+        if "[" in intro_text:
+            from tools.inline_markup import render_inline_markup
+
+            intro_html = f"<p>{render_inline_markup(intro_text)}</p>"
+        else:
+            intro_html = f"<p>{html.escape(intro_text)}</p>"
     list_html = ""
     if cleaned:
         lis = "".join(f"<li>{html.escape(item)}</li>" for item in cleaned[:5])
@@ -210,7 +216,10 @@ def hub_detail_breadcrumb(
 ) -> str:
     field_hub = field_hub_slug(category) if category and field_hub_page_exists(category) else ""
     hub_index_href = f"{rel_path.parent.as_posix()}/index.html"
-    items = static_crumb_items((hub_index_label, hub_index_href))
+    items: list[tuple[str, str | None]] = [
+        ("トップ", "index.html"),
+        (hub_index_label, hub_index_href),
+    ]
     if field_hub and category and field_hub_page_exists(category):
         items.append((category, f"terms/{field_hub}/index.html"))
     items.append((title, None))
@@ -347,11 +356,29 @@ def hub_breadcrumb_json_ld(
     category: str = "",
     field_hub: str = "",
 ) -> list[dict]:
-    crumb_items = static_crumb_items((hub_index_name, hub_index_url))
+    from tools.build_glossary_pages import public_url
+
+    items = [
+        {"@type": "ListItem", "position": 1, "name": "トップ", "item": public_url(base_url, "index.html")},
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": hub_index_name,
+            "item": public_url(base_url, hub_index_url),
+        },
+    ]
+    pos = 3
     if field_hub and category:
-        crumb_items.append((category, f"terms/{field_hub}/index.html"))
-    crumb_items.append((title, None))
-    items = crumb_json_ld(crumb_items, last_item_url=canonical)
+        items.append(
+            {
+                "@type": "ListItem",
+                "position": pos,
+                "name": category,
+                "item": public_url(base_url, f"terms/{field_hub}/index.html"),
+            }
+        )
+        pos += 1
+    items.append({"@type": "ListItem", "position": pos, "name": title, "item": canonical})
     return items
 
 

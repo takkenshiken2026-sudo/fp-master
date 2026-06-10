@@ -90,7 +90,7 @@ def _index_html(cfg: dict) -> str:
   <p>学科・実技それぞれの問題データと試験画面は、順次 <code>/fp2/</code> 配下に追加していきます。</p>
   <div class="fp2-shell-links">
     <a href="/">級を選び直す</a>
-    <a href="/fp3/">FP3級マスターで学習する</a>
+    <a href="/">FP3級マスターで学習する</a>
   </div>
 </main>
 </body>

@@ -14,6 +14,7 @@ import html
 from pathlib import Path
 
 from tools.site_config import (
+    base_path,
     brand_logo_lines,
     brand_logo_size_class,
     brand_name,
@@ -24,8 +25,6 @@ from tools.site_config import (
     ga4_measurement_id,
     learning_nav_label,
     navigation_items,
-    site_href,
-    spa_hash_href,
 )
 
 FORM_URL = contact_url()
@@ -246,10 +245,7 @@ def _breadcrumb_ol(rel_path: Path, items: list[tuple[str, str | None]]) -> str:
     lis: list[str] = []
     for text, href in items:
         if href:
-            if href.startswith("http://") or href.startswith("https://") or href.startswith("/"):
-                h = href
-            else:
-                h = footer_href(rel_path, href)
+            h = footer_href(rel_path, href) if not href.startswith("http") else href
             lis.append(f'<li><a href="{html.escape(h)}">{html.escape(text)}</a></li>')
         else:
             lis.append(f'<li aria-current="page">{html.escape(text)}</li>')
@@ -293,7 +289,10 @@ def _topnav_logo(rel_path: Path) -> str:
 def _learning_nav_href(rel_path: Path, dest: str) -> str:
     """学習ナビのリンク先（#hash は SPA トップ、それ以外は site 相対パス）。"""
     if dest.startswith("#"):
-        return spa_hash_href(dest)
+        bp = base_path()
+        if bp:
+            return f"{bp}{dest}"
+        return "/" + dest
     return footer_href(rel_path, dest)
 
 
@@ -430,27 +429,6 @@ def q_index_tools_close_html() -> str:
     return "</div>"
 
 
-def q_index_subject_row_html(
-    *,
-    gakka_count: int,
-    jitsugi_count: int,
-) -> str:
-    """過去問一覧の学科・実技切替（常時表示）。"""
-    total = gakka_count + jitsugi_count
-    return (
-        '<div class="q-index-subject-row" role="group" aria-label="科目">'
-        '<span class="q-index-subject-label">科目</span>'
-        '<div class="q-index-chips q-index-subject-chips">'
-        f'<button type="button" class="q-index-filter-opt q-index-subject-btn on" data-subject="all">'
-        f"すべて<span class=\"q-index-filter-count\">（{total}）</span></button>"
-        f'<button type="button" class="q-index-filter-opt q-index-subject-btn" data-subject="gakka">'
-        f"学科<span class=\"q-index-filter-count\">（{gakka_count}）</span></button>"
-        f'<button type="button" class="q-index-filter-opt q-index-subject-btn" data-subject="jitsugi">'
-        f"実技<span class=\"q-index-filter-count\">（{jitsugi_count}）</span></button>"
-        "</div></div>"
-    )
-
-
 def q_index_stats_line(*, question_count: int, mode: str, year_count: int = 0, category_count: int = 0) -> str:
     """一覧パネル見出し下の統計（過去問・実践・一問一答で文言を統一）。"""
     n = question_count
@@ -519,7 +497,7 @@ def q_hub_links_html(rel_path: Path, *, current: str) -> str:
                 f"</li>"
             )
         else:
-            href = site_href(target)
+            href = "/" + target.lstrip("/")
             lis.append(
                 f'<li class="q-hub-tab">'
                 f'<a class="q-hub-tab-label" href="{html.escape(href)}">{html.escape(label)}</a>'

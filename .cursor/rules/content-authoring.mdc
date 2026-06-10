@@ -14,8 +14,6 @@ globs:
 
 # コンテンツ執筆（要約）
 
-**過去問・実技問**（`past_questions.csv`、表・図・stem 分離）は `.cursor/rules/fp-past-question-authoring.mdc` を参照。
-
 **正本:** `docs/seo-article-guidelines.md`（記事・用語・色・公開境界）
 
 | 種別 | ドキュメント | スクリプト |

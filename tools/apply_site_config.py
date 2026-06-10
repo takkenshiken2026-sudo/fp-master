@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.site_config import (
+    base_path,
     brand_logo_lines,
     brand_logo_size_class,
     brand_mark,
@@ -35,6 +36,7 @@ from tools.site_config import (
 )
 from tools.html_footer import site_page_footer, site_page_header, site_shell_footer
 from tools.brand_assets import inject_brand_head
+from tools.build_index_faq_ldjson import inject_index_faq_ldjson
 from tools.index_seo_head import (
     INDEX_SEO_MARKER_END,
     INDEX_SEO_MARKER_START,
@@ -83,10 +85,22 @@ _RELATED_OFFICIAL_SECTION_RE = re.compile(
 )
 
 _MANKAN_OFFICIAL_LINK_RE = re.compile(
-    r'<a href="https://www\.mankan\.org/"[^>]*>試験実施団体</a>'
+    r'<a href="https://www\.mankan\.(?:org|or\.jp)/"[^>]*>試験実施団体</a>'
+)
+_AUTH_LOGO_BLOCK_RE = re.compile(
+    r'<div class="auth-logo-mark" title="[^"]*">[^<]+</div>\s*'
+    r"<h1>[^<]+</h1>\s*"
+    r'<p class="auth-logo-fullname">[^<]+</p>',
+    re.I,
 )
 _MLIT_OFFICIAL_LINK_RE = re.compile(
     r'<a href="https://www\.mlit\.go\.jp/[^"]*"[^>]*>国土交通省(?:\s*住宅局)?</a>'
+)
+_JAFP_OFFICIAL_LINK_RE = re.compile(
+    r'<a href="[^"]*" target="_blank" rel="noopener" style="color:var\(--text2\);text-decoration:underline">日本FP協会（公式）</a>'
+)
+_NTA_OFFICIAL_LINK_RE = re.compile(
+    r'<a href="[^"]*" target="_blank" rel="noopener" style="color:var\(--text2\);text-decoration:underline">国税庁</a>'
 )
 
 
@@ -108,6 +122,26 @@ def apply_ga4_measurement_ids(text: str) -> str:
 def fix_spa_breadcrumb_top(text: str) -> str:
     """SPA 内パンくず1段目はサイト名ではなく「トップ」に統一する。"""
     return _SPA_BREADCRUMB_TOP_RE.sub(r"\1トップ\2トップ\3", text)
+
+
+_LEGACY_SPA_PREFIXES = ("/fp3", "/fp2")
+
+
+def fix_legacy_base_path_hrefs(text: str) -> str:
+    """basePath 未設定時に旧多級サブパス（/fp3 等）へのリンク・canonical をルートに揃える。"""
+    if base_path():
+        return text
+    origin = clean_origin()
+    for legacy in _LEGACY_SPA_PREFIXES:
+        text = text.replace(f'href="{legacy}#', 'href="/#')
+        text = text.replace(f"href='{legacy}#", "href='/#")
+        text = text.replace(f'href="{legacy}/index.html"', 'href="/index.html"')
+        text = text.replace(f"href='{legacy}/index.html'", "href='/index.html'")
+        text = text.replace(f'href="{legacy}/"', 'href="/"')
+        text = text.replace(f"{origin}{legacy}/", f"{origin}/")
+        text = text.replace(f"{origin}{legacy}#", f"{origin}/#")
+        text = text.replace(f"{origin}{legacy}\"", f'{origin}/"')
+    return text
 
 
 def replace_all(text: str) -> str:
@@ -185,8 +219,30 @@ def fix_wrong_official_urls(text: str) -> str:
     official = primary_external_link()
     url = str(official.get("url") or "").strip()
     label = str(official.get("label") or official_organization()).strip()
+    links = external_links()
+    if url and "jafp.or.jp" not in url and ("jafp.or.jp" in text or "日本FP協会（公式）" in text):
+        if label:
+            anchor = (
+                f'<a href="{html.escape(url)}" target="_blank" rel="noopener" '
+                f'style="color:var(--text2);text-decoration:underline">{html.escape(label)}</a>'
+            )
+            text = _JAFP_OFFICIAL_LINK_RE.sub(anchor, text)
+        text = text.replace("https://www.jafp.or.jp/", url)
+        if len(links) > 1:
+            sec_url = str(links[1].get("url") or "").strip()
+            sec_label = str(links[1].get("label") or "").strip()
+            sec_short = sec_label.split("（")[0].strip() if sec_label else ""
+            if sec_url and sec_short:
+                text = text.replace("法令・税制の原文は", "法令・通達の原文は")
+                sec_anchor = (
+                    f'<a href="{html.escape(sec_url)}" target="_blank" rel="noopener" '
+                    f'style="color:var(--text2);text-decoration:underline">{html.escape(sec_short)}</a>'
+                )
+                text = _NTA_OFFICIAL_LINK_RE.sub(sec_anchor, text)
+                text = text.replace("https://www.nta.go.jp/", sec_url)
     if url:
         text = text.replace("https://www.mankan.org/", url)
+        text = text.replace("https://www.mankan.or.jp/", url)
         if label:
             text = _MANKAN_OFFICIAL_LINK_RE.sub(
                 f'<a href="{html.escape(url)}" target="_blank" rel="noopener noreferrer">{html.escape(label)}</a>',
@@ -200,7 +256,6 @@ def fix_wrong_official_urls(text: str) -> str:
                 f'href="{html.escape(url)}" target="_blank" rel="noopener" style="color:var(--text2);text-decoration:underline">試験実施団体</a>',
                 f'href="{html.escape(url)}" target="_blank" rel="noopener" style="color:var(--text2);text-decoration:underline">{html.escape(label)}</a>',
             )
-    links = external_links()
     if links and "jafp.or.jp" in links[0]["url"]:
         text = text.replace(
             "https://www.mlit.go.jp/jutakukentiku/house/",
@@ -366,6 +421,18 @@ def _ensure_topnav_logo_stack(text: str) -> str:
     )
 
 
+def update_index_auth_modal(text: str) -> str:
+    mark = html.escape(brand_mark())
+    bn = html.escape(brand_name())
+    en = html.escape(exam_name())
+    replacement = (
+        f'<div class="auth-logo-mark" title="{bn}">{mark}</div>\n'
+        f"      <h1>{bn}</h1>\n"
+        f'      <p class="auth-logo-fullname">{en}対策サイト</p>'
+    )
+    return _AUTH_LOGO_BLOCK_RE.sub(replacement, text, count=1)
+
+
 def update_index_brand_mark(text: str) -> str:
     mark = _index_logo_mark_html()
 
@@ -513,6 +580,7 @@ def main() -> int:
         old = path.read_text(encoding="utf-8")
         new = replace_all(old)
         if path.suffix == ".html":
+            new = fix_legacy_base_path_hrefs(new)
             new = migrate_legacy_takken_leaks(new)
             new = fix_wrong_official_urls(new)
             new = update_static_page_canonical(new, path)
@@ -525,6 +593,7 @@ def main() -> int:
         if path == ROOT / "index.html":
             new = ensure_site_config_before_fields(new)
             new = inject_index_seo_head(new)
+            new = inject_index_faq_ldjson(new)
             new = inject_index_noscript(new)
             new = inject_index_fields_fallback(new)
             new = update_index_spa_seo_js(new)
@@ -532,6 +601,7 @@ def main() -> int:
             new = ensure_index_theme(new)
             new = update_index_shell_footer(new)
             new = update_index_brand_mark(new)
+            new = update_index_auth_modal(new)
             new = update_index_logo_styles(new)
             new = update_index_glossary_excerpt(new)
         if new != old:

@@ -15,7 +15,7 @@ if str(ROOT) not in sys.path:
 from tools.site_config import base_path, clean_origin  # noqa: E402
 
 PUBLIC_SITE = ROOT / "public_site"
-FP3_PREFIX = base_path() or "/fp3"
+FP3_PREFIX = base_path()
 
 
 def redirect_html(target_path: str) -> str:
@@ -60,7 +60,7 @@ def main() -> int:
         return 1
     count = 0
     for rel in legacy_rel_paths():
-        dest_url = f"{FP3_PREFIX}/{rel}"
+        dest_url = f"{FP3_PREFIX}/{rel}" if FP3_PREFIX else f"/{rel}"
         out_path = PUBLIC_SITE / rel
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(redirect_html(dest_url), encoding="utf-8")

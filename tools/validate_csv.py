@@ -40,8 +40,7 @@ from tools.affiliate_links import (  # noqa: E402
 )
 from tools.related_links import parse_related_link_token
 from tools.site_config import category_to_field_map, extended_correct_answers, guide_genre_labels
-from tools.question_diagram import diagram_id_exists as question_diagram_id_exists
-from tools.term_diagram import DIAGRAM_ID_RE, diagram_id_exists as term_diagram_id_exists
+from tools.term_diagram import DIAGRAM_ID_RE, diagram_id_exists
 
 
 def split_semicolon(value: str) -> list[str]:
@@ -333,37 +332,6 @@ class Validator:
                 else:
                     self.warn(path, idx, issue.message)
             self._validate_diagram_id(path, row, idx)
-        self.validate_fp3_terms_catalog()
-
-    def validate_fp3_terms_catalog(self) -> None:
-        path = DATA_DIR / "fp3_terms_catalog.csv"
-        if not path.is_file():
-            self.warn(path, None, "fp3_terms_catalog.csv がありません（用語一覧マスタ）")
-            return
-        _, rows = self.read_csv(path, {"term", "category", "short_def"})
-        if len(rows) < 200:
-            self.warn(
-                path,
-                None,
-                f"fp3_terms_catalog.csv の行数が少なすぎます（{len(rows)} 行）",
-            )
-        seen: set[str] = set()
-        valid_cats = set(self.category_map.keys())
-        for idx, row in enumerate(rows, start=2):
-            term = self.require_text(path, row, idx, "term")
-            if term:
-                if term in seen:
-                    self.error(path, idx, f"term が重複しています: {term}")
-                seen.add(term)
-            cat = self.require_text(path, row, idx, "category")
-            if cat and cat not in valid_cats:
-                self.error(
-                    path,
-                    idx,
-                    f"category が site-config の分野と一致しません: {cat!r}",
-                )
-            if not self.norm(row.get("short_def")):
-                self.error(path, idx, "short_def が空です")
 
     def _validate_diagram_id(self, path: Path, row: dict[str, str], line: int) -> None:
         raw = self.norm(row.get("diagram_id"))
@@ -376,11 +344,12 @@ class Validator:
                 f"diagram_id は半角英小文字・数字・ハイフンのみ: {raw!r}",
             )
             return
-        if not (term_diagram_id_exists(raw) or question_diagram_id_exists(raw)):
+        if not diagram_id_exists(raw):
             self.error(
                 path,
                 line,
-                f"diagram_id に対応する JSON がありません: data/term_diagrams/ または data/question_diagrams/{raw}.json",
+                f"diagram_id に対応する JSON がありません:"
+                f" data/term_diagrams/{raw}.json または data/question_diagrams/{raw}.json",
             )
 
     def validate_guide_articles(self) -> None:
@@ -404,6 +373,11 @@ class Validator:
                 " docs/guide-article-catalog.md の記事カタログを参照してください。",
             )
         slugs: set[str] = {self.norm(r.get("slug")) for r in rows if self.norm(r.get("slug"))}
+        slug_titles: dict[str, str] = {
+            self.norm(r.get("slug")): self.norm(r.get("title"))
+            for r in rows
+            if self.norm(r.get("slug"))
+        }
         seen: set[str] = set()
         affiliate_count = 0
         affiliate_ready_count = 0
@@ -527,7 +501,7 @@ class Validator:
                         "アフィリエイト記事の related_links には、試験ガイド・無料コンテンツへ向ける内部 slug を2件以上推奨します",
                     )
 
-            for issue in check_guide_row(row, slug_set=slugs, line=idx):
+            for issue in check_guide_row(row, slug_set=slugs, slug_titles=slug_titles, line=idx):
                 if issue.level == "ERROR":
                     self.error(path, idx, f"[{issue.column}] {issue.message}")
                 else:

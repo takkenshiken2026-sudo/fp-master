@@ -14,9 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.build_past_question_pages import build_materials_html
 from tools.correct_answer_format import collect_choice_texts, is_valid_correct, parse_correct_js_index
-from tools.past_question_subject import subject_from_row
 from tools.site_config import category_to_field_map, extended_correct_answers
 
 DATA_CSV = ROOT / "data" / "past_questions.csv"
@@ -38,18 +36,13 @@ def norm(s: str | None) -> str:
     return (s or "").strip()
 
 
-def build_app_stem_text(row: dict) -> str:
-    """アプリ出題用テキスト。diagram_id がある場合 preamble は資料 HTML 側へ。"""
-    from tools.build_past_question_pages import resolve_stem_text
-    from tools.fp_table_parser import preamble_is_materials
-
+def build_plain_text(row: dict) -> str:
     parts: list[str] = []
-    stem = resolve_stem_text(row) if norm(row.get("diagram_id")) else norm(row.get("stem"))
+    stem = norm(row.get("stem"))
     preamble = norm(row.get("preamble"))
-    diagram_id = norm(row.get("diagram_id"))
     if stem:
         parts.append(stem)
-    if preamble and not diagram_id and not preamble_is_materials(preamble):
+    if preamble:
         parts.append(preamble)
     for lab, key in LABELS:
         t = norm(row.get(key))
@@ -88,25 +81,20 @@ def row_to_obj(row: dict, line_no: int) -> dict | None:
             return None
         raise ValueError(f"line {line_no}: 正答なし year={year} no={qno}")
 
-    text = build_app_stem_text(row)
+    text = build_plain_text(row)
     exp = norm(row.get("explanation")) or "（解説は未入力です。）"
-    materials_html = build_materials_html(row)
 
     qid = year * 100 + qno
-    obj: dict = {
+    return {
         "id": qid,
         "year": year,
         "num": qno,
         "field": field,
-        "subject": subject_from_row(row, qno=qno),
         "text": text,
         "opts": opts,
         "ans": 0 if cor is None else cor,
         "exp": exp,
     }
-    if materials_html:
-        obj["materialsHtml"] = materials_html
-    return obj
 
 
 def level_from_tags(tags: str) -> int:
@@ -141,16 +129,14 @@ def practice_row_to_obj(row: dict, line_no: int) -> dict | None:
             return None
         raise ValueError(f"practice_questions.csv line {line_no}: 正答なし no={qno}")
 
-    text = build_app_stem_text(row)
+    text = build_plain_text(row)
     exp = norm(row.get("explanation")) or "（解説は未入力です。）"
-    materials_html = build_materials_html(row)
     qid = PRACTICE_ID_BASE + qno
-    practice_obj: dict = {
+    return {
         "id": qid,
         "year": PRACTICE_POOL_YEAR,
         "num": qno,
         "field": field,
-        "subject": subject_from_row(row, qno=qno),
         "text": text,
         "opts": opts,
         "ans": 0 if cor is None else cor,
@@ -158,16 +144,13 @@ def practice_row_to_obj(row: dict, line_no: int) -> dict | None:
         "level": level_from_tags(row.get("tags", "")),
         "publicPath": f"q/practice/p{qno:03d}/index.html",
     }
-    if materials_html:
-        practice_obj["materialsHtml"] = materials_html
-    return practice_obj
 
 
 def load_practice_questions() -> list[dict]:
     if not PRACTICE_CSV.is_file():
         return []
-    with PRACTICE_CSV.open(encoding="utf-8-sig", newline="") as f:
-        rows = list(csv.DictReader(f))
+    text = PRACTICE_CSV.read_text(encoding="utf-8-sig")
+    rows = list(csv.DictReader(text.splitlines()))
     out: list[dict] = []
     for i, row in enumerate(rows, start=2):
         o = practice_row_to_obj(row, i)
@@ -199,8 +182,8 @@ def main() -> int:
     if not DATA_CSV.is_file():
         print(f"入力がありません: {DATA_CSV}", file=sys.stderr)
         return 1
-    with DATA_CSV.open(encoding="utf-8-sig", newline="") as f:
-        rows = list(csv.DictReader(f))
+    text = DATA_CSV.read_text(encoding="utf-8-sig")
+    rows = list(csv.DictReader(text.splitlines()))
     objs: list[dict] = []
     year_labels: dict[int, str] = {}
     for i, row in enumerate(rows, start=2):
