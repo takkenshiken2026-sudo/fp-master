@@ -132,6 +132,37 @@ def is_glossary_draft_entry(entry: dict) -> bool:
     return norm(entry.get("content_status")) == "draft"
 
 
+# 一覧・分野ハブには載せない執筆サンプル／メタ用語（related_terms 解決用に CSV には残す）
+GLOSSARY_INDEX_EXCLUDED_TERMS: frozenset[str] = frozenset(
+    {
+        "【図解デモ】建ぺい率と容積率",
+        "一問一答",
+        "公式情報",
+        "出題範囲",
+        "受験資格",
+        "合格基準",
+        "学習記録",
+        "復習",
+        "模擬試験",
+        "比較表",
+        "用語解説",
+        "試験要項",
+        "過去問",
+    }
+)
+GLOSSARY_INDEX_EXCLUDED_SLUGS: frozenset[str] = frozenset({"g-diagram-demo.html"})
+
+
+def is_glossary_index_excluded(entry: dict) -> bool:
+    if entry.get("slug_file") in GLOSSARY_INDEX_EXCLUDED_SLUGS:
+        return True
+    return entry.get("term") in GLOSSARY_INDEX_EXCLUDED_TERMS
+
+
+def glossary_index_entries(entries: list[dict]) -> list[dict]:
+    return [e for e in entries if not is_glossary_index_excluded(e)]
+
+
 def lookup_key(s: str) -> str:
     return re.sub(r"\s+", "", s)
 
@@ -255,7 +286,7 @@ def split_semicolon(s: str) -> list[str]:
 TERMS_INDEX_CSS_VER = "20260611-terms-draft-badge"
 TERMS_INDEX_JS_VER = "20260611-terms-draft-badge"
 ROBOTS_NOINDEX_FOLLOW = '<meta name="robots" content="noindex, follow">'
-TERMS_INDEX_SEARCH_PLACEHOLDER = "例：ストレスチェック、ラインケア、うつ病…"
+TERMS_INDEX_SEARCH_PLACEHOLDER = "例：終価係数、iDeCo、高額療養費…"
 
 # CSV enrich 時の分野テンプレ（一覧の定義抜粋には出さない）
 _GENERIC_SNIPPET_SUFFIXES = (
@@ -1593,13 +1624,15 @@ def main() -> int:
         hub = field_hub_slug(cat)
         hub_dir = TERMS_DIR / hub
         hub_dir.mkdir(parents=True, exist_ok=True)
+        hub_entries = glossary_index_entries(by_cat[cat])
         (hub_dir / "index.html").write_text(
-            build_field_hub_html(cat, hub, by_cat[cat], base),
+            build_field_hub_html(cat, hub, hub_entries, base),
             encoding="utf-8",
         )
         hub_count += 1
 
-    (TERMS_DIR / "index.html").write_text(build_terms_index(entries, base), encoding="utf-8")
+    index_entries = glossary_index_entries(entries)
+    (TERMS_DIR / "index.html").write_text(build_terms_index(index_entries, base), encoding="utf-8")
 
     from tools.build_term_diagram_sample_pages import build_all as build_term_diagram_samples
 
