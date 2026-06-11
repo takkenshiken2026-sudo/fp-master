@@ -128,6 +128,10 @@ def norm(s: str | None) -> str:
     return (s or "").strip()
 
 
+def is_glossary_draft_entry(entry: dict) -> bool:
+    return norm(entry.get("content_status")) == "draft"
+
+
 def lookup_key(s: str) -> str:
     return re.sub(r"\s+", "", s)
 
@@ -248,8 +252,9 @@ def split_semicolon(s: str) -> list[str]:
     return [x.strip() for x in re.split(r"[;；]", s or "") if x.strip()]
 
 
-TERMS_INDEX_CSS_VER = "20260524-terms-table-14px"
-TERMS_INDEX_JS_VER = "20260521-terms-snippet"
+TERMS_INDEX_CSS_VER = "20260611-terms-draft-badge"
+TERMS_INDEX_JS_VER = "20260611-terms-draft-badge"
+ROBOTS_NOINDEX_FOLLOW = '<meta name="robots" content="noindex, follow">'
 TERMS_INDEX_SEARCH_PLACEHOLDER = "例：ストレスチェック、ラインケア、うつ病…"
 
 # CSV enrich 時の分野テンプレ（一覧の定義抜粋には出さない）
@@ -338,6 +343,12 @@ def terms_index_snippet(entry: dict) -> str:
     return short
 
 
+def terms_index_draft_badge(entry: dict) -> str:
+    if not is_glossary_draft_entry(entry):
+        return ""
+    return '<span class="terms-idx-draft-badge">準備中</span>'
+
+
 def render_terms_index_tbody(entries: list[dict]) -> str:
     """JS 未実行時も一覧が見えるよう、全件の tbody をサーバー側で生成する（1語1行・3列）。"""
     items = sort_terms_index_entries(entries)
@@ -347,11 +358,12 @@ def render_terms_index_tbody(entries: list[dict]) -> str:
         href = html.escape(terms_index_href(item["slug_file"]))
         href_attr = f' data-entry-href="{href}"'
         short_def = html.escape(terms_index_snippet(item))
+        badge = terms_index_draft_badge(item)
         rows.append(
             "<tr class=\"terms-idx-table-row\">"
             f'<td class="terms-idx-td-term" data-label="用語"{href_attr} tabindex="0">'
             f'<div class="terms-idx-term-cell"><a href="{href}">{html.escape(item["term"])}</a>'
-            f"</div></td>"
+            f"{badge}</div></td>"
             f'<td class="terms-idx-td-cat" data-label="分野"{href_attr}>'
             f'{html.escape(item.get("category") or "")}</td>'
             f'<td class="terms-idx-td-snippet" data-label="定義"{href_attr}>'
@@ -377,6 +389,7 @@ def terms_index_item_dict(entry: dict) -> dict:
         "shortDef": snippet,
         "href": terms_index_href(entry["slug_file"]),
         "fieldHub": entry.get("field_hub") or "",
+        "contentStatus": norm(entry.get("content_status")) or "published",
         "search": " ".join(x for x in search_bits if x),
     }
 
@@ -689,6 +702,98 @@ def peer_comparison_table_html(
         f"{body}</tbody></table>"
         '<p class="term-compare-note">数値・手続の正誤は演習と公式テキストで必ず確認してください。</p>'
     )
+
+
+def build_term_draft_html(
+    entry: dict,
+    rel_path: Path,
+    base_url: str,
+) -> str:
+    """詳細記事未執筆（content_status=draft）用の準備中ページ。"""
+    term = entry["term"]
+    category = entry["category"]
+    short_def = entry["short_def"] or entry.get("definition") or ""
+    slug_file = entry["slug_file"]
+    title = f"{term}｜用語解説（準備中）｜{brand_name()}"
+    desc = meta_description(
+        f"{term}の用語解説記事を準備中です。{short_def}"
+    )
+    canonical = public_url(base_url, f"terms/{slug_file}")
+    css_links = rel_editorial_css(rel_path)
+    field_badge = glossary_field_badge_html(category)
+    crumb_items = [
+        ("トップ", "index.html"),
+        ("用語解説一覧", "terms/index.html"),
+        (term, None),
+    ]
+    page_header = site_page_header(rel_path, current="terms")
+    page_breadcrumb = breadcrumb_html(rel_path, crumb_items)
+    page_footer = site_page_footer(rel_path, current="terms")
+    hub_tabs = knowledge_hub_tabs_html(
+        current="terms",
+        **knowledge_hub_tab_hrefs(here="terms"),
+    )
+    back_link = '<p class="term-draft-back"><a href="index.html">用語解説一覧へ戻る</a></p>'
+    notice = (
+        '<section class="term-draft-notice" aria-labelledby="term-draft-title">'
+        '<h2 id="term-draft-title">解説記事を準備中です</h2>'
+        f"<p><strong>{html.escape(term)}</strong>の詳細解説は現在執筆中です。"
+        "一覧では短い定義を確認できます。公開までしばらくお待ちください。</p>"
+        "</section>"
+    )
+    def_block = ""
+    if short_def:
+        def_block = (
+            '<section class="seo-article-section term-definition-section" aria-labelledby="term-draft-def">'
+            '<h2 id="term-draft-def">短い定義</h2>'
+            f"<p>{html.escape(short_def)}</p>"
+            "</section>"
+        )
+    meta_bits = []
+    if category:
+        meta_bits.append(f'<span class="meta-category">{html.escape(category)}</span>')
+    meta_bits.append('<span class="term-draft-status-badge">準備中</span>')
+    meta_html = f'<div class="article-meta">{"".join(meta_bits)}</div>'
+
+    return f"""<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+{seo_brand_asset_tags(rel_path)}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{html.escape(title)}</title>
+<meta name="description" content="{html.escape(desc)}">
+{ROBOTS_NOINDEX_FOLLOW}
+<link rel="canonical" href="{html.escape(canonical)}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{html.escape(title)}">
+<meta property="og:description" content="{html.escape(desc)}">
+<meta property="og:url" content="{html.escape(canonical)}">
+<meta name="twitter:card" content="summary_large_image">
+{seo_editorial_head_fonts()}
+{css_links}
+</head>
+<body class="{shell_body_class('term-article-page term-draft-page')}">
+{site_page_wrap_open()}
+{page_header}
+<main class="seo-article-main">
+  {page_breadcrumb}
+  {hub_tabs}
+  <article class="{seo_editorial_article_class()}">
+    {meta_html}
+    <h1 class="article-title">{html.escape(term)}</h1>
+    {field_badge}
+    <p class="article-lead"><strong>{html.escape(term)}</strong>の用語解説記事を準備しています。</p>
+    {notice}
+    {def_block}
+    {back_link}
+  </article>
+</main>
+{page_footer}
+{site_page_wrap_close()}
+</body>
+</html>
+"""
 
 
 def build_term_html(
@@ -1441,6 +1546,7 @@ def load_glossary_entries(*, strict: bool = True) -> list[dict]:
                 "fact_checked_at": norm(row.get("fact_checked_at")),
                 "last_reviewed_at": norm(row.get("last_reviewed_at")),
                 "source_checked_at": norm(row.get("source_checked_at")),
+                "content_status": norm(row.get("content_status")) or "published",
             }
         )
     return entries
@@ -1471,12 +1577,13 @@ def main() -> int:
         out_file = TERMS_DIR / e["slug_file"]
         rel_path = out_file.relative_to(ROOT)
         out_file.parent.mkdir(parents=True, exist_ok=True)
-        out_file.write_text(
-            build_term_html(
+        if is_glossary_draft_entry(e):
+            page_html = build_term_draft_html(e, rel_path, base)
+        else:
+            page_html = build_term_html(
                 e, rel_path, base, term_lookup, entries, guides, by_term=entries_by_term
-            ),
-            encoding="utf-8",
-        )
+            )
+        out_file.write_text(page_html, encoding="utf-8")
 
     by_cat: dict[str, list[dict]] = {}
     for e in entries:

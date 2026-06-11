@@ -2201,6 +2201,38 @@ a.q-hub-tab-label:hover {
   padding: 7px 12px;
   box-shadow: none;
 }
+.terms-idx-draft-badge,
+.term-draft-status-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--text2);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.term-draft-notice {
+  margin: 1.25rem 0;
+  padding: 1rem 1.1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+}
+.term-draft-notice h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+.term-draft-notice p {
+  margin: 0;
+}
+.term-draft-back {
+  margin-top: 1.5rem;
+}
 .terms-idx-search {
   flex: 1;
   max-width: 420px;
