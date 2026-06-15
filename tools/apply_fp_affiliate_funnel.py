@@ -12,20 +12,29 @@ CSV_PATH = ROOT / "data" / "guide_articles.csv"
 
 AFFILIATE_TITLES = {
     "affiliate-online-course-compare": "FP3級オンライン講座比較【オンスク.JP vs 資格スクエア】独学との併用",
+    "affiliate-textbooks-recommend": "FP3級のおすすめテキスト3選【2026-2027年度版·独学】",
+    "affiliate-problem-books": "FP3級のおすすめ問題集3選【2026年度版·過去問·予想模試】",
 }
 
 BODY = {
     "affiliate-online-course-compare": (
         "週の学習時間が足りない場合は、affiliate-online-course-compare でオンスク.JPと資格スクエアの演習設計を比較し、当サイト演習量は維持したまま1社に絞ると続きやすいです。"
     ),
+    "affiliate-textbooks-recommend": (
+        "テキスト1冊は、affiliate-textbooks-recommend でみんなが欲しかった·ユーキャン32日·うかる速攻の3冊を比較してから固定すると、途中で教材を変えずに済みます。"
+    ),
+    "affiliate-problem-books": (
+        "テキスト第1周40％以降の演習1冊は、affiliate-problem-books でみんなが欲しかった·ユーキャン·スッキリ過去+予想の3冊からテキストと縦串で選ぶと迷いが減ります。"
+    ),
 }
 
 GUIDE_AFFILIATE: dict[str, tuple[str, int]] = {
     "compare-self-study-vs-correspondence": ("affiliate-online-course-compare", 2),
-    "compare-textbook-vs-app": ("affiliate-online-course-compare", 2),
-    "attr-zero-knowledge-start": ("affiliate-online-course-compare", 2),
+    "compare-textbook-vs-app": ("affiliate-textbooks-recommend", 2),
+    "attr-zero-knowledge-start": ("affiliate-textbooks-recommend", 2),
     "faq-study-hours": ("affiliate-online-course-compare", 2),
-    "compare-past-questions-only": ("affiliate-online-course-compare", 2),
+    "compare-past-questions-only": ("affiliate-problem-books", 2),
+    "tools-ichimon-vs-past": ("affiliate-problem-books", 2),
     "attr-parental-leave": ("affiliate-online-course-compare", 2),
     "attr-side-business-freelance": ("affiliate-online-course-compare", 2),
 }

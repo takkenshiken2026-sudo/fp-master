@@ -1,0 +1,68 @@
+slug: affiliate-problem-books
+theme_key: problem-books
+search_intent: FP3級技能検定の問題集・過去問を比較して選びたい
+title: FP3級のおすすめ問題集3選【2026年度版·過去問·予想模試】
+layout: product-comparison
+asp_primary: amazon
+comparison_kind: books
+comparison_title: おすすめ問題集3選（比較）
+price_disclaimer: 価格・在庫・版情報は執筆時点（2026-06-12）のAmazon税込参考です。購入前に必ず販売ページでご確認ください。
+products:
+  - rank: 1
+    offer_type: book
+    name: 2025-2026年版 みんなが欲しかった! FPの問題集3級
+    publisher: TAC出版
+    edition: 2025-2026年版
+    price_yen: 1760
+    price_note: Amazon税込参考·2026-2027年版は購入前に版を確認
+    pages: 520
+    format: A5判
+    asin: '4300116059'
+    image_file: fp-book-4300116059.webp
+    amazon_url: https://www.amazon.co.jp/dp/4300116059/ref=nosim?tag=ue083093-22
+    for_who: みんなが欲しかったテキストと縦串で厳選過去問演習をしたい人
+    highlights:
+      - 本試験問題から厳選·CBT模試プログラム付き
+      - 姉妹テキストと章立ての相性がよい定番
+      - 実技3種（個人·保険·資産）に対応
+  - rank: 2
+    offer_type: book
+    name: "これだけで完成！ユーキャンのFP3級 きほん問題集 '26～'27年版"
+    publisher: 自由国民社
+    edition: "26～'27年版"
+    price_yen: 1650
+    price_note: Amazon税込参考·送料別
+    pages: 304
+    format: A5判
+    asin: '442661712X'
+    image_file: fp-book-442661712x.webp
+    amazon_url: https://www.amazon.co.jp/dp/442661712X/ref=nosim?tag=ue083093-22
+    for_who: ユーキャンきほんテキスト読了後に頻出問題を効率演習したい人
+    highlights:
+      - 頻出厳選·オリジナル予想模擬試験つき
+      - きほんテキストへのリンクで復習が速い
+      - CBT模試特典で画面演習に接続
+  - rank: 3
+    offer_type: book
+    name: 2026-2027年版 スッキリとける過去＋予想問題 FP技能士3級
+    publisher: TAC出版
+    edition: 2026-2027年版
+    price_yen: 1650
+    price_note: Amazon税込参考·送料別
+    pages: 368
+    format: A5判
+    asin: '4300120935'
+    image_file: fp-book-4300120935.webp
+    amazon_url: https://www.amazon.co.jp/dp/4300120935/ref=nosim?tag=ue083093-22
+    for_who: 過去問と予想問題を1冊でコンパクトに回したい社会人
+    highlights:
+      - 科目別精選過去問＋予想問題が1冊
+      - 赤シート付きで暗記復習向き
+      - テキスト1冊と役割分担しやすい薄型
+related_links:
+  - tools-ichimon-vs-past:一問一答と過去問の使い分け
+  - compare-past-questions-only:テキストなしで過去問だけで合格できるか
+  - faq-study-hours:勉強時間の目安
+  - affiliate-textbooks-recommend:おすすめテキスト3選
+  - ../../q/index.html:過去問を解く（無料）
+operator_note: Amazon tag=ue083093-22。4300116059 / 442661712X / 4300120935。2026-06-12 価格確認。みんな問題集2026-2027版(ISBN9784300120859)はAmazon未掲載のため2025-2026版を掲載。

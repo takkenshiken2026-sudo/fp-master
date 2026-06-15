@@ -195,7 +195,7 @@ REWRITES: dict[str, dict[str, str]] = {
                 "attr-zero-knowledge-start:金融知識ゼロからFP3級を目指す場合の最初の一歩",
                 "exam-wp-written-vs-practical:学科試験と実技試験の違いと対策の分け方",
                 "tools-smartphone-app:スマホアプリでFP3級を勉強する方法と注意点",
-                "../../q/index.html:過去問を解く（無料）",
+                "tools-ichimon-vs-past:一問一答と過去問の使い分け",
                 f"{ONSUKU_A8}:オンスク.JP FP3級講座（公式）",
                 f"{SHIKAKU_A8}:資格スクエア FP講座（公式）",
             ]
