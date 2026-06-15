@@ -654,6 +654,15 @@ _GA4_SKIP_PREFIXES = (
 )
 
 
+def _is_guide_retire_redirect(text: str) -> bool:
+    """build_guide_retire_redirects が書く noindex スタブ（GA4 不要）。"""
+    return (
+        "記事移動中" in text
+        and 'content="noindex, follow"' in text
+        and "location.replace" in text
+    )
+
+
 def _ga4_page_issues(root: Path, rel: str, *, require_page_view: bool = False) -> list[Issue]:
     """公開 HTML の GA4 スニペット整合性（リダイレクト専用 URL は除外）。"""
     if any(rel.startswith(p) for p in _GA4_SKIP_PREFIXES):
@@ -662,6 +671,8 @@ def _ga4_page_issues(root: Path, rel: str, *, require_page_view: bool = False) -
     if not path.is_file():
         return []
     text = path.read_text(encoding="utf-8")
+    if _is_guide_retire_redirect(text):
+        return []
     issues: list[Issue] = []
     expected = ga4_measurement_id()
     if "site-analytics.js" not in text:
@@ -775,6 +786,12 @@ def _static_page_site_leaks(root: Path) -> list[Issue]:
     return issues
 
 
+def _guide_index_picks(root: Path) -> list[Issue]:
+    from tools.validate_guide_index_picks import validate_guide_index_picks
+
+    return validate_guide_index_picks(root)
+
+
 def main() -> int:
     root = ROOT
     if len(sys.argv) > 1 and sys.argv[1] == "--root":
@@ -815,6 +832,7 @@ def main() -> int:
     issues.extend(_viewport_and_static_css(root))
     issues.extend(_ga4_tracking(root))
     issues.extend(_static_page_site_leaks(root))
+    issues.extend(_guide_index_picks(root))
 
     if not issues:
         print("validate_site_integration: OK")

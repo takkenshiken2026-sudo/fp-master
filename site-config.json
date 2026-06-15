@@ -230,6 +230,28 @@
       "legacyGlossaryCat": "inheritance"
     }
   ],
+  "guideIndexPicks": {
+    "title": "おすすめオンライン講座",
+    "lead": "2026年度版の比較記事から、オンスク.JPと資格スクエアの選び方へ。",
+    "leadsByHub": {
+      "articles": "2026年度版の比較記事から、FP3級オンライン講座の比較記事へ。",
+      "terms": "用語暗記と併用するオンライン講座の比較記事へ。",
+      "q": "無料演習と併用するオンライン講座の比較記事へ。"
+    },
+    "layout": "strip",
+    "items": [
+      {
+        "kind": "course",
+        "kindLabel": "オンライン講座",
+        "title": "FP3級オンライン講座比較【オンスク vs 資格スクエア】",
+        "description": "月額・動画・演習量を比較し、独学テキストとの併用設計を解説します。資格スクエアは新規販売終了の公式告知あり。",
+        "href": "affiliate-online-course-compare/",
+        "cta": "2講座を比較する",
+        "image": "images/affiliate/fp-course-onsuku-fp3.webp",
+        "imageAlt": "オンスク.JP FP3級オンライン通信講座"
+      }
+    ]
+  },
   "externalLinks": [
     {
       "label": "日本FP協会（公式）",
