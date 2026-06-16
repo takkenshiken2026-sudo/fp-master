@@ -81,8 +81,6 @@ GLOSSARY_MIN_RELATED_TERMS = 2
 GLOSSARY_MIN_EXAM_POINT_ITEMS = 2
 GLOSSARY_FAQ_COUNT = 4
 
-GLOSSARY_CONTENT_STATUSES = frozenset({"draft", "published", "review_needed", "archived"})
-
 # 法令・制度分野で importance A/S のときは根拠列を推奨（警告）
 LAW_CATEGORY_KEYWORDS = ("法令", "制度", "法")
 
@@ -92,15 +90,6 @@ def split_semicolon(value: str) -> list[str]:
 
 def norm(value: object) -> str:
     return str(value or "").strip()
-
-
-def glossary_content_status(row: dict[str, str]) -> str:
-    status = norm(row.get("content_status"))
-    return status if status else "published"
-
-
-def is_glossary_draft(row: dict[str, str]) -> bool:
-    return glossary_content_status(row) == "draft"
 
 
 @dataclass(frozen=True)
@@ -132,30 +121,6 @@ def check_glossary_row(
 
     def warn(msg: str) -> None:
         issues.append(GlossaryRowIssue("WARN", msg))
-
-    status = glossary_content_status(row)
-    if status not in GLOSSARY_CONTENT_STATUSES:
-        warn(f"content_status は draft / published / review_needed / archived のいずれかを推奨します: {status!r}")
-
-    if is_glossary_draft(row):
-        category = norm(row.get("category"))
-        if not category:
-            err("category は必須です")
-        tags = split_semicolon(norm(row.get("tags")))
-        if not tags:
-            err("tags は1件以上必須です（セミコロン区切り）")
-        short = norm(row.get("short_def"))
-        if not short:
-            err("short_def は必須です（一覧表示用の短い定義）")
-        elif len(short) < 12:
-            err(f"short_def は 12 文字以上にしてください（現在 {len(short)} 文字）")
-        definition = norm(row.get("definition"))
-        if definition and len(definition) < 12:
-            err(f"definition は 12 文字以上にしてください（現在 {len(definition)} 文字）")
-        importance = norm(row.get("importance"))
-        if importance and importance not in GLOSSARY_IMPORTANCE_VALUES:
-            warn(f"importance は A/B/C/S のいずれかを推奨します: {importance!r}")
-        return issues
 
     for col in GLOSSARY_BASE_REQUIRED:
         if col not in row:

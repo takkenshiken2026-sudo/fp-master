@@ -35,29 +35,119 @@
   },
   "navigation": {
     "header": [
-      { "label": "級選択", "href": "/", "key": "portal" },
-      { "label": "FP3級", "href": "/fp3/", "key": "fp3" },
+      { "label": "FP3級", "href": "/", "key": "fp3" },
+      { "label": "トップ", "href": "index.html", "key": "top" },
+      { "label": "このサイトについて", "href": "about.html", "key": "about" },
+      { "label": "過去問一覧", "href": "q/index.html", "key": "q" },
+      { "label": "用語解説", "href": "terms/index.html", "key": "terms" },
+      { "label": "試験ガイド", "href": "articles/index.html", "key": "articles" },
+      { "label": "関連リンク", "href": "related-sites.html", "key": "related" },
       { "label": "プライバシー", "href": "privacy.html", "key": "privacy" }
     ],
     "footer": [
-      { "label": "級選択", "href": "/", "key": "portal" },
-      { "label": "FP3級", "href": "/fp3/", "key": "fp3" },
+      { "label": "FP3級", "href": "/", "key": "fp3" },
+      { "label": "トップ", "href": "index.html", "key": "top" },
+      { "label": "このサイトについて", "href": "about.html", "key": "about" },
+      { "label": "過去問一覧", "href": "q/index.html", "key": "q" },
+      { "label": "用語解説", "href": "terms/index.html", "key": "terms" },
+      { "label": "試験ガイド", "href": "articles/index.html", "key": "articles" },
+      { "label": "関連リンク", "href": "related-sites.html", "key": "related" },
       { "label": "プライバシー", "href": "privacy.html", "key": "privacy" },
       { "label": "お問い合わせ", "href": "__CONTACT__", "key": "contact" }
     ]
   },
+  "guideArticleGenres": [
+    {
+      "id": "audience",
+      "label": "属性別・状況別",
+      "phase": "学習を設計する",
+      "style": "study",
+      "hint": "学生・社会人・主婦・転職など属性別の受験メリットと学習設計"
+    },
+    {
+      "id": "field-six",
+      "label": "分野別対策（6科目別）",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "6科目ごとの出題傾向・頻出論点・計算問題の対策"
+    },
+    {
+      "id": "written-practical",
+      "label": "学科・実技の違いと対策",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "学科・実技の違い、日本FP協会・きんざいの選び方と対策"
+    },
+    {
+      "id": "compare",
+      "label": "比較・選択系",
+      "phase": "学習を設計する",
+      "style": "study",
+      "hint": "独学と講座、他資格との比較、受験スタイルの選び方"
+    },
+    {
+      "id": "after-pass",
+      "label": "合格後・活用",
+      "phase": "横断",
+      "style": "meta",
+      "hint": "合格後の資格活用・履歴書・上位資格・継続教育"
+    },
+    {
+      "id": "faq",
+      "label": "よくある質問",
+      "phase": "横断",
+      "style": "meta",
+      "hint": "勉強時間・合格率・試験当日・合否確認などFAQ"
+    }
+  ],
   "fields": [
-    { "id": "life", "name": "ライフプランニングと資金計画", "aliases": [], "legacyGlossaryCat": "life" },
-    { "id": "risk", "name": "リスク管理", "aliases": [], "legacyGlossaryCat": "risk" },
-    { "id": "asset", "name": "金融資産運用", "aliases": [], "legacyGlossaryCat": "asset" },
-    { "id": "tax", "name": "タックスプランニング", "aliases": [], "legacyGlossaryCat": "tax" },
-    { "id": "inheritance", "name": "相続・事業承継", "aliases": [], "legacyGlossaryCat": "inheritance" }
+    {
+      "id": "life-plan",
+      "name": "ライフプランニングと資金計画",
+      "aliases": ["ライフプランニングと資金計画", "ライフプランニング", "資金計画"],
+      "legacyGlossaryCat": "life-plan"
+    },
+    {
+      "id": "risk",
+      "name": "リスク管理",
+      "aliases": ["リスク管理", "保険"],
+      "legacyGlossaryCat": "risk"
+    },
+    {
+      "id": "asset",
+      "name": "金融資産運用",
+      "aliases": ["金融資産運用", "資産運用"],
+      "legacyGlossaryCat": "asset"
+    },
+    {
+      "id": "tax",
+      "name": "タックスプランニング",
+      "aliases": ["タックスプランニング", "税金", "税制"],
+      "legacyGlossaryCat": "tax"
+    },
+    {
+      "id": "realestate",
+      "name": "不動産",
+      "aliases": ["不動産"],
+      "legacyGlossaryCat": "realestate"
+    },
+    {
+      "id": "inheritance",
+      "name": "相続・事業承継",
+      "aliases": ["相続・事業承継", "相続", "事業承継"],
+      "legacyGlossaryCat": "inheritance"
+    }
   ],
   "externalLinks": [
     {
       "label": "日本FP協会（公式）",
       "url": "https://www.jafp.or.jp/",
       "description": "FP技能検定の試験日程・要項・合格発表などの公式情報を確認してください。"
+    },
+    {
+      "label": "FP技能検定",
+      "url": "https://www.jafp.or.jp/exam/",
+      "description": "FP2級・FP3級技能検定の受験案内・申込・試験範囲。"
     }
   ]
 }

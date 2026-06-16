@@ -30,6 +30,7 @@ from tools.guide_rewrite_rules import (
 
 GUIDE_MIN_SECTION_BODY = 180  # ERROR（published）: 専門家解説の目安
 GUIDE_MIN_FAQ_ANSWER = 100
+GUIDE_ARTICLE_MAX = 50  # テンプレート標準: 試験ガイドは50本以内
 
 
 def reader_facing_text(
@@ -215,6 +216,11 @@ def check_guide_row(
     lead = norm(row.get("lead"))
     if lead and len(lead) < GUIDE_PRO["lead"]:
         warn("lead", f"リードは {GUIDE_PRO['lead']} 文字以上を推奨（現在 {len(lead)} 文字）")
+    if lead and len(lead) > GUIDE_PRO["lead_max"]:
+        warn(
+            "lead",
+            f"リードは {GUIDE_PRO['lead_max']} 文字以内を推奨（現在 {len(lead)} 文字。ビルド時に自動短縮されます）",
+        )
 
     meta = norm(row.get("meta_description"))
     if meta:
