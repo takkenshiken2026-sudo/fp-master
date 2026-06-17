@@ -147,11 +147,17 @@ def main() -> int:
         ([py, "tools/build_article_pages.py"], False),
         ([py, "tools/build_glossary_pages.py"], False),
         ([py, "tools/build_sitemap.py"], True),
-        ([py, "tools/validate_site_integration.py"], False),
     ]
     for cmd, optional in steps:
         if not run(cmd, optional=optional):
             return 1
+
+    # ルート index 等を再同期したうえで fp2 用 canonical / ナビを最終適用
+    sync_shell_files()
+    if not run([py, "tools/apply_site_config.py"]):
+        return 1
+    if not run([py, "tools/validate_site_integration.py"]):
+        return 1
 
     print(f"FP2 site built under {FP2}")
     return 0
