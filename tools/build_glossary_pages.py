@@ -19,13 +19,17 @@ import sys
 from pathlib import Path
 from xml.sax.saxutils import escape as xml_escape
 
-ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # 用語一覧テーブル3列目の見出し（詳細記事の「定義と基本理解」セクションとは別）
 TERMS_INDEX_SNIPPET_LABEL = "概要"
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.site_config import resolve_site_root
+
+ROOT = resolve_site_root()
 
 from tools.html_footer import (
     ROBOTS_INDEX_FOLLOW,
@@ -48,6 +52,7 @@ from tools.seo_utils import (
 from tools.term_diagram import diagram_body_html
 from tools.seo_body_markup import seo_section_body_html  # noqa: E402
 from tools.site_config import (
+    base_path,
     brand_name,
     category_order,
     category_to_field_map,
@@ -275,8 +280,10 @@ def parse_term_tags(raw: str) -> list[str]:
 
 
 def terms_index_href(slug_file: str) -> str:
-    """用語一覧からのリンク（/terms/ 配下）。pathname が /terms のときも壊れないようルート相対にする。"""
-    return f"/terms/{slug_file.lstrip('/')}"
+    """用語一覧からのリンク（/terms/ 配下）。multi-grade では basePath を付与。"""
+    bp = base_path().rstrip("/")
+    prefix = f"{bp}/terms" if bp else "/terms"
+    return f"{prefix}/{slug_file.lstrip('/')}"
 
 
 

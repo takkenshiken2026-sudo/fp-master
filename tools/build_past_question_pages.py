@@ -29,15 +29,18 @@ import sys
 from pathlib import Path
 from xml.sax.saxutils import escape as xml_escape
 
-ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from tools.guide_index_picks_ui import build_guide_index_picks_html
 from tools.q_explanation import build_explanation_html
 from tools.q_content_quality import is_demo_past_question_row
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog
+from tools.site_config import resolve_site_root
+
+ROOT = resolve_site_root()
 from tools.html_footer import (
     ROBOTS_INDEX_FOLLOW,
     breadcrumb_html,

@@ -15,10 +15,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from tools.index_seo_head import (  # noqa: E402
     INDEX_SEO_MARKER_END,
@@ -37,8 +37,10 @@ from tools.site_config import (  # noqa: E402
     ga4_measurement_id,
     load_config,
     public_url,
+    resolve_site_root,
 )
 
+ROOT = resolve_site_root()
 
 @dataclass
 class Issue:
@@ -816,17 +818,17 @@ def main() -> int:
     err = _terms_js(root / "site-terms-index.js")
     if err:
         issues.append(err)
-    err = _build_all_includes_practice(root / "tools" / "build_all.py")
+    err = _build_all_includes_practice(REPO_ROOT / "tools" / "build_all.py")
     if err:
         issues.append(err)
-    err = _build_all_includes_apply(root / "tools" / "build_all.py")
+    err = _build_all_includes_apply(REPO_ROOT / "tools" / "build_all.py")
     if err:
         issues.append(err)
     issues.extend(_mode_index_counts(root))
     issues.extend(_ichimon_js_public_paths(root))
     issues.extend(_site_q_index_js(root / "site-q-index.js"))
     issues.extend(_static_chrome(root))
-    issues.extend(_html_footer_source(root))
+    issues.extend(_html_footer_source(REPO_ROOT))
     issues.extend(_header_learning_nav(root))
     issues.extend(_responsive_css_source(root))
     issues.extend(_viewport_and_static_css(root))

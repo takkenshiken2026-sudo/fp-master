@@ -134,6 +134,8 @@ def main() -> int:
     py = sys.executable
     steps: list[tuple[list[str], bool]] = [
         ([py, "tools/import_fp2_past_questions.py"], False),
+        ([py, "tools/audit_fp2_glossary_catalog.py", "--write-catalog"], False),
+        ([py, "tools/import_fp2_glossary_catalog.py"], False),
         ([py, "tools/validate_csv.py", "--scope", "questions"], False),
         ([py, "tools/generate_brand_assets.py", "--target", str(FP2.resolve())], True),
         ([py, "tools/apply_site_config.py"], False),

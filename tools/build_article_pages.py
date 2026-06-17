@@ -12,9 +12,13 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.site_config import resolve_site_root
+
+ROOT = resolve_site_root()
 
 from tools.html_footer import (  # noqa: E402
     ROBOTS_INDEX_FOLLOW,
@@ -36,6 +40,7 @@ from tools.site_config import (  # noqa: E402
     guide_genre_order_index,
     guide_genre_style_by_label,
     primary_external_link,
+    public_url as site_public_url,
 )
 
 from tools.seo_editorial_chrome import (  # noqa: E402
@@ -65,7 +70,7 @@ def apply_vars(value: str) -> str:
 
 
 def public_url(rel_path: str) -> str:
-    return f"{clean_origin().rstrip('/')}/{rel_path.lstrip('/')}"
+    return site_public_url(rel_path)
 
 
 def rel_prefix(rel_path: Path) -> str:

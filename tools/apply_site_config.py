@@ -10,9 +10,9 @@ import csv
 import html
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from tools.site_config import (
     base_path,
@@ -31,6 +31,7 @@ from tools.site_config import (
     official_organization,
     primary_external_link,
     public_url,
+    resolve_site_root,
     sync_config_files,
     fields,
 )
@@ -52,6 +53,8 @@ from tools.index_spa_patch import (
     inject_index_noscript,
     inject_index_spa_ui_leaks,
 )
+
+ROOT = resolve_site_root()
 
 
 TEXT_TARGETS = [

@@ -10,12 +10,14 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from tools.correct_answer_format import collect_choice_texts, is_valid_correct, parse_correct_js_index
-from tools.site_config import category_to_field_map, extended_correct_answers
+from tools.site_config import category_to_field_map, extended_correct_answers, resolve_site_root
+
+ROOT = resolve_site_root()
 
 DATA_CSV = ROOT / "data" / "past_questions.csv"
 PRACTICE_CSV = ROOT / "data" / "practice_questions.csv"

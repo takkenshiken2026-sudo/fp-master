@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from tools.build_glossary_pages import lookup_key
@@ -81,6 +82,26 @@ GLOSSARY_MIN_RELATED_TERMS = 2
 GLOSSARY_MIN_EXAM_POINT_ITEMS = 2
 GLOSSARY_FAQ_COUNT = 4
 
+# 相続税・基礎控除の人数→金額（万円）。docs/fp2-glossary-calculation-rules.md と同期。
+# 式: 3,000 + 600 × 法定相続人の数
+INHERITANCE_BASIC_DEDUCTION_BY_HEADCOUNT: dict[int, int] = {
+    1: 3600,
+    2: 4200,
+    3: 4800,
+    4: 5400,
+    5: 6000,
+}
+
+_STATUTORY_HEIR_HEADCOUNT = re.compile(
+    r"(?:"
+    r"法定相続人(?:の数(?:は|が))?(\d+)人"
+    r"|(?<=[＝=])(\d+)人"
+    r"|(\d+)人[＝=]\s*[\d,]+\s*万"
+    r"|(\d+)人(?:の場合|なら|です|。|\)|（)"
+    r")",
+    re.I,
+)
+
 # 法令・制度分野で importance A/S のときは根拠列を推奨（警告）
 LAW_CATEGORY_KEYWORDS = ("法令", "制度", "法")
 
@@ -104,6 +125,175 @@ def _is_law_heavy(category: str, importance: str) -> bool:
     return any(k in category for k in LAW_CATEGORY_KEYWORDS)
 
 
+def inheritance_basic_deduction_yen(headcount: int) -> int:
+    """相続税法第15条の基礎控除額（万円）。"""
+    return 3000 + 600 * headcount
+
+
+def _parse_man_yen(value: str) -> int | None:
+    digits = value.replace(",", "").replace("，", "").strip()
+    if not digits.isdigit():
+        return None
+    return int(digits)
+
+
+def _statutory_heir_headcount_from_match(match: re.Match[str]) -> int:
+    for group in match.groups():
+        if group is not None:
+            return int(group)
+    raise ValueError("no headcount group")
+
+
+def _is_family_role_headcount(text: str, match: re.Match[str], headcount: int) -> bool:
+    """配偶者1人・子2人など、法定相続人の総数ではない表記を除外。"""
+    prefix = text[max(0, match.start() - 10) : match.start() + len(str(headcount))]
+    return bool(
+        re.search(
+            rf"(?:配偶者|実子|養子|兄弟|父母|祖父母|子|孫){headcount}\s*$",
+            prefix,
+        )
+    )
+
+
+def inheritance_basic_deduction_calc_issues(text: str) -> list[str]:
+    """600万×人数と基礎控除額の不整合を検出。戻り値は WARN メッセージ。"""
+    if not text:
+        return []
+    if "600万" not in text and "基礎控除" not in text:
+        return []
+    issues: list[str] = []
+
+    # 3,000万＋600万×N＝X万 / 600万×N＝X万
+    amount_pattern = r"(?:3,?000|3000)万(?:円|)"
+    patterns = (
+        re.compile(
+            rf"{amount_pattern}\s*[＋+]\s*600万(?:円|)\s*[×x]\s*(\d+)"
+            r"[^0-9]{{0,24}}[=＝]\s*([\d,]+)\s*万",
+            re.I,
+        ),
+        re.compile(
+            r"600万(?:円|)\s*[×x]\s*(\d+)[^0-9]{0,24}[=＝]\s*([\d,]+)\s*万",
+            re.I,
+        ),
+    )
+    seen: set[tuple[int, int]] = set()
+    for pattern in patterns:
+        for match in pattern.finditer(text):
+            headcount = int(match.group(1))
+            stated = _parse_man_yen(match.group(2))
+            if stated is None:
+                continue
+            key = (headcount, stated)
+            if key in seen:
+                continue
+            seen.add(key)
+            expected = inheritance_basic_deduction_yen(headcount)
+            if stated != expected:
+                issues.append(
+                    f"相続税の基礎控除の算数不一致: {headcount}人なら"
+                    f" {expected:,}万円（3,000万＋600万×{headcount}）ですが、"
+                    f" {stated:,}万円 と記載されています"
+                )
+
+    # 法定相続人の人数表記と基礎控除額（配偶者1人などは除外）
+    for hc_match in _STATUTORY_HEIR_HEADCOUNT.finditer(text):
+        headcount = _statutory_heir_headcount_from_match(hc_match)
+        if _is_family_role_headcount(text, hc_match, headcount):
+            continue
+
+        fragment = hc_match.group(0)
+        inline = re.search(r"(\d+)人[＝=]\s*([\d,]+)\s*万", fragment, re.I)
+        if inline:
+            stated = _parse_man_yen(inline.group(2))
+        else:
+            start = max(0, hc_match.start() - 60)
+            end = min(len(text), hc_match.end() + 100)
+            window = text[start:end]
+            if "基礎控除" not in window:
+                near = re.search(r"([\d,]+)\s*万(?:円|)控除", window, re.I)
+                if not near:
+                    continue
+                stated = _parse_man_yen(near.group(1))
+            else:
+                bi_idx = window.find("基礎控除")
+                tail = window[bi_idx:]
+                stated = None
+                formula = re.search(
+                    rf"{amount_pattern}\s*[＋+]\s*600万[^=＝]{{0,40}}[=＝]\s*([\d,]+)\s*万",
+                    tail,
+                    re.I,
+                )
+                if formula:
+                    stated = _parse_man_yen(formula.group(1))
+                else:
+                    direct = re.search(
+                        r"(?:額|の金額|)(?:は|が|)\s*([\d,]+)\s*万(?!円?\s*[＋+×])",
+                        tail[len("基礎控除") :],
+                        re.I,
+                    )
+                    if direct:
+                        stated = _parse_man_yen(direct.group(1))
+                    else:
+                        near = re.search(r"([\d,]+)\s*万(?:円|)控除", window, re.I)
+                        if near:
+                            stated = _parse_man_yen(near.group(1))
+                if stated is None:
+                    continue
+
+        key = (headcount, stated)
+        if key in seen:
+            continue
+        seen.add(key)
+        expected = inheritance_basic_deduction_yen(headcount)
+        if stated != expected:
+            issues.append(
+                f"相続税の基礎控除の人数と金額が不一致: {headcount}人→"
+                f"{expected:,}万円が正、記載は{stated:,}万円"
+            )
+    return issues
+
+
+def is_glossary_draft_stub(row: dict[str, str]) -> bool:
+    """一覧用 draft 行（詳細記事未執筆）。published または article_title ありは詳細記事扱い。"""
+    status = norm(row.get("content_status")).lower()
+    if status == "published":
+        return False
+    if norm(row.get("article_title")):
+        return False
+    return status in {"", "draft"}
+
+
+def check_glossary_draft_stub(row: dict[str, str]) -> list[GlossaryRowIssue]:
+    """draft 一覧行の最小検証（詳細記事ルールは適用しない）。"""
+    issues: list[GlossaryRowIssue] = []
+    term = norm(row.get("term"))
+    if not term:
+        return issues
+
+    def err(msg: str) -> None:
+        issues.append(GlossaryRowIssue("ERROR", msg))
+
+    def warn(msg: str) -> None:
+        issues.append(GlossaryRowIssue("WARN", msg))
+
+    if not norm(row.get("category")):
+        err("category は必須です")
+    short_def = norm(row.get("short_def"))
+    if not short_def:
+        err("short_def は必須です")
+    elif len(short_def) < GLOSSARY_MIN_LENGTHS["short_def"]:
+        err(
+            f"short_def は {GLOSSARY_MIN_LENGTHS['short_def']} 文字以上にしてください"
+            f"（現在 {len(short_def)} 文字）"
+        )
+    if not split_semicolon(norm(row.get("tags"))):
+        err("tags は1件以上必須です（セミコロン区切り）")
+    importance = norm(row.get("importance"))
+    if importance and importance not in GLOSSARY_IMPORTANCE_VALUES:
+        warn(f"importance は A / B / C / S のいずれかを推奨します: {importance!r}")
+    return issues
+
+
 def check_glossary_row(
     row: dict[str, str],
     *,
@@ -111,6 +301,9 @@ def check_glossary_row(
     line: int | None = None,
 ) -> list[GlossaryRowIssue]:
     """1行分の用語詳細記事ルール。validate_csv と scaffold の双方から利用。"""
+    if is_glossary_draft_stub(row):
+        return check_glossary_draft_stub(row)
+
     issues: list[GlossaryRowIssue] = []
     term = norm(row.get("term"))
     if not term:
@@ -141,7 +334,7 @@ def check_glossary_row(
     if not importance:
         err("importance は必須です（A / B / C / S）")
     elif importance not in GLOSSARY_IMPORTANCE_VALUES:
-        warn(f"importance は A/B/C/S のいずれかを推奨します: {importance!r}")
+        warn(f"importance は A / B / C / S のいずれかを推奨します: {importance!r}")
 
     tags = split_semicolon(norm(row.get("tags")))
     if not tags:
@@ -253,6 +446,30 @@ def check_glossary_row(
     answer = norm(row.get("example_answer"))
     if answer and answer not in {"○", "〇", "×", "✕", "╳"} and len(answer) < 5:
         err("example_answer は ○/× または5文字以上の解説にしてください")
+
+    calc_text = "\n".join(
+        norm(row.get(col))
+        for col in (
+            "short_def",
+            "definition",
+            "explanation",
+            "article_lead",
+            "term_detail_body",
+            "exam_points",
+            "common_mistakes",
+            "memory_tip",
+            "example_question",
+            "example_answer",
+            *(f"faq_{n}_answer" for n in range(1, GLOSSARY_FAQ_COUNT + 1)),
+        )
+    )
+    if "基礎控除" in calc_text or "600万" in calc_text:
+        seen_calc: set[str] = set()
+        for msg in inheritance_basic_deduction_calc_issues(calc_text):
+            if msg in seen_calc:
+                continue
+            seen_calc.add(msg)
+            warn(msg)
 
     _ = line
     return issues

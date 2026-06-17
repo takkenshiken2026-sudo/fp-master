@@ -22,12 +22,15 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from tools.q_explanation import build_explanation_html, build_ichimon_explanation_html  # noqa: E402
+from tools.site_config import resolve_site_root
+
+ROOT = resolve_site_root()
 from tools.q_content_quality import (  # noqa: E402
     build_ichimon_primary_ids,
     ichimon_robots_meta,

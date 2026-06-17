@@ -13,12 +13,15 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-os.environ.setdefault("EXAM_SITE_ROOT", str(ROOT))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+os.environ.setdefault("EXAM_SITE_ROOT", str(REPO_ROOT))
 
 from tools.build_glossary_pages import make_term_lookup
+from tools.site_config import resolve_site_root
+
+ROOT = resolve_site_root()
 from tools.glossary_term_rules import (
     GLOSSARY_BASE_REQUIRED,
     GLOSSARY_PRODUCTION_TARGET,
@@ -117,12 +120,19 @@ class Validator:
         if missing:
             return fieldnames, rows
         if not rows:
-            if path.name in ("comparisons.csv", "numbers.csv", "mistakes.csv"):
-                self.warn(
-                    path,
-                    None,
-                    "データ行がありません（知識ハブは執筆拡充前でも可。目標件数は validate_knowledge_hub の WARN を参照）",
+            if path.name in (
+                "comparisons.csv",
+                "numbers.csv",
+                "mistakes.csv",
+                "practice_questions.csv",
+                "ichimon_questions.csv",
+            ):
+                msg = (
+                    "データ行がありません（知識ハブは執筆拡充前でも可。目標件数は validate_knowledge_hub の WARN を参照）"
+                    if path.name in ("comparisons.csv", "numbers.csv", "mistakes.csv")
+                    else "データ行がありません（未整備の場合は可）"
                 )
+                self.warn(path, None, msg)
             else:
                 self.error(path, None, "データ行がありません")
         return fieldnames, rows
@@ -239,6 +249,9 @@ class Validator:
 
     def validate_practice_questions(self) -> None:
         path = DATA_DIR / "practice_questions.csv"
+        if not path.is_file():
+            self.warn(path, None, "practice_questions.csv がありません（実践演習未整備の場合は可）")
+            return
         required = {
             "question_no",
             "type",
@@ -268,6 +281,9 @@ class Validator:
 
     def validate_ichimon_questions(self) -> None:
         path = DATA_DIR / "ichimon_questions.csv"
+        if not path.is_file():
+            self.warn(path, None, "ichimon_questions.csv がありません（一問一答未整備の場合は可）")
+            return
         required = {"id", "question", "answer", "explanation", "category"}
         _, rows = self.read_csv(path, required)
         seen: set[str] = set()
