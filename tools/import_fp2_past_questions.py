@@ -155,6 +155,13 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.gakka.is_file():
+        if PAST_CSV.is_file():
+            print(
+                f"SKIP: 学科 JSON が見つかりません（{args.gakka}）。"
+                f" 既存の {PAST_CSV} を使用します。",
+                file=sys.stderr,
+            )
+            return 0
         print(f"ERROR: 学科 JSON が見つかりません: {args.gakka}", file=sys.stderr)
         return 1
 
