@@ -6,7 +6,7 @@ FP2級向け学習サイト。デスクトップの学科過去問 JSON から C
 
 | パス | 内容 |
 |------|------|
-| `data/past_questions.csv` | 学科・四答択（ビルドで生成） |
+| `data/past_questions.csv` | 学科・四答択（問1〜60）＋実技（問61〜100） |
 | `data/source/fp2/` | 取り込み元 JSON（リポジトリ正本: `data/source/fp2/`） |
 | `site-config.json` | FP2級設定（`basePath` `/fp2`、6分野・四答択） |
 
@@ -21,13 +21,14 @@ python3 tools/build_fp2_site.py
 
 ```bash
 python3 tools/import_fp2_past_questions.py \
-  --gakka ~/Desktop/FP2級学科過去問データ/merged/fp2_gakka_past_questions_all.json
+  --gakka ~/Desktop/FP2級学科過去問データ/merged/fp2_gakka_past_questions_all.json \
+  --jitsugi ~/Desktop/FP2級実技過去問データ/merged/fp2_jitsugi_past_questions_all.json
 ```
 
 ## 公開範囲（2026-06）
 
 - **学科過去問** … 2025・2026年公表分（各60問・計120問）
-- **実技過去問** … JSON はデスクトップにありますが、正解未収録のため未公開（順次追加予定）
+- **実技過去問** … 2025・2026年公表分（各40問・計80問）。正解未収録の問は問題文のみ掲載
 - **用語・試験ガイド** … 未整備（空の index のみ）
 
 ルートの FP3級サイトは `/`、FP2級は `/fp2/` です。

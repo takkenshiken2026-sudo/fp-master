@@ -163,5 +163,6 @@ def format_past_stem_html(stem: str) -> str:
     op = format_operation_plan_stem(raw)
     if op:
         return op
-    br = "<br>\n"
-    return f"<p>{html.escape(raw).replace(chr(10), br)}</p>"
+    from tools.fp_table_parser import stem_display_to_html
+
+    return stem_display_to_html(raw)

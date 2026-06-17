@@ -22,6 +22,7 @@ from tools.build_glossary_pages import make_term_lookup
 from tools.site_config import resolve_site_root
 
 ROOT = resolve_site_root()
+from tools.past_question_subject import is_pending_past_answer
 from tools.glossary_term_rules import (
     GLOSSARY_BASE_REQUIRED,
     GLOSSARY_PRODUCTION_TARGET,
@@ -172,17 +173,26 @@ class Validator:
         return category
 
     def validate_choices_and_correct(self, path: Path, row: dict[str, str], line: int, *, allow_invalidated: bool) -> None:
+        qtype = self.norm(row.get("type"))
+        pending = is_pending_past_answer(row)
+        if pending and qtype in ("open", "truefalse"):
+            if not self.norm(row.get("explanation")):
+                self.error(path, line, "explanation が空です（正解未収録の記述・○×問題）")
+            return
         choices = [self.norm(row.get(f"choice_{i}")) for i in range(1, 9)]
         max_choice = max([i for i, value in enumerate(choices, start=1) if value] or [4])
-        if not choices[0] or not choices[1]:
-            self.error(path, line, "choice_1 と choice_2 は必須です")
-            return
-        for i in range(1, max_choice):
-            if not choices[i - 1]:
-                self.error(path, line, f"choice_{i} が空です")
+        if qtype not in ("open", "truefalse"):
+            if not choices[0] or not choices[1]:
+                self.error(path, line, "choice_1 と choice_2 は必須です")
+                return
+            for i in range(1, max_choice):
+                if not choices[i - 1]:
+                    self.error(path, line, f"choice_{i} が空です")
         invalidated = allow_invalidated and self.truthy(row.get("is_invalidated"))
         correct = self.norm(row.get("correct"))
         if invalidated and not correct:
+            return
+        if pending and not correct:
             return
         if not correct:
             self.error(path, line, "correct が空です")

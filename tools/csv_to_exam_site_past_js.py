@@ -15,6 +15,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools.correct_answer_format import collect_choice_texts, is_valid_correct, parse_correct_js_index
+from tools.past_question_subject import is_pending_past_answer
 from tools.site_config import category_to_field_map, extended_correct_answers, resolve_site_root
 
 ROOT = resolve_site_root()
@@ -62,6 +63,8 @@ def parse_correct(raw: str, *, max_choice: int) -> int | None:
 def row_to_obj(row: dict, line_no: int) -> dict | None:
     if norm(row.get("is_invalidated", "")).upper() == "TRUE":
         return None
+    if is_pending_past_answer(row):
+        return None
     year = int(row["exam_year"])
     qno = int(row["question_no"])
     cat = norm(row.get("category"))
@@ -69,11 +72,15 @@ def row_to_obj(row: dict, line_no: int) -> dict | None:
     if not field:
         raise ValueError(f"line {line_no}: 未対応の category={cat!r}")
 
+    qtype = norm(row.get("type"))
     opts = collect_choice_texts(row)
-    min_choices = 2 if extended_correct_answers() else 4
+    if qtype in ("open", "truefalse"):
+        min_choices = 0
+    else:
+        min_choices = 2 if extended_correct_answers() else 4
     if len(opts) < min_choices:
         raise ValueError(f"line {line_no}: 選択肢欠け year={year} no={qno}")
-    max_choice = len(opts)
+    max_choice = len(opts) or 4
 
     inv = norm(row.get("is_invalidated", "")).upper() == "TRUE"
     cor_raw = norm(row.get("correct"))

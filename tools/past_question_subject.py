@@ -7,6 +7,8 @@ from __future__ import annotations
 import re
 
 SUBJECT_LABELS = {"gakka": "学科", "jitsugi": "実技"}
+PENDING_ANSWER_TAG = "正解未収録"
+FP2_JITSUGI_QUESTION_START = 61
 
 
 def parse_tags(raw: str | list[str]) -> list[str]:
@@ -38,6 +40,12 @@ def subject_from_tags(tags: list[str]) -> str:
     return ""
 
 
+def is_pending_past_answer(row: dict) -> bool:
+    raw = row.get("tags") or ""
+    tags = parse_tags(raw) if not isinstance(raw, list) else [str(t) for t in raw]
+    return PENDING_ANSWER_TAG in tags or PENDING_ANSWER_TAG in str(raw)
+
+
 def subject_from_row(row: dict, *, qno: int | None = None) -> str:
     raw = row.get("tags") or ""
     tags = parse_tags(raw) if not isinstance(raw, list) else [str(t) for t in raw]
@@ -45,6 +53,8 @@ def subject_from_row(row: dict, *, qno: int | None = None) -> str:
     if subject:
         return subject
     num = qno if qno is not None else int(row.get("question_no") or 0)
+    if num >= FP2_JITSUGI_QUESTION_START:
+        return "jitsugi"
     if num >= 31:
         return "jitsugi"
     if num >= 1:

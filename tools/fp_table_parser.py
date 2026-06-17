@@ -229,6 +229,25 @@ def is_question_stem_text(text: str) -> bool:
     return False
 
 
+def _should_merge_broken_line(prev: str, nxt: str) -> bool:
+    """PDF由来の途中改行のみ結合（表の行区切りは維持）。"""
+    if not prev or not nxt:
+        return False
+    prev = prev.rstrip()
+    if prev.endswith("、") and re.match(r"^[ぁ-んァ-ヶー・一-龠]", nxt):
+        if not re.match(r"^[\(（][0-9０-９]", nxt):
+            return True
+    if re.search(r"[。．！？…」』）\)、：:]$", prev):
+        return False
+    if re.search(r"[円％%ドル万]$", prev) or re.search(r"[0-9０-９]$", prev):
+        return False
+    if nxt.startswith(("＜", "〔", "［", "注", "・", "（", "(")):
+        return False
+    if re.match(r"^[^\n]{0,50}：", nxt):
+        return False
+    return bool(re.match(r"^[ぁ-んァ-ヶー・一-龠〝〟（(]", nxt))
+
+
 def normalize_jp_linebreaks(text: str) -> str:
     """PDF由来の不自然な改行（例: の保\\n険）を結合する。"""
     if not text:
@@ -245,10 +264,9 @@ def normalize_jp_linebreaks(text: str) -> str:
             merged.append(s)
             continue
         prev = merged[-1]
-        if prev and not re.search(r"[。．！？…」』）\)、]$", prev.rstrip()):
-            if re.match(r"^[ぁ-んァ-ヶー・一-龠〝〟（(]", s):
-                merged[-1] = prev.rstrip() + s
-                continue
+        if _should_merge_broken_line(prev, s):
+            merged[-1] = prev.rstrip() + s
+            continue
         merged.append(s)
     return "\n".join(merged)
 

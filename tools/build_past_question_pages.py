@@ -101,10 +101,11 @@ def parse_correct(raw: str, *, max_choice: int = 5) -> int | str | None:
 
 def build_stem_html(row: dict) -> str:
     from tools.q_stem_format import format_past_stem_html
+    from tools.past_question_text import clean_past_field
 
     parts: list[str] = []
     stem = norm(row.get("stem"))
-    preamble = norm(row.get("preamble"))
+    preamble = clean_past_field(norm(row.get("preamble")), "material")
     br = "<br>\n"
     if stem:
         parts.append(format_past_stem_html(stem))
@@ -112,7 +113,7 @@ def build_stem_html(row: dict) -> str:
         parts.append(f"<p>{html.escape(preamble).replace(chr(10), br)}</p>")
     stmts: list[tuple[str, str]] = []
     for lab, key in LABELS:
-        t = norm(row.get(key))
+        t = clean_past_field(norm(row.get(key)), "inline")
         if t:
             stmts.append((lab, t))
     if stmts:
@@ -588,22 +589,32 @@ def split_semicolon(s: str) -> list[str]:
 
 
 def load_rows() -> list[dict]:
-    text = DATA_CSV.read_text(encoding="utf-8-sig")
-    return list(csv.DictReader(text.splitlines()))
+    with DATA_CSV.open(encoding="utf-8-sig", newline="") as f:
+        return list(csv.DictReader(f))
 
 
 def page_dict(row: dict, line_no: int) -> dict:
     year = int(row["exam_year"])
     qno = int(row["question_no"])
     from tools.correct_answer_format import collect_choice_texts
+    from tools.past_question_subject import is_pending_past_answer
 
+    typ = norm(row.get("type")) or "single"
+    pending = is_pending_past_answer(row)
     opts = collect_choice_texts(row)
+    from tools.past_question_text import clean_past_field
+
+    opts = [clean_past_field(o, "inline") for o in collect_choice_texts(row)]
+    opts = [o for o in opts if o]
     from tools.site_config import extended_correct_answers
 
-    min_choices = 2 if extended_correct_answers() else 4
+    if typ in ("open", "truefalse"):
+        min_choices = 0
+    else:
+        min_choices = 2 if extended_correct_answers() else 4
     if len(opts) < min_choices:
         raise ValueError(f"line {line_no}: 選択肢欠け {year}-{qno}")
-    max_choice = len(opts)
+    max_choice = len(opts) or 4
     inv = norm(row.get("is_invalidated", "")).upper() == "TRUE"
     from tools.correct_answer_format import is_valid_correct, parse_correct_page_value
 
@@ -611,14 +622,13 @@ def page_dict(row: dict, line_no: int) -> dict:
     cor = parse_correct_page_value(
         cor_raw, extended=extended_correct_answers(), max_choice=max_choice
     )
-    if cor is None and not inv:
+    if cor is None and not inv and not pending:
         if extended_correct_answers() and is_valid_correct(cor_raw, max_choice=max_choice):
             cor = cor_raw
         else:
             raise ValueError(f"line {line_no}: 正答なし {year}-{qno}")
     wareki = norm(row.get("exam_wareki"))
     cat = norm(row.get("category"))
-    typ = norm(row.get("type")) or "single"
     stem_plain = norm(row.get("stem"))
     exp = norm(row.get("explanation")) or "（解説は未入力です。）"
     return {
@@ -631,6 +641,7 @@ def page_dict(row: dict, line_no: int) -> dict:
         "stem_plain": stem_plain,
         "opts": opts,
         "correct": cor,
+        "pending_answer": pending,
         "is_exempt": norm(row.get("is_exempt", "")).upper() == "TRUE",
         "is_invalidated": inv,
         "note": norm(row.get("note")),
@@ -669,8 +680,23 @@ def build_question_html(
         f'<li class="q-opt"><span class="q-opt-num">（{i}）</span> {html.escape(o)}</li>'
         for i, o in enumerate(page["opts"], start=1)
     )
+    opts_section = ""
+    if page["opts"]:
+        opts_section = (
+            f'  <section class="q-block" aria-labelledby="q-opts-h">\n'
+            f'    <h2 id="q-opts-h" class="q-h2">選択肢</h2>\n'
+            f'    <ol class="q-opts">\n'
+            f'      {opts_html}\n'
+            f'    </ol>\n'
+            f'  </section>\n'
+        )
 
-    if page["is_invalidated"] or page["correct"] is None:
+    if page.get("pending_answer"):
+        ans_block = (
+            "<p>正解・解説は解答資料の公表後に追加予定です。"
+            "現時点では問題文の確認用に掲載しています。</p>"
+        )
+    elif page["is_invalidated"] or page["correct"] is None:
         ans_block = (
             "<p>本問は試験上「出題無効」となった年度があります（"
             + html.escape(page["note"] or "公式の扱いを確認してください")
@@ -682,6 +708,8 @@ def build_question_html(
     badges = []
     if page["is_exempt"]:
         badges.append('<span class="q-badge">試験免除出題</span>')
+    if page.get("pending_answer"):
+        badges.append('<span class="q-badge">正解未収録</span>')
     if page["is_invalidated"]:
         badges.append('<span class="q-badge q-badge-warn">出題無効</span>')
     badge_html = ("<p class=\"q-badges\">" + " ".join(badges) + "</p>") if badges else ""
@@ -770,12 +798,7 @@ def build_question_html(
     <h2 id="q-stem-h" class="q-h2">問題</h2>
     <div class="q-stem">{page["stem_html"]}</div>
   </section>
-  <section class="q-block" aria-labelledby="q-opts-h">
-    <h2 id="q-opts-h" class="q-h2">選択肢</h2>
-    <ol class="q-opts">
-      {opts_html}
-    </ol>
-  </section>
+  {opts_section}
   <section class="q-block q-answer" aria-labelledby="q-ans-h">
     <h2 id="q-ans-h" class="q-h2">正答</h2>
     {ans_block}
