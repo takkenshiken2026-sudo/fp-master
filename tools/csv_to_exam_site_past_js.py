@@ -151,8 +151,8 @@ def practice_row_to_obj(row: dict, line_no: int) -> dict | None:
 def load_practice_questions() -> list[dict]:
     if not PRACTICE_CSV.is_file():
         return []
-    text = PRACTICE_CSV.read_text(encoding="utf-8-sig")
-    rows = list(csv.DictReader(text.splitlines()))
+    with PRACTICE_CSV.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
     out: list[dict] = []
     for i, row in enumerate(rows, start=2):
         o = practice_row_to_obj(row, i)
@@ -184,8 +184,8 @@ def main() -> int:
     if not DATA_CSV.is_file():
         print(f"入力がありません: {DATA_CSV}", file=sys.stderr)
         return 1
-    text = DATA_CSV.read_text(encoding="utf-8-sig")
-    rows = list(csv.DictReader(text.splitlines()))
+    with DATA_CSV.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
     objs: list[dict] = []
     year_labels: dict[int, str] = {}
     for i, row in enumerate(rows, start=2):

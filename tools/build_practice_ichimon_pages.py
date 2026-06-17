@@ -168,13 +168,15 @@ def marubatsu_label(correct_answer: bool) -> str:
 def load_practice_rows() -> list[dict]:
     if not PRACTICE_CSV.is_file():
         return []
-    return list(csv.DictReader(PRACTICE_CSV.read_text(encoding="utf-8-sig").splitlines()))
+    with PRACTICE_CSV.open(encoding="utf-8-sig", newline="") as f:
+        return list(csv.DictReader(f))
 
 
 def load_ichimon_rows() -> list[dict]:
     if not ICHIMON_CSV.is_file():
         return []
-    return list(csv.DictReader(ICHIMON_CSV.read_text(encoding="utf-8-sig").splitlines()))
+    with ICHIMON_CSV.open(encoding="utf-8-sig", newline="") as f:
+        return list(csv.DictReader(f))
 
 
 def practice_page_dict(row: dict, line_no: int) -> dict:
