@@ -137,6 +137,7 @@ def main() -> int:
         ([py, "tools/audit_fp2_glossary_catalog.py", "--write-catalog"], False),
         ([py, "tools/import_fp2_glossary_catalog.py"], False),
         ([py, "tools/validate_csv.py", "--scope", "questions"], False),
+        ([py, "tools/validate_practice_questions.py"], False),
         ([py, "tools/generate_brand_assets.py", "--target", str(FP2.resolve())], True),
         ([py, "tools/apply_site_config.py"], False),
         ([py, "tools/csv_to_exam_site_past_js.py"], False),

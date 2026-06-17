@@ -17,11 +17,21 @@ from tools.build_past_question_pages import parse_correct
 from tools.correct_answer_format import collect_choice_texts
 from tools.csv_to_exam_site_past_js import practice_row_to_obj
 from tools.fp_table_parser import norm
-from tools.site_config import category_to_field_map, extended_correct_answers
+from tools.site_config import category_to_field_map, exam_grade, extended_correct_answers, resolve_site_root
 
-PRACTICE_CSV = ROOT / "data" / "practice_questions.csv"
+SITE_ROOT = resolve_site_root()
+PRACTICE_CSV = SITE_ROOT / "data" / "practice_questions.csv"
 MIN_CHOICE_NOTE_LEN = 72
-REQUIRED_TAGS = ("FP3級", "実践演習")
+
+
+def required_practice_tags() -> tuple[str, ...]:
+    grade = exam_grade()
+    if grade == "FP2":
+        return ("FP2級", "実践演習")
+    if grade == "FP3":
+        return ("FP3級", "実践演習")
+    label = f"{grade}級" if grade else "級"
+    return (label, "実践演習")
 
 
 def load_rows() -> list[dict]:
@@ -64,6 +74,7 @@ def validate() -> list[str]:
     seen_no: set[int] = set()
     seen_stem: dict[str, int] = {}
     min_choices = 2 if extended_correct_answers() else 3
+    required_tags = required_practice_tags()
 
     for i, row in enumerate(rows, start=2):
         if norm(row.get("is_invalidated", "")).upper() == "TRUE":
@@ -85,9 +96,13 @@ def validate() -> list[str]:
             errors.append(f"{line}: 未対応 category={cat!r}")
 
         tags = norm(row.get("tags"))
-        for t in REQUIRED_TAGS:
+        for t in required_tags:
             if t not in tags:
                 errors.append(f"{line}: tags に {t!r} がありません")
+        if "四答択" in tags and min_choices < 4:
+            min_row_choices = 4
+        else:
+            min_row_choices = min_choices
 
         if not norm(row.get("source_ref")):
             errors.append(f"{line}: source_ref が空です")
@@ -101,7 +116,7 @@ def validate() -> list[str]:
             seen_stem[stem] = i
 
         opts = collect_choice_texts(row)
-        if len(opts) < min_choices:
+        if len(opts) < min_row_choices:
             errors.append(f"{line}: 選択肢が不足 no={qno}")
 
         cor = parse_correct(row.get("correct"), max_choice=len(opts))
