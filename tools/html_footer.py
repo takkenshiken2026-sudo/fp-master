@@ -482,6 +482,15 @@ def q_index_filters_details_html(
     )
 
 
+def q_hub_href(target: str) -> str:
+    """過去問・実践・一問一答タブ用の絶対パス（site-config basePath 付き）。"""
+    bp = base_path().rstrip("/")
+    path = target.lstrip("/")
+    if bp:
+        return f"{bp}/{path}"
+    return f"/{path}"
+
+
 def q_hub_links_html(rel_path: Path, *, current: str) -> str:
     """過去問・実践演習・一問一答のモード切替タブ（一覧・個別ページ共通）。"""
     items: list[tuple[str, str, str]] = [
@@ -498,7 +507,7 @@ def q_hub_links_html(rel_path: Path, *, current: str) -> str:
                 f"</li>"
             )
         else:
-            href = "/" + target.lstrip("/")
+            href = q_hub_href(target)
             lis.append(
                 f'<li class="q-hub-tab">'
                 f'<a class="q-hub-tab-label" href="{html.escape(href)}">{html.escape(label)}</a>'

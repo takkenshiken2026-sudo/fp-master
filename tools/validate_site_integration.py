@@ -30,6 +30,7 @@ from tools.index_spa_patch import (  # noqa: E402
     INDEX_NOSCRIPT_MARKER_END,
     INDEX_NOSCRIPT_MARKER_START,
 )
+from tools.html_footer import q_hub_href  # noqa: E402
 from tools.site_config import (  # noqa: E402
     base_path,
     clean_origin,
@@ -118,8 +119,8 @@ def _q_index(q_index: Path) -> list[Issue]:
     if 'aria-current="page">過去問</span>' not in text and "is-current" not in text:
         issues.append(Issue("q/index.html: 過去問タブの current 表示がありません"))
     if (
-        "/q/orig/index.html" not in text
-        and "/q/practice/index.html" not in text
+        q_hub_href("q/orig/index.html") not in text
+        and q_hub_href("q/practice/index.html") not in text
         and 'href="practice/index.html"' not in text
     ):
         issues.append(Issue("q/index.html: 実践演習タブへのリンクがありません"))
@@ -326,8 +327,12 @@ def _mode_index_hub_tabs(mode: str, index_path: Path) -> list[Issue]:
     issues: list[Issue] = []
     if "q-hub-links" not in text:
         issues.append(Issue(f"q/{mode}/index.html: q_hub_links_html（3モードタブ）がありません"))
-    for href in ("/q/index.html", "/q/practice/index.html", "/q/ichimon/index.html"):
-        if href not in text and href.replace("/q/", "") not in text:
+    for href in (
+        q_hub_href("q/index.html"),
+        q_hub_href("q/practice/index.html"),
+        q_hub_href("q/ichimon/index.html"),
+    ):
+        if href not in text and href.replace(f"{base_path()}/", "").lstrip("/") not in text:
             issues.append(Issue(f"q/{mode}/index.html: タブリンク {href} がありません"))
     return issues
 
