@@ -35,11 +35,15 @@ from tools.past_question_subject import (
 )
 from tools.past_question_text import clean_past_field, clean_past_row_fields
 
-DEFAULT_GAKKA = Path.home() / "Desktop/FP2級学科過去問データ/merged/fp2_gakka_past_questions_all.json"
-DEFAULT_JITSUGI = Path.home() / "Desktop/FP2級実技過去問データ/merged/fp2_jitsugi_past_questions_all.json"
+DESKTOP_GAKKA = Path.home() / "Desktop/FP2級学科過去問データ/merged/fp2_gakka_past_questions_all.json"
+DESKTOP_JITSUGI = Path.home() / "Desktop/FP2級実技過去問データ/merged/fp2_jitsugi_past_questions_all.json"
 FP2_DATA = ROOT / "fp2" / "data"
 PAST_CSV = FP2_DATA / "past_questions.csv"
 SOURCE_DIR = ROOT / "data" / "source" / "fp2"
+REPO_GAKKA = SOURCE_DIR / "fp2_gakka_past_questions_all.json"
+REPO_JITSUGI = SOURCE_DIR / "fp2_jitsugi_past_questions_all.json"
+DEFAULT_GAKKA = DESKTOP_GAKKA if DESKTOP_GAKKA.is_file() else REPO_GAKKA
+DEFAULT_JITSUGI = DESKTOP_JITSUGI if DESKTOP_JITSUGI.is_file() else REPO_JITSUGI
 
 PAST_COLUMNS = [
     "exam_year",
@@ -166,6 +170,28 @@ def read_existing_gakka_rows() -> list[dict]:
     return out
 
 
+def read_existing_jitsugi_rows() -> list[dict]:
+    if not PAST_CSV.is_file():
+        return []
+    with PAST_CSV.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    out: list[dict] = []
+    for row in rows:
+        if subject_from_row(row) == "jitsugi":
+            out.append(row)
+        elif int(row.get("question_no") or 0) >= FP2_JITSUGI_QUESTION_START:
+            out.append(row)
+    return out
+
+
+def resolve_import_json(cli_path: Path, repo_path: Path) -> Path:
+    if cli_path.is_file():
+        return cli_path
+    if repo_path.is_file():
+        return repo_path
+    return cli_path
+
+
 def gakka_to_past_row(q: dict) -> dict:
     year = parse_year_from_id(q["id"])
     qno = int(q["questionNo"])
@@ -285,9 +311,12 @@ def main() -> int:
     parser.add_argument("--no-copy-source", action="store_true")
     args = parser.parse_args()
 
+    gakka_path = resolve_import_json(args.gakka, REPO_GAKKA)
+    jitsugi_path = resolve_import_json(args.jitsugi, REPO_JITSUGI)
+
     gakka_rows: list[dict] = []
-    if args.gakka.is_file():
-        gakka_rows = [gakka_to_past_row(q) for q in iter_questions(args.gakka)]
+    if gakka_path.is_file():
+        gakka_rows = [gakka_to_past_row(q) for q in iter_questions(gakka_path)]
     else:
         gakka_rows = read_existing_gakka_rows()
         if not gakka_rows:
@@ -300,13 +329,21 @@ def main() -> int:
         )
 
     jitsugi_rows: list[dict] = []
-    if args.jitsugi.is_file():
-        jitsugi_rows = [jitsugi_to_past_row(q) for q in iter_questions(args.jitsugi)]
+    if jitsugi_path.is_file():
+        jitsugi_rows = [jitsugi_to_past_row(q) for q in iter_questions(jitsugi_path)]
     else:
-        print(
-            f"SKIP: 実技 JSON が見つかりません（{args.jitsugi}）。実技は取り込みません。",
-            file=sys.stderr,
-        )
+        jitsugi_rows = read_existing_jitsugi_rows()
+        if jitsugi_rows:
+            print(
+                f"SKIP: 実技 JSON が見つかりません（{args.jitsugi}）。"
+                f" 既存 CSV から実技 {len(jitsugi_rows)} 行を維持します。",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"SKIP: 実技 JSON が見つかりません（{args.jitsugi}）。実技は取り込みません。",
+                file=sys.stderr,
+            )
 
     past_rows = gakka_rows + jitsugi_rows
     past_rows.sort(key=lambda r: (int(r["exam_year"]), int(r["question_no"])))
@@ -315,10 +352,10 @@ def main() -> int:
 
     if not args.no_copy_source:
         SOURCE_DIR.mkdir(parents=True, exist_ok=True)
-        if args.gakka.is_file():
-            shutil.copy2(args.gakka, SOURCE_DIR / "fp2_gakka_past_questions_all.json")
-        if args.jitsugi.is_file():
-            shutil.copy2(args.jitsugi, SOURCE_DIR / "fp2_jitsugi_past_questions_all.json")
+        if gakka_path.is_file() and gakka_path != REPO_GAKKA:
+            shutil.copy2(gakka_path, REPO_GAKKA)
+        if jitsugi_path.is_file() and jitsugi_path != REPO_JITSUGI:
+            shutil.copy2(jitsugi_path, REPO_JITSUGI)
 
     years = sorted({int(r["exam_year"]) for r in past_rows})
     jitsugi_count = len(jitsugi_rows)
