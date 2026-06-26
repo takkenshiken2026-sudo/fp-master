@@ -156,5 +156,14 @@ window.SITE_CONFIG = {
       ],
       "legacyGlossaryCat": "inheritance"
     }
-  ]
+  ],
+  "coursePromo": {
+    "url": "https://px.a8.net/svt/ejp?a8mat=4B3TF0+DUXI7E+408S+BW0YB&a8ejpredirect=https%3A%2F%2Fonsuku.jp%2Ftraining%2Ffp3",
+    "modeTitle": "オンスク.JP FP3級講座",
+    "modePurpose": "スマホで動画＋演習338問を回したい",
+    "priceLabel": "月額1,078円〜",
+    "tagLabel": "PR",
+    "footnote": "※ オンスク.JP公式サイトへ移動します。料金・受講条件は申込前に各ページでご確認ください。",
+    "lpUrl": "https://onsuku.jp/training/fp3"
+  }
 };

@@ -138,6 +138,15 @@
       "legacyGlossaryCat": "inheritance"
     }
   ],
+  "coursePromo": {
+    "url": "https://onsuku.jp/training/fp2",
+    "lpUrl": "https://onsuku.jp/training/fp2",
+    "modeTitle": "オンスク.JP FP2級講座",
+    "modePurpose": "スマホで動画講座＋演習を回したい",
+    "priceLabel": "月額1,078円〜",
+    "tagLabel": "PR",
+    "footnote": "※ オンスク.JP公式サイトへ移動します。料金・受謓条件は申込前に各ページでご確認ください。"
+  },
   "externalLinks": [
     {
       "label": "日本FP協会（公式）",
