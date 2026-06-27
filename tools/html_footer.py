@@ -20,9 +20,11 @@ from tools.site_config import (
     brand_name,
     contact_url,
     copyright_text,
+    exam_grade,
     exam_name,
     footer_disclaimer,
     ga4_measurement_id,
+    grade_switcher_items,
     learning_nav_label,
     navigation_items,
 )
@@ -258,6 +260,44 @@ def _breadcrumb_ol(rel_path: Path, items: list[tuple[str, str | None]]) -> str:
     </nav>"""
 
 
+def grade_switcher_href(rel_path: Path, site_path: str) -> str:
+    """サイトルート絶対パス（/fp2/ 等）を rel_path からの href に変換。"""
+    site_path = site_path.strip()
+    if site_path.startswith("http://") or site_path.startswith("https://"):
+        return site_path
+    if site_path.startswith("/"):
+        bp = base_path().rstrip("/")
+        if bp and (site_path == bp or site_path.startswith(f"{bp}/")):
+            suffix = site_path[len(bp):].lstrip("/")
+            rel_target = suffix if suffix else "index.html"
+            return html_rel_href(rel_path.as_posix(), rel_target)
+        return site_path
+    return footer_href(rel_path, site_path)
+
+
+def grade_switcher_html(rel_path: Path) -> str:
+    items = grade_switcher_items()
+    if not items:
+        return ""
+    current = exam_grade()
+    parts: list[str] = []
+    for item in items:
+        label = html.escape(item["label"])
+        href = html.escape(grade_switcher_href(rel_path, item["path"]))
+        if item["grade"] == current:
+            parts.append(
+                f'<span class="site-footer-grade is-current" aria-current="true">{label}</span>'
+            )
+        else:
+            parts.append(f'<a class="site-footer-grade" href="{href}">{label}</a>')
+    inner = "\n          ".join(parts)
+    return (
+        f'<nav class="site-footer-grades" aria-label="試験級の切り替え">\n'
+        f"          {inner}\n"
+        f"        </nav>"
+    )
+
+
 def _brand_logo_mark_html() -> str:
     """ヘッダー・フッター共通の2行ロゴマーク（同型 HTML）。"""
     top, bottom = brand_logo_lines()
@@ -365,12 +405,19 @@ def site_shell_footer(
                 f'<a href="{html.escape(href)}"{cur}>{html.escape(label)}</a>'
             )
     links_html = "\n          ".join(links)
+    grades_html = grade_switcher_html(rel_path)
+    grades_block = ""
+    if grades_html:
+        grades_block = (
+            "\n        <span class=\"site-footer-sep\" aria-hidden=\"true\"></span>\n"
+            f"        {grades_html}"
+        )
     footer = f"""<footer class="site-footer" role="contentinfo">
     <div class="site-footer-scroll">
       <div class="site-footer-inner">
         <a class="site-footer-brand" href="{root}" title="{title}">
           {mark}
-        </a>
+        </a>{grades_block}
         <span class="site-footer-sep" aria-hidden="true"></span>
         <nav class="site-footer-legal" aria-label="サイト情報・ポリシー">
           {links_html}

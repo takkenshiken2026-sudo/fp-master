@@ -351,6 +351,38 @@ a.site-page-brand:hover,
   color: var(--text);
   font-weight: 700;
 }
+.site-footer-grades {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.site-footer-grade {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.site-footer-grade:hover {
+  border-color: var(--text2);
+  color: var(--text);
+  background: var(--bg4);
+}
+.site-footer-grade.is-current {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
 .site-footer-copy {
   font-size: 10px;
   color: var(--text3);

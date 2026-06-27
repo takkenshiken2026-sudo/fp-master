@@ -63,11 +63,6 @@ window.SITE_CONFIG = {
     ],
     "footer": [
       {
-        "label": "FP3級",
-        "href": "/",
-        "key": "fp3"
-      },
-      {
         "label": "トップ",
         "href": "index.html",
         "key": "top"

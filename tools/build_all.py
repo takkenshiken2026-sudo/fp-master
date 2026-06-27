@@ -48,6 +48,7 @@ def main() -> int:
     run([py, "tools/validate_internal_links.py"])
     run([py, "tools/validate_public_content.py"])
     run([py, "tools/build_fp2_site.py"])
+    run([py, "tools/apply_site_config.py"])
     run(["bash", "tools/prepare_public_site.sh"])
     return 0
 

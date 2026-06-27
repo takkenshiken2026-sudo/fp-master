@@ -9,6 +9,10 @@
   "examName": "ファイナンシャル・プランナー試験（FP3級）",
   "basePath": "",
   "gradePortalHref": "/",
+  "gradeSwitcher": [
+    { "grade": "FP3", "label": "FP3級", "path": "/" },
+    { "grade": "FP2", "label": "FP2級", "path": "/fp2/" }
+  ],
   "siteOrigin": "https://fp-master.jp",
   "contactUrl": "https://fp-master.jp/contact",
   "ga4MeasurementId": "G-SD8XK5LH5R",

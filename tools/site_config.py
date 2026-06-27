@@ -125,6 +125,22 @@ def grade_portal_href() -> str:
     return str(CONFIG.get("gradePortalHref") or "").strip()
 
 
+def grade_switcher_items() -> list[dict[str, str]]:
+    raw = CONFIG.get("gradeSwitcher")
+    if not isinstance(raw, list):
+        return []
+    out: list[dict[str, str]] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        grade = str(item.get("grade") or "").strip()
+        label = str(item.get("label") or "").strip()
+        path = str(item.get("path") or item.get("href") or "").strip()
+        if grade and label and path:
+            out.append({"grade": grade, "label": label, "path": path})
+    return out
+
+
 def google_site_verification() -> str:
     """Google Search Console の HTML タグ確認用トークン（未設定なら空）。"""
     return str(CONFIG.get("googleSiteVerification") or "").strip()

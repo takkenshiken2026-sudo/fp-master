@@ -1150,6 +1150,10 @@ body.is-solving .site-footer{display:none!important}
 .site-footer-legal{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px 14px;flex:0 0 auto}
 .site-footer-legal a{font-size:11px;color:var(--text3);cursor:pointer;transition:color .15s;text-decoration:none;white-space:nowrap;flex-shrink:0}
 .site-footer-legal a:hover{color:var(--text2)}
+.site-footer-grades{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:6px;flex:0 0 auto}
+.site-footer-grade{font-size:10px;font-weight:600;line-height:1.4;padding:3px 10px;border-radius:999px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background .15s,border-color .15s,color .15s}
+.site-footer-grade:hover{border-color:var(--text2);color:var(--text);background:var(--bg4)}
+.site-footer-grade.is-current{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
 .site-footer-copy{font-size:10px;color:var(--text3);opacity:.92;flex:0 0 auto;white-space:nowrap;line-height:1.2;margin-left:auto}
 .site-footer-copy-brand{font-weight:600;color:var(--text3)}
 .site-footer-copy-sub{display:inline;font-size:inherit;font-weight:500;opacity:.88}
@@ -1986,6 +1990,11 @@ body.is-solving .site-footer{display:none!important}
           <a class="site-footer-brand" href="index.html" title="FP3級マスター（ファイナンシャル・プランナー試験（FP3級）対策）トップへ">
             <div class="topnav-logo-mark" aria-hidden="true"><span class="logo-mark-line">FP3級</span><span class="logo-mark-line logo-mark-line--sub">マスター</span></div>
           </a>
+          <span class="site-footer-sep" aria-hidden="true"></span>
+          <nav class="site-footer-grades" aria-label="試験級の切り替え">
+            <span class="site-footer-grade is-current" aria-current="true">FP3級</span>
+            <a class="site-footer-grade" href="/fp2/">FP2級</a>
+          </nav>
           <span class="site-footer-sep" aria-hidden="true"></span>
           <nav class="site-footer-legal" aria-label="サイト情報・ポリシー">
             <a href="index.html">トップ</a>
