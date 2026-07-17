@@ -38,7 +38,7 @@ from tools.guide_index_picks_ui import build_guide_index_picks_html
 from tools.q_explanation import build_explanation_html
 from tools.q_content_quality import is_demo_past_question_row
 from tools.q_similar_questions import build_similar_questions_html, load_question_catalog
-from tools.site_config import resolve_site_root
+from tools.site_config import resolve_site_root, write_crawler_files
 
 ROOT = resolve_site_root()
 from tools.html_footer import (
@@ -1074,13 +1074,8 @@ def main() -> int:
         pass
 
     # sitemap.xml は tools/build_sitemap.py が生成
-
-    robots = ROOT / "robots.txt"
-    robots.write_text(
-        "User-agent: *\nAllow: /\n\nSitemap: "
-        + f"{base}/sitemap.xml\n",
-        encoding="utf-8",
-    )
+    # robots.txt は site-config 正本（AdSense 時は Google-adstxt Allow を含む）
+    write_crawler_files()
 
     print(f"Wrote {len(pages)} question pages under {past_root}")
     print(f"Wrote {q_index}")

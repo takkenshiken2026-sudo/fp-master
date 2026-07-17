@@ -31,7 +31,6 @@ def main() -> int:
     run([py, "tools/validate_csv.py"])
     run([py, "tools/validate_question_explanations.py"])
     run([py, "tools/generate_brand_assets.py"])
-    run([py, "tools/write_ads_txt.py"])
     run([py, "tools/apply_site_config.py"])
     run([py, "tools/csv_to_exam_site_past_js.py"])
     run([py, "tools/csv_to_exam_site_ichimondou_js.py"])
@@ -42,6 +41,8 @@ def main() -> int:
     run([py, "tools/build_glossary_pages.py"])
     run([py, "tools/build_hub_retire_redirects.py"])
     run([py, "tools/build_sitemap.py"])
+    # AdSense: 生成物で上書きされた robots/ads.txt を最終確定
+    run([py, "tools/write_ads_txt.py"])
     run([py, "tools/validate_sitemap.py"])
     run([py, "tools/validate_generated_seo.py"])
     run([py, "tools/validate_site_integration.py"])
@@ -50,6 +51,7 @@ def main() -> int:
     run([py, "tools/validate_public_content.py"])
     run([py, "tools/build_fp2_site.py"])
     run([py, "tools/apply_site_config.py"])
+    run([py, "tools/write_ads_txt.py"])
     run(["bash", "tools/prepare_public_site.sh"])
     return 0
 
