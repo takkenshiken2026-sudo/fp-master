@@ -723,8 +723,19 @@ def _adsense_head(root: Path) -> list[Issue]:
     else:
         pub = client.replace("ca-pub-", "pub-", 1) if client.startswith("ca-pub-") else client
         body = ads_txt.read_text(encoding="utf-8", errors="replace")
-        if pub not in body:
-            issues.append(Issue(f"ads.txt: publisher ID（{pub}）が含まれていません"))
+        expected_line = f"google.com, {pub}, DIRECT, f08c47fec0942fa0"
+        if expected_line not in body:
+            issues.append(
+                Issue(f"ads.txt: 必須行がありません（期待: {expected_line}）")
+            )
+        # 改行コードが CRLF だと一部クローラで解釈が揺れるため LF を要求
+        if "\r" in body:
+            issues.append(Issue("ads.txt: CRLF が含まれています（LF のみにしてください）"))
+    robots = root / "robots.txt"
+    if robots.is_file():
+        robots_text = robots.read_text(encoding="utf-8", errors="replace")
+        if "Google-adstxt" not in robots_text:
+            issues.append(Issue("robots.txt: Google-adstxt クローラの Allow がありません"))
     return issues
 
 

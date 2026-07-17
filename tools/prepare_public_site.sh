@@ -38,8 +38,25 @@ do
   fi
   cp "$f" "$OUT/"
 done
-# AdSense 用 ads.txt（未配置サイトはスキップ）
-if [[ -f "$ROOT/ads.txt" ]]; then
+# AdSense: adsenseClientId があるサイトは ads.txt を必須（ドメインルートで 200 配信）
+ADSENSE_CLIENT="$(python3 - <<'PY'
+import json
+from pathlib import Path
+cfg = json.loads(Path("site-config.json").read_text(encoding="utf-8"))
+print(str(cfg.get("adsenseClientId") or "").strip())
+PY
+)"
+if [[ -n "$ADSENSE_CLIENT" ]]; then
+  if [[ ! -f "$ROOT/ads.txt" ]]; then
+    echo "prepare_public_site.sh: adsenseClientId 設定時は ads.txt が必須です（tools/write_ads_txt.py を実行）。" >&2
+    exit 1
+  fi
+  cp "$ROOT/ads.txt" "$OUT/"
+  if [[ ! -f "$OUT/ads.txt" ]]; then
+    echo "prepare_public_site.sh: public_site/ads.txt の配置に失敗しました。" >&2
+    exit 1
+  fi
+elif [[ -f "$ROOT/ads.txt" ]]; then
   cp "$ROOT/ads.txt" "$OUT/"
 fi
 for d in articles q terms; do
