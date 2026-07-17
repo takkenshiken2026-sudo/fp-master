@@ -150,6 +150,11 @@ def ga4_measurement_id() -> str:
     return str(CONFIG.get("ga4MeasurementId") or "").strip()
 
 
+def adsense_client_id() -> str:
+    """Google AdSense の publisher client ID（例: ca-pub-…）。未設定なら空。"""
+    return str(CONFIG.get("adsenseClientId") or "").strip()
+
+
 def copyright_text() -> str:
     configured = str(CONFIG.get("copyright") or "").strip()
     if configured:
