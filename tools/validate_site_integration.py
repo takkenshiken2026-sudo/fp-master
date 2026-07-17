@@ -713,8 +713,12 @@ def _adsense_head(root: Path) -> list[Issue]:
         issues.append(Issue(f"index.html: <head> に AdSense スクリプト（{client}）がありません"))
     if ADSENSE_MARKER not in head:
         issues.append(Issue("index.html: AdSense マーカー <!--ADSENSE_HEAD--> がありません"))
-    ads_txt = root / "ads.txt"
-    if not ads_txt.is_file():
+    # ads.txt はドメインルート専用。basePath 付きビルド（例: /fp2）は親ディレクトリも見る。
+    ads_candidates = [root / "ads.txt"]
+    if base_path():
+        ads_candidates.append(root.parent / "ads.txt")
+    ads_txt = next((p for p in ads_candidates if p.is_file()), None)
+    if ads_txt is None:
         issues.append(Issue("ads.txt: AdSense 用 ads.txt がありません"))
     else:
         pub = client.replace("ca-pub-", "pub-", 1) if client.startswith("ca-pub-") else client
