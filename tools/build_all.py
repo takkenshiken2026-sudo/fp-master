@@ -31,6 +31,7 @@ def main() -> int:
     run([py, "tools/validate_csv.py"])
     run([py, "tools/validate_question_explanations.py"])
     run([py, "tools/generate_brand_assets.py"])
+    run([py, "tools/write_ads_txt.py"])
     run([py, "tools/apply_site_config.py"])
     run([py, "tools/csv_to_exam_site_past_js.py"])
     run([py, "tools/csv_to_exam_site_ichimondou_js.py"])
