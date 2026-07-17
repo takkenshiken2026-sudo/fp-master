@@ -585,12 +585,13 @@ def write_crawler_files() -> None:
     origin = clean_origin()
     host = origin.replace("https://", "").replace("http://", "").strip("/")
     (ROOT / "CNAME").write_text(host + "\n", encoding="utf-8")
-    (ROOT / "robots.txt").write_text(
-        "User-agent: *\n"
-        "Allow: /\n\n"
-        f"Sitemap: {origin}/sitemap.xml\n",
-        encoding="utf-8",
-    )
+    robots_parts: list[str] = []
+    if adsense_client_id():
+        # AdSense ads.txt クローラ向け（ステータス「不明」回避）
+        robots_parts.append("User-agent: Google-adstxt\nAllow: /ads.txt\n")
+    robots_parts.append("User-agent: *\nAllow: /\n")
+    robots_parts.append(f"Sitemap: {origin}/sitemap.xml\n")
+    (ROOT / "robots.txt").write_text("\n".join(robots_parts), encoding="utf-8")
 
 
 def sync_config_files() -> None:
