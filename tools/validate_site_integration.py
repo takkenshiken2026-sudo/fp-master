@@ -30,8 +30,9 @@ from tools.index_spa_patch import (  # noqa: E402
     INDEX_NOSCRIPT_MARKER_END,
     INDEX_NOSCRIPT_MARKER_START,
 )
-from tools.html_footer import q_hub_href  # noqa: E402
+from tools.html_footer import ADSENSE_MARKER, q_hub_href  # noqa: E402
 from tools.site_config import (  # noqa: E402
+    adsense_client_id,
     base_path,
     clean_origin,
     exam_name,
@@ -695,6 +696,34 @@ def _ga4_page_issues(root: Path, rel: str, *, require_page_view: bool = False) -
     return issues
 
 
+def _adsense_head(root: Path) -> list[Issue]:
+    """site-config の adsenseClientId があるとき head / ads.txt を検証。"""
+    client = adsense_client_id()
+    if not client:
+        return []
+    issues: list[Issue] = []
+    index = root / "index.html"
+    if not index.is_file():
+        issues.append(Issue("index.html: AdSense 検証用のファイルがありません"))
+        return issues
+    text = index.read_text(encoding="utf-8", errors="replace")
+    head = text.split("</head>", 1)[0] if "</head>" in text else text
+    needle = f"pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={client}"
+    if needle not in head:
+        issues.append(Issue(f"index.html: <head> に AdSense スクリプト（{client}）がありません"))
+    if ADSENSE_MARKER not in head:
+        issues.append(Issue("index.html: AdSense マーカー <!--ADSENSE_HEAD--> がありません"))
+    ads_txt = root / "ads.txt"
+    if not ads_txt.is_file():
+        issues.append(Issue("ads.txt: AdSense 用 ads.txt がありません"))
+    else:
+        pub = client.replace("ca-pub-", "pub-", 1) if client.startswith("ca-pub-") else client
+        body = ads_txt.read_text(encoding="utf-8", errors="replace")
+        if pub not in body:
+            issues.append(Issue(f"ads.txt: publisher ID（{pub}）が含まれていません"))
+    return issues
+
+
 def _ga4_tracking(root: Path) -> list[Issue]:
     """docs/integration-checklist — GA4 測定IDとスニペットの横断検証。"""
     issues: list[Issue] = []
@@ -838,6 +867,7 @@ def main() -> int:
     issues.extend(_responsive_css_source(root))
     issues.extend(_viewport_and_static_css(root))
     issues.extend(_ga4_tracking(root))
+    issues.extend(_adsense_head(root))
     issues.extend(_static_page_site_leaks(root))
     issues.extend(_guide_index_picks(root))
 
