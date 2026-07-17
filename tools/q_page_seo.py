@@ -143,16 +143,21 @@ def index_h1(mode: str) -> str:
 
 
 def index_page_title(mode: str) -> str:
-    """一覧ページの <title>（試験名・モード・模試キーワード・ブランド）。"""
+    """一覧ページの <title>。検索需要の高いキーワード（例: FP3級 過去問）を先頭に置く。"""
     c = seo_copy()
     label = MODE_LABEL[mode]
+    # ブランド名から短い級名（例: FP3級マスター→FP3級）を取り出し、キーワードを前方配置。
+    short = brand_name().replace("マスター", "").strip() or exam_name()
     if mode == "past":
+        head = f"{short} {label}一覧（無料）"
         sub = f"{c['mockExam']}対策"
     elif mode == "practice":
+        head = f"{short} {label}一覧"
         sub = f"{c['mockExam']}前の演習"
     else:
+        head = f"{short} {label}一覧"
         sub = f"{c['mockExam']}前の確認"
-    return f"{exam_name()} {label}一覧｜{sub}｜{brand_name()}"
+    return f"{head}｜{sub}｜{brand_name()}"
 
 
 def past_year_display(year: int, wareki: str = "") -> str:
