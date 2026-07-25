@@ -4,6 +4,10 @@ public_site/
 visual-smoke/
 tmp/
 
+# Python バイトコードキャッシュ（ビルドスクリプト実行時に生成）
+__pycache__/
+*.pyc
+
 # 一括運用の生成レポート（コミットしない）
 *_report.txt
 hub_deploy_report.txt
