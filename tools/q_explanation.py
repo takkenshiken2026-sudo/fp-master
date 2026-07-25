@@ -609,20 +609,18 @@ def infer_wrong_choice_note(
             "最も不適切な一つだけを選びます。"
         )
     elif mode == "most_correct":
-        if not multi_pick and correct and correct_text:
-            parts.append(
-                f"本問で選ぶべき正答は（{correct}）「{_snippet(correct_text, 56)}」です。"
-                "この肢の記述は、その論点とは一致しません。"
-            )
+        # 正答の再掲（リード文と重複する定型）は避け、根拠となる本文を優先する。
         abs_hint = _wrong_choice_absolute_hint(opt)
         if abs_hint:
             parts.append(abs_hint)
         hint = _wrong_choice_correct_hint(correct_body)
         if hint and hint not in "".join(parts):
             hint_core = hint.rstrip("。．.!！?？")
+            parts.append(f"正答の根拠は「{_snippet(hint_core, 72)}」です。")
+        elif not multi_pick and correct and correct_text:
+            # 根拠本文が取れないときのみ、正答を一度だけ明示する。
             parts.append(
-                f"正答の根拠は「{_snippet(hint_core, 60)}」です。"
-                "誤答肢との差分を一行メモに残してください。"
+                f"本問で選ぶべき正答は（{correct}）「{_snippet(correct_text, 56)}」です。"
             )
     else:
         parts.append(
