@@ -65,6 +65,7 @@ TEXT_TARGETS = [
     ROOT / "index.html",
     ROOT / "about.html",
     ROOT / "privacy.html",
+    ROOT / "contact.html",
     ROOT / "related-sites.html",
     ROOT / "articles" / "index.html",
     ROOT / "site-analytics.js",
@@ -73,6 +74,7 @@ TEXT_TARGETS = [
 STATIC_PAGE_CURRENTS = {
     ROOT / "about.html": "about",
     ROOT / "privacy.html": "privacy",
+    ROOT / "contact.html": "contact",
     ROOT / "related-sites.html": "related",
     ROOT / "articles" / "index.html": "articles",
 }
@@ -80,6 +82,7 @@ STATIC_PAGE_CURRENTS = {
 STATIC_PAGE_CANONICAL = {
     ROOT / "about.html": "about.html",
     ROOT / "privacy.html": "privacy.html",
+    ROOT / "contact.html": "contact",
     ROOT / "related-sites.html": "related-sites.html",
 }
 

@@ -10,6 +10,7 @@ for f in \
   index.html \
   about.html \
   privacy.html \
+  contact.html \
   related-sites.html \
   site-config.json \
   site-config.js \

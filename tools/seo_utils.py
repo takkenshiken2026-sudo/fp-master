@@ -62,6 +62,9 @@ def sitemap_loc_rel(rel: str) -> str:
     m = _ARTICLE_DETAIL_INDEX.match(normalized)
     if m:
         return f"articles/{m.group(1)}/"
+    # contact ページは canonical（拡張子なし /contact）に合わせる。
+    if normalized == "contact.html":
+        return "contact"
     return normalized
 
 
@@ -70,6 +73,8 @@ def html_path_for_sitemap_loc(loc_path: str) -> Path:
     normalized = loc_path.replace("\\", "/").lstrip("/")
     if normalized.endswith("/"):
         return Path(normalized) / "index.html"
+    if normalized == "contact":
+        return Path("contact.html")
     return Path(normalized)
 
 
