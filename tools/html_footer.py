@@ -197,6 +197,7 @@ def ga4_head_snippet() -> str:
 ADSENSE_MARKER = "<!--ADSENSE_HEAD-->"
 _ADSENSE_BLOCK_RE = re.compile(
     rf"(?:{re.escape(ADSENSE_MARKER)}\s*)?"
+    r'(?:<meta\s+name="google-adsense-account"\s+content="[^"]*"\s*/?>\s*)?'
     r'<script\s+async\s+src="https://pagead2\.googlesyndication\.com/pagead/js/adsbygoogle\.js\?client=[^"]+"'
     r'(?:\s+crossorigin="anonymous")?\s*>\s*</script>\s*',
     re.I,
@@ -204,13 +205,14 @@ _ADSENSE_BLOCK_RE = re.compile(
 
 
 def adsense_head_snippet() -> str:
-    """生成 HTML の <head> 内用 AdSense 自動広告スクリプト。未設定なら空文字。"""
+    """生成 HTML の <head> 内用 AdSense 設置コード（所有確認メタタグ + 自動広告スクリプト）。未設定なら空文字。"""
     client = adsense_client_id()
     if not client:
         return ""
     client_esc = html.escape(client, quote=True)
     return (
         f"{ADSENSE_MARKER}\n"
+        f'<meta name="google-adsense-account" content="{client_esc}">\n'
         f'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={client_esc}"\n'
         f'     crossorigin="anonymous"></script>'
     )
